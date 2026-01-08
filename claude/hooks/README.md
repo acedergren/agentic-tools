@@ -1,53 +1,116 @@
 # Claude Code Hooks
 
-*Coming soon* - Automation hooks for Claude Code sessions
+Automation hooks that execute in response to Claude Code events, enabling customization of AI-assisted development workflows.
 
-## 🎯 What Are Hooks?
+## 📦 What's Included
 
-Claude Code hooks are automation scripts that run at specific points during your Claude sessions:
+### 🎯 Hook Types
+- **Tool Hooks** - Execute before/after tool calls (Bash, Edit, Write, etc.)
+- **Session Hooks** - Execute at session start/end
+- **User Prompt Hooks** - Execute when user submits a message
 
-- **PreToolUse**: Before Claude executes a tool
-- **PostToolUse**: After successful tool execution
-- **PostToolUseFailure**: After a tool fails
-- **UserPromptSubmit**: When you submit a message
-- **SessionStart**: When a Claude session begins
-- **SessionEnd**: When a session ends
+### 📝 Example Hooks
+Pre-configured hooks for common scenarios:
 
-## 📋 Planned Hook Templates
+- **[commit-preflight.sh](examples/commit-preflight.sh)** - Pre-commit validation checks
+- **[security-scan.sh](examples/security-scan.sh)** - Security scanning before Bash commands
+- **[cost-tracker.sh](examples/cost-tracker.sh)** - Track API usage and costs
+- **[session-summary.sh](examples/session-summary.sh)** - Summarize work done in session
+- **[file-backup.sh](examples/file-backup.sh)** - Backup files before edits
 
-### Security & Compliance
-- Pre-commit security checks
-- Secret detection
-- License compliance validation
-- Code quality gates
+### 🔧 Configuration
+- **[hookify-rules.md](hookify-rules.md)** - Using the /hookify command
+- **[hook-templates/](hook-templates/)** - Starter templates
 
-### Git Workflows
-- Conventional commit validation
-- Branch naming enforcement
-- PR template validation
-- Commit message formatting
+---
 
-### Testing & Quality
-- Auto-run tests before commits
-- Coverage thresholds
-- Linting enforcement
-- Build validation
+## 🚀 Quick Start
 
-### Deployment & CI/CD
-- Pre-deploy checks
-- Environment validation
-- Rollback automation
-- Status notifications
+### Enable Hooks
 
-## 🚀 Coming Soon
+Hooks are configured in your Claude Code settings:
 
-This section will include:
-- Hook template library
-- Installation scripts
-- Configuration examples
-- Best practices guide
+```json
+// ~/.config/claude/config.json or .claude/settings.local.json
+{
+  "hooks": {
+    "user-prompt-submit": {
+      "command": ".claude/hooks/examples/cost-tracker.sh",
+      "blocking": false
+    },
+    "bash-pre": {
+      "command": ".claude/hooks/examples/security-scan.sh",
+      "blocking": true
+    },
+    "session-start": {
+      "command": ".claude/hooks/examples/session-summary.sh start",
+      "blocking": false
+    }
+  }
+}
+```
 
-## 📚 Resources
+### Hook Lifecycle
 
-- [Claude Code Hooks Documentation](https://docs.anthropic.com/claude-code/hooks)
-- Main README: `../../README.md`
+```
+User Action
+    ↓
+Pre-Hook (blocking)    → Can prevent action if exits non-zero
+    ↓
+Claude Action (Bash, Edit, Write, etc.)
+    ↓
+Post-Hook (non-blocking) → Always runs, cannot prevent action
+```
+
+---
+
+## 📖 Available Hook Types
+
+### Tool Hooks
+
+Execute before/after specific tool calls:
+
+| Hook | When It Runs | Use Case |
+|------|--------------|----------|
+| `bash-pre` | Before Bash execution | Security scanning, validation |
+| `bash-post` | After Bash execution | Logging, metrics |
+| `edit-pre` | Before Edit tool | Backup, validation |
+| `edit-post` | After Edit tool | Testing, formatting |
+| `write-pre` | Before Write tool | Template validation |
+| `write-post` | After Write tool | Auto-formatting, linting |
+| `read-pre` | Before Read tool | Access control |
+| `read-post` | After Read tool | Audit logging |
+
+### Session Hooks
+
+Execute at session boundaries:
+
+| Hook | When It Runs | Use Case |
+|------|--------------|----------|
+| `session-start` | Session begins | Environment setup, context loading |
+| `session-end` | Session ends | Cleanup, summary generation |
+| `session-compact` | Before context compaction | Save important context |
+
+### User Prompt Hooks
+
+Execute when user submits messages:
+
+| Hook | When It Runs | Use Case |
+|------|--------------|----------|
+| `user-prompt-submit` | User sends message | Cost tracking, logging |
+| `user-prompt-receive` | Before Claude processes | Message preprocessing |
+
+---
+
+## 🔗 See Also
+
+- [hookify-rules.md](hookify-rules.md) - Using /hookify command
+- [examples/](examples/) - Pre-built hook examples
+- [hook-templates/](hook-templates/) - Starter templates
+- [../settings/](../settings/) - Claude Code permissions
+- [../../git-workflow/](../../git-workflow/) - Git workflow templates
+
+---
+
+**Last Updated**: January 2026
+**Claude Code Version**: 1.x+
