@@ -1,0 +1,16 @@
+feat(scope): brief description in imperative mood
+
+# Why: Explain the motivation for this feature
+# - What problem does it solve?
+# - What value does it provide?
+
+# How: Describe the implementation approach (optional)
+# - Key technical decisions
+# - Any trade-offs made
+
+# Testing: How was this tested? (optional)
+# - Unit tests added
+# - Integration tests
+# - Manual testing performed
+
+# Closes #issue-number (if applicable)

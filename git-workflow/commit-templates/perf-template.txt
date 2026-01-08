@@ -1,0 +1,26 @@
+perf(scope): brief description of performance improvement
+
+# Problem: What was slow?
+# - Operation: [description]
+# - Before: [time/metric]
+# - After: [time/metric]
+# - Improvement: [percentage]
+
+# Solution: How was it optimized?
+# - Algorithm change
+# - Caching added
+# - Index added to database
+# - Query optimization
+# - Lazy loading
+
+# Benchmark: How was this measured?
+# - Tool used: [e.g., hyperfine, Chrome DevTools]
+# - Test conditions: [environment, data size]
+# - Results: [detailed numbers]
+
+# Trade-offs: Any downsides? (optional)
+# - Increased memory usage
+# - More complex code
+# - Additional dependencies
+
+# Related to #issue-number

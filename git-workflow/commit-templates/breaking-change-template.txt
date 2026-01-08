@@ -1,0 +1,27 @@
+feat(scope)!: brief description of the change
+
+# Why: Explain why this breaking change is necessary
+# - What problem does it solve?
+# - Why couldn't it be backward compatible?
+
+BREAKING CHANGE: Clear description of what breaks
+
+# Before: How it worked previously
+# Example:
+# API returned: { "user": {...} }
+
+# After: How it works now
+# Example:
+# API now returns: { "data": { "user": {...} }, "meta": {...} }
+
+# Migration Guide: How should users adapt?
+# Step-by-step instructions for updating code:
+# 1. Update all API calls to expect new format
+# 2. Handle new error responses
+# 3. Update type definitions
+
+# Impact: Who is affected?
+# - All API clients
+# - Specific features: [list]
+
+# Closes #issue-number

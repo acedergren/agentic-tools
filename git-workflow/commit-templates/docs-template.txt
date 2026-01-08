@@ -1,0 +1,21 @@
+docs(scope): brief description of documentation changes
+
+# What: Describe what documentation was added/updated
+# - New guide
+# - Updated API docs
+# - Fixed typos
+# - Added examples
+
+# Scope: What area does this cover?
+# - README
+# - API documentation
+# - Code comments
+# - Architecture docs
+# - User guide
+
+# Content: Key changes made
+# - Added section on X
+# - Updated examples for Y
+# - Clarified explanation of Z
+
+# Related to #issue-number (if applicable)

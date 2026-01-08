@@ -1,0 +1,21 @@
+refactor(scope): brief description of refactoring
+
+# What: Describe what code was refactored
+# - Which components/modules?
+# - What structure changed?
+
+# Why: Motivation for refactoring
+# - Improve code quality
+# - Better separation of concerns
+# - Prepare for future features
+# - Simplify logic
+
+# Changes: Technical details
+# - Extracted X into separate module
+# - Renamed Y for clarity
+# - Reorganized Z structure
+
+# Impact: Confirm no functional changes
+# ✓ All tests passing
+# ✓ No behavior changes
+# ✓ No API changes

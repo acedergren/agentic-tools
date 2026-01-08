@@ -1,0 +1,22 @@
+chore(scope): brief description
+
+# Scope examples: deps, build, ci, config
+
+# For Dependency Updates:
+# - Package: [name]
+# - Version: [old] → [new]
+# - Breaking changes: Yes/No
+# - Migration needed: Yes/No
+
+# For Build/Config Changes:
+# - What was changed?
+# - Why was it necessary?
+
+# For CI Updates:
+# - Workflow changed: [name]
+# - Purpose: [description]
+
+# Testing: How was this verified?
+# ✓ Build passes
+# ✓ Tests pass
+# ✓ CI/CD pipeline works

@@ -1,0 +1,15 @@
+fix(scope): brief description of what was fixed
+
+# What: Describe the bug that was fixed
+# - What was the incorrect behavior?
+# - What conditions triggered it?
+
+# Root Cause: Why did the bug occur? (optional but helpful)
+
+# Solution: How was it fixed?
+# - What changes were made?
+# - Why this approach?
+
+# Testing: How was the fix verified?
+
+# Fixes #issue-number
