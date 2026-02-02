@@ -5,6 +5,12 @@
 *.swo
 *~
 
+# Agent-specific
+.claude/session-logs/
+.claude/.sessions/
+.cursor/cache/
+.cursor/logs/
+
 # OS
 .DS_Store
 Thumbs.db
