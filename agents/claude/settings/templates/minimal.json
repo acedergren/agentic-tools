@@ -1,0 +1,49 @@
+{
+  "permissions": {
+    "allow": [
+      "# ============================================",
+      "# Minimal Security Template",
+      "# ============================================",
+      "#",
+      "# Best for: Auditing, learning, restricted environments",
+      "# Includes: Basic git, essential Unix commands only",
+      "# Network: Documentation sites only",
+      "#",
+
+      "# ============================================",
+      "# Version Control (Read-Only)",
+      "# ============================================",
+      "Bash(git status:*)",
+      "Bash(git log:*)",
+      "Bash(git diff:*)",
+      "Bash(git show:*)",
+      "Bash(git branch:*)",
+
+      "# ============================================",
+      "# File Inspection",
+      "# ============================================",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(grep:*)",
+      "Bash(find:*)",
+      "Bash(tree:*)",
+      "Bash(wc:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+
+      "# ============================================",
+      "# System Information",
+      "# ============================================",
+      "Bash(pwd:*)",
+      "Bash(whoami:*)",
+      "Bash(hostname:*)",
+      "Bash(uname:*)",
+
+      "# ============================================",
+      "# Web Fetching (Documentation Only)",
+      "# ============================================",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:developer.mozilla.org)"
+    ]
+  }
+}
