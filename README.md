@@ -1,224 +1,189 @@
 # Solutions Edge - Agentic Tools
 
-Comprehensive toolkit for AI-assisted development with Claude Code, including optimized permissions, Git workflows, and automation hooks.
+**Agent-Agnostic** toolkit for AI-assisted development with support for Claude Code, GitHub Copilot, Cursor, Windsurf, and more. Includes code review tooling, Git workflows, automation hooks, and agent-specific configurations.
 
 ## 📦 What's Included
 
-### 🔐 Claude Code Permissions (`claude/settings/`)
-- **User-Level Config** - Global permissions (400+ commands) for all projects
-- **Project-Level Config** - Project-specific permissions example
-- Covers Node.js, Python, iOS, Android, Go, Rust, C/C++, Ruby, PHP, Perl, and more
-- Full DevOps stack: Docker, Kubernetes, Terraform, Ansible
-- All cloud platforms: AWS, GCP, Azure, OCI, Cloudflare
+### 🤖 Multi-Agent Support (`agents/`)
+Configurations for multiple AI coding assistants:
+- **[Claude Code](agents/claude/)** - Permissions (400+ commands), hooks, MCP servers
+- **[GitHub Copilot](agents/copilot/)** - VS Code integration, GitHub workflows
+- **[Cursor](agents/cursor/)** - .cursorrules, IDE features, Composer mode
+- **[Windsurf](agents/windsurf/)** - Context files, Cascade mode for multi-file operations
+
+### 📋 Code Review Tooling (`review-tooling/`)
+**Agent-agnostic** code review resources:
+- **[Code Review Checklist](review-tooling/code-review-checklist.md)** - Comprehensive quality, security, and testing checklist
+- **[PR Review Guidelines](review-tooling/pr-review-guidelines.md)** - Step-by-step review process with AI prompts
+- **Multi-Agent Workflows** - Examples for all supported agents
 
 ### 🔄 Git Workflows (`git-workflow/`)
+**Agent-agnostic** Git workflow templates:
 - **Workflow Guides** - Trunk-Based, GitHub Flow, GitFlow strategies
 - **Commit Templates** - 8 templates for Conventional Commits
 - **PR Templates** - 6 templates for different change types
 - **Branch Naming** - Conventions and enforcement strategies
 
-### 🪝 Claude Hooks (`claude/hooks/`)
-- **5 Example Hooks** - Security, pre-commit, cost tracking, session logging, backups
-- **4 Hook Templates** - Starter templates for custom hooks
-- **Hookify Guide** - Using /hookify command to create hooks from conversations
-- **Full Documentation** - Configuration, testing, best practices
-
 ---
 
-## 🚀 Quick Start - Claude Permissions
+## 🚀 Quick Start
 
-### User-Level Setup (Recommended)
+### Choose Your AI Assistant
 
-Global permissions that apply to **all** Claude Code projects:
+Select your preferred AI coding assistant for setup instructions:
+
+#### [Claude Code →](agents/claude/README.md)
+- **Best for:** Advanced automation, custom workflows, strict security
+- **Features:** Explicit permissions, hooks system, MCP support
+- **Setup time:** 5 minutes
 
 ```bash
-# 1. Create Claude config directory
+# Install global permissions
 mkdir -p ~/.config/claude
-
-# 2. Copy user-level config
-cp claude/settings/user-level/config.json ~/.config/claude/config.json
-
-# 3. Verify
-ls -lh ~/.config/claude/config.json
+cp agents/claude/settings/user-level/config.json ~/.config/claude/config.json
 ```
 
-### Project-Level Setup (Optional)
-
-For project-specific permissions:
+#### [GitHub Copilot →](agents/copilot/README.md)
+- **Best for:** GitHub workflows, VS Code users, team collaboration
+- **Features:** Chat integration, inline suggestions, workspace awareness
+- **Setup time:** 2 minutes
 
 ```bash
-# In your project directory
-mkdir -p .claude
-cp claude/settings/project-level/settings.local.json .claude/settings.local.json
+# Clone this repo for reference
+git clone https://github.com/acedergren/solutionsedge-agentic-tools.git ~/.solutionsedge-tools
+```
+
+#### [Cursor →](agents/cursor/README.md)
+- **Best for:** Fast iteration, inline editing, modern IDE experience
+- **Features:** .cursorrules, Composer mode, context awareness
+- **Setup time:** 3 minutes
+
+```bash
+# Add to your project
+cd your-project
+git submodule add https://github.com/acedergren/solutionsedge-agentic-tools.git .solutionsedge-tools
+
+# Create .cursorrules (see agents/cursor/README.md)
+```
+
+#### [Windsurf →](agents/windsurf/README.md)
+- **Best for:** Multi-file refactoring, large changes, code exploration
+- **Features:** Cascade mode, smart context, Codeium integration
+- **Setup time:** 3 minutes
+
+```bash
+# Clone for reference
+git clone https://github.com/acedergren/solutionsedge-agentic-tools.git ~/.solutionsedge-tools
+```
+
+### Use Agent-Agnostic Tools
+
+All agents can use the review tooling and git workflows:
+
+```bash
+# Code Review
+# In any AI assistant:
+"Review this code using .solutionsedge-tools/review-tooling/code-review-checklist.md"
+
+# Commit Messages
+# Reference: .solutionsedge-tools/git-workflow/commit-templates/
+
+# PR Descriptions  
+# Use: .solutionsedge-tools/git-workflow/pr-templates/feature-pr.md
 ```
 
 ---
 
-## 🎯 Claude Permissions - What's Covered
+## 🎯 Features Overview
 
-### Development Tools (400+ commands)
+### Agent-Agnostic Code Review Tooling
 
-#### Core Development
-- **Node.js**: pnpm, npm, npx, node, yarn, bun, deno, turbo, nx
-- **Python**: python3, pip, pytest, mypy, black, isort, ruff, poetry, pipenv
-- **iOS/macOS**: xcodebuild, swift, xcrun, swiftlint, fastlane, pod
-- **Android**: gradle, adb, emulator
-- **Java/JVM**: java, maven, gradle, kotlin, scala
-- **Ruby**: ruby, gem, bundle, rails, rspec, rubocop
-- **Go**: go, gofmt, golangci-lint
-- **Rust**: cargo, rustc, rustfmt, clippy
-- **C/C++**: gcc, clang, make, cmake, gdb, lldb, valgrind
-- **Perl**: perl, cpan
-- **PHP**: php, composer, phpunit
+✅ **Comprehensive checklist** covering:
+- Code quality and functionality
+- Security vulnerabilities (XSS, SQL injection, hardcoded secrets)
+- Testing coverage and quality
+- Documentation requirements
+- Performance considerations
+- Architecture and design patterns
 
-#### Version Managers
-- nvm, pyenv, rbenv, asdf, tfenv, goenv, jenv, sdkman
+✅ **Step-by-step review guidelines** including:
+- Workflow for systematic reviews
+- Agent-specific examples (Copilot, Claude, Cursor, Windsurf)
+- Effective review comment writing
+- Approval criteria and scope guidelines
 
-#### Infrastructure as Code
-- **Terraform**: terraform, terragrunt, tflint, tfsec
-- **Ansible**: ansible, ansible-playbook, ansible-vault
-- **Pulumi**: pulumi
+✅ **Works with all AI assistants** - Same checklist, consistent results
 
-#### Cloud Platforms
-- **Oracle Cloud (OCI)**: oci, sqlcl, sql, sqlplus
-- **AWS**: aws
-- **Google Cloud**: gcloud
-- **Azure**: az
-- **Others**: doctl, fly, vercel, netlify, railway
-- **Cloudflare**: wrangler, cloudflare, cloudflared
+### Git Workflows & Templates
 
-#### Containers & Orchestration
-- **Docker**: docker, docker-compose, podman
-- **Kubernetes**: kubectl, k9s, helm, minikube, kind, skaffold
+✅ **Three workflow strategies:**
+- Trunk-Based Development - Fast, CI/CD-focused
+- GitHub Flow - Simple, PR-based workflow
+- GitFlow - Feature branches with release management
 
-#### Databases
-- PostgreSQL, MySQL, SQLite, MongoDB, Redis, InfluxDB, Cassandra
+✅ **Conventional Commit templates:**
+- 8 commit message templates for different change types
+- Automated commit message generation prompts
+- Examples for each commit type
 
-#### Testing & Quality
-- **Testing**: vitest, jest, playwright, cypress, selenium
-- **Linting**: eslint, prettier, shellcheck, shfmt
-- **Security**: snyk, semgrep, trivy, grype, syft
+✅ **PR description templates:**
+- 6 templates: feature, bugfix, hotfix, docs, breaking changes, minimal
+- Complete with checklists and structured sections
+- GitHub/GitLab ready
 
-#### Observability
-- grafana-cli, prometheus, alertmanager, loki, tempo, opentelemetry
+✅ **Branch naming conventions:**
+- Clear patterns for different change types
+- Examples and enforcement strategies
 
-#### System Package Managers
-- brew, apt, dnf, yum, pacman, snap, flatpak, nix
+### Agent-Specific Configurations
 
-#### Modern CLI Tools
-- **File Operations**: exa, eza, lsd, fd, ripgrep, bat
-- **Navigation**: zoxide, fzf
-- **Monitoring**: procs, dust, duf, btop, glances
-- **Performance**: hyperfine, tokei
+✅ **Claude Code** ([agents/claude/](agents/claude/)):
+- 400+ bash command permissions
+- Pre/post action hooks for automation
+- MCP server support
+- Session and cost tracking
 
-#### System Tools
-- **Terminal**: tmux, screen, byobu, zellij
-- **SSH/Security**: ssh-keygen, gpg, age, sops
-- **Debugging**: strace, ltrace, perf, gdb, lldb
-- **Network**: tcpdump, nmap, mtr, speedtest
-- **Compression**: tar, zip, gzip, zstd, lz4, 7z
+✅ **GitHub Copilot** ([agents/copilot/](agents/copilot/)):
+- VS Code integration guide
+- Copilot Chat prompts library
+- GitHub Actions integration
+- Workspace settings
 
-#### All Standard Unix Commands
-- ls, cat, grep, find, sed, awk, base64, cut, sort, uniq, diff, chmod, chown, mkdir, cp, mv, rm, ln, ps, kill, curl, wget, ssh, rsync, and 100+ more
+✅ **Cursor** ([agents/cursor/](agents/cursor/)):
+- .cursorrules configuration examples
+- Composer mode workflows
+- Context-aware assistance patterns
+- Team adoption guide
 
----
-
-## 📊 Configuration Stats
-
-### User-Level Config
-- **Size**: 615 lines (21 KB)
-- **Bash Commands**: 400+ permission patterns
-- **Categories**: 30+ organized sections
-- **Scope**: All Claude Code projects
-
-### Project-Level Example
-- **Size**: 296 lines (9.6 KB)
-- **Focus**: Project-specific tools, scripts, MCP servers
-- **Includes**: Serena MCP, Snyk, Playwright, custom skills
+✅ **Windsurf** ([agents/windsurf/](agents/windsurf/)):
+- Cascade mode for multi-file operations
+- Project context configuration
+- Codeium integration
+- Advanced features guide
 
 ---
 
-## 🔒 Security Philosophy
+## 🔄 Multi-Agent Philosophy
 
-### Two-Tier Permission Strategy
+This repository supports a **multi-agent** approach to AI-assisted development:
 
-```
-User-Level (~/.config/claude/config.json)
-    ↓ Global baseline - safe everywhere
-    ↓
-Project-Level (.claude/settings.local.json)
-    ↓ Project-specific extensions
-    ↓
-Final Permission Set (merged)
-```
+### Core Principles
 
-**User-Level**: Conservative, universal tools safe across all projects
-**Project-Level**: Aggressive, project-specific tools and scripts
+1. **Agent-Agnostic Standards** - Review tooling and Git workflows work with any AI assistant
+2. **Agent-Specific Optimizations** - Each agent has unique features that can be leveraged
+3. **Team Flexibility** - Team members can use different agents with consistent standards
+4. **Progressive Adoption** - Start with one agent, expand to others as needed
 
-### What's NOT Included (By Design)
+### When to Use Which Agent
 
-- ❌ Destructive operations without wildcards (rm -rf /, dd, mkfs)
-- ❌ System modification commands (reboot, shutdown, init)
-- ❌ Direct file path permissions (antipattern - use Read/Write tools instead)
+| Use Case | Recommended Agent | Why |
+|----------|-------------------|-----|
+| **Strict Security** | Claude Code | Explicit permissions, pre-action hooks |
+| **GitHub Teams** | GitHub Copilot | Native GitHub integration, familiar to VS Code users |
+| **Fast Iteration** | Cursor | Best-in-class inline editing, Composer mode |
+| **Large Refactors** | Windsurf | Cascade mode for multi-file operations |
+| **Mixed Teams** | Any/All | Use agent-agnostic tooling for consistency |
 
----
-
-## 📝 Customization
-
-### Adding New Commands
-
-Edit your local config and add to the appropriate section:
-
-```json
-{
-  "permissions": {
-    "allow": [
-      "# ============================================",
-      "# Your Custom Section",
-      "# ============================================",
-      "Bash(your-tool:*)",
-      "Bash(another-tool:*)"
-    ]
-  }
-}
-```
-
-### Permission Patterns
-
-- `Bash(tool:*)` - Allow all subcommands
-- `Bash(tool subcommand:*)` - Allow specific subcommand with arguments
-- `WebFetch(domain:example.com)` - Allow fetching from domain
-- `mcp__server__tool` - Allow specific MCP server tool
-
----
-
-## 🔍 Comparison: Before vs After
-
-### Before Optimization
-- **Entries**: 432 granular permissions
-- **Size**: 40 KB
-- **Issues**:
-  - Missing 91 common commands
-  - Hardcoded file paths
-  - Duplicate patterns
-  - No organization
-
-### After Optimization
-- **Entries**: 400+ organized patterns
-- **Size**: 21 KB (48% reduction)
-- **Improvements**:
-  - ✅ All common dev tools covered
-  - ✅ Organized into 30+ categories
-  - ✅ Consolidated patterns
-  - ✅ Best practices applied
-
----
-
-## 🎓 Learning Resources
-
-- [Claude Code Documentation](https://claude.com/claude-code)
-- [Claude Code GitHub](https://github.com/anthropics/claude-code)
-- [Permissions Best Practices](https://docs.anthropic.com/claude-code/permissions)
 
 ---
 
@@ -226,59 +191,95 @@ Edit your local config and add to the appropriate section:
 
 ```
 solutionsedge-agentic-tools/
-├── README.md
-├── LICENSE (AGPL-3.0)
-├── claude/
-│   ├── settings/
-│   │   ├── user-level/
-│   │   │   └── config.json              # Global permissions (400+ commands)
-│   │   ├── project-level/
-│   │   │   └── settings.local.json      # Project example
-│   │   └── templates/                    # 4 use-case templates
-│   └── hooks/
-│       ├── README.md                     # Hooks documentation
-│       ├── hookify-rules.md              # Using /hookify command
-│       ├── examples/                     # 5 ready-to-use hooks
-│       │   ├── commit-preflight.sh
-│       │   ├── security-scan.sh
-│       │   ├── cost-tracker.sh
-│       │   ├── session-summary.sh
-│       │   └── file-backup.sh
-│       └── hook-templates/               # 4 starter templates
-│           ├── bash-pre.sh
-│           ├── edit-pre.sh
-│           ├── user-prompt-submit.sh
-│           └── session-start.sh
-├── git-workflow/
-│   ├── README.md                         # Workflow comparison & setup
-│   ├── workflows/                        # 3 workflow strategies
-│   │   ├── trunk-based.md
-│   │   ├── github-flow.md
-│   │   └── gitflow.md
-│   ├── commit-templates/                 # 8 commit templates
-│   │   ├── conventional-commits.md
-│   │   ├── feature-template.txt
-│   │   ├── fix-template.txt
-│   │   └── ... (5 more templates)
-│   ├── pr-templates/                     # 6 PR templates
-│   │   ├── feature-pr.md
-│   │   ├── bugfix-pr.md
-│   │   └── ... (4 more templates)
-│   └── branch-naming/                    # Branch naming guide
-│       └── conventions.md
-└── .gitignore
+├── README.md                         # This file
+├── LICENSE                           # AGPL-3.0
+│
+├── agents/                           # Agent-specific configurations
+│   ├── README.md                     # Multi-agent guide
+│   ├── claude/                       # Claude Code
+│   │   ├── README.md
+│   │   ├── settings/                 # Permissions (400+ commands)
+│   │   │   ├── user-level/
+│   │   │   │   └── config.json
+│   │   │   └── templates/            # 4 use-case templates
+│   │   └── hooks/                    # Automation hooks
+│   │       ├── README.md
+│   │       ├── hookify-rules.md
+│   │       ├── examples/             # 5 ready-to-use hooks
+│   │       └── hook-templates/       # 4 starter templates
+│   ├── copilot/                      # GitHub Copilot
+│   │   └── README.md                 # Setup & integration guide
+│   ├── cursor/                       # Cursor IDE
+│   │   └── README.md                 # .cursorrules & workflows
+│   └── windsurf/                     # Windsurf IDE
+│       └── README.md                 # Cascade mode & context
+│
+├── review-tooling/                   # Agent-agnostic review tools
+│   ├── README.md                     # Review tooling guide
+│   ├── code-review-checklist.md      # Comprehensive checklist
+│   └── pr-review-guidelines.md       # Step-by-step process
+│
+└── git-workflow/                     # Agent-agnostic Git tools
+    ├── README.md                     # Workflow comparison
+    ├── workflows/                    # 3 workflow strategies
+    │   ├── trunk-based.md
+    │   ├── github-flow.md
+    │   └── gitflow.md
+    ├── commit-templates/             # 8 commit templates
+    │   ├── conventional-commits.md
+    │   ├── feature-template.txt
+    │   └── ... (5 more)
+    ├── pr-templates/                 # 6 PR templates
+    │   ├── feature-pr.md
+    │   ├── bugfix-pr.md
+    │   └── ... (4 more)
+    └── branch-naming/                # Branch conventions
+        └── conventions.md
 ```
+
+---
+
+## 🎓 Learning Resources
+
+### Agent Documentation
+- **Claude Code**: [agents/claude/README.md](agents/claude/README.md)
+- **GitHub Copilot**: [agents/copilot/README.md](agents/copilot/README.md)
+- **Cursor**: [agents/cursor/README.md](agents/cursor/README.md)
+- **Windsurf**: [agents/windsurf/README.md](agents/windsurf/README.md)
+
+### Official Resources
+- [Claude Code Documentation](https://claude.com/claude-code)
+- [GitHub Copilot Docs](https://docs.github.com/copilot)
+- [Cursor Documentation](https://cursor.sh/docs)
+- [Windsurf IDE](https://codeium.com/windsurf)
+
+### Community
+- [Conventional Commits](https://www.conventionalcommits.org/)
+- [GitHub Flow](https://guides.github.com/introduction/flow/)
+- [Trunk-Based Development](https://trunkbaseddevelopment.com/)
 
 ---
 
 ## 🤝 Contributing
 
-Found a missing tool or best practice? PRs welcome!
+Help make this toolkit better for everyone!
 
-1. Add the tool to the appropriate category
-2. Follow existing naming patterns
-3. Add to this README
-4. Test the configuration
+### What to Contribute
+
+1. **Agent integrations** - Add support for new AI coding assistants
+2. **Review templates** - Improve checklists and guidelines
+3. **Workflow patterns** - Share successful Git workflows
+4. **Agent-specific tips** - Best practices for each agent
+5. **Bug fixes** - Correct errors or outdated information
+
+### How to Contribute
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/your-feature`
+3. Make your changes following existing patterns
+4. Test with at least one AI agent
+5. Update documentation
+6. Submit a pull request
 
 ---
 
@@ -297,17 +298,30 @@ This project is licensed under the AGPL-3.0 License - see the [LICENSE](LICENSE)
 
 ---
 
+
 ## 🙏 Acknowledgments
 
-**Solutions Edge** - Agentic Tools for Modern Development
+**Solutions Edge** - Agent-Agnostic Tools for Modern Development
 
-- Optimized for solo developers, small teams, and enterprise use
-- Covers 10+ programming languages and frameworks
-- Includes modern DevOps tools (Docker, Kubernetes, Terraform, Ansible)
-- Full cloud platform support (AWS, GCP, Azure, OCI, Cloudflare)
-- Security-focused with Snyk, Semgrep, Trivy integration
+### Coverage
+- ✅ **Multi-Agent Support** - Claude Code, GitHub Copilot, Cursor, Windsurf
+- ✅ **Code Review Tooling** - Comprehensive checklists and guidelines
+- ✅ **Git Workflows** - Trunk-Based, GitHub Flow, GitFlow
+- ✅ **Developer Tools** - 400+ commands (Claude Code permissions)
+- ✅ **All Ecosystems** - Node.js, Python, Go, Rust, iOS, Android, and more
+- ✅ **DevOps Ready** - Docker, Kubernetes, Terraform, Ansible
+- ✅ **Cloud Platforms** - AWS, GCP, Azure, OCI, Cloudflare
+- ✅ **Security-Focused** - Review checklists, security scanning patterns
+
+### Use Cases
+- 📱 Solo developers using any AI coding assistant
+- 👥 Small teams with mixed agent preferences
+- 🏢 Enterprise teams requiring consistent standards
+- 🎓 Learning effective code review practices
+- 🔒 Security-conscious development workflows
 
 ---
 
 **Last Updated**: January 2026
-**Claude Code Version**: Compatible with latest CLI
+**Version**: 2.0 - Multi-Agent Support
+**Compatible With**: Claude Code, GitHub Copilot, Cursor, Windsurf, and other AI coding assistants

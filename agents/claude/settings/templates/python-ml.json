@@ -1,0 +1,77 @@
+{
+  "permissions": {
+    "allow": [
+      "# ============================================",
+      "# Python ML/Data Science Template",
+      "# ============================================",
+      "#",
+      "# Best for: Machine learning, data analysis, scientific computing",
+      "# Includes: Python tools, Jupyter, testing, data libraries",
+      "#",
+
+      "# ============================================",
+      "# Python & Package Management",
+      "# ============================================",
+      "Bash(python:*)",
+      "Bash(python3:*)",
+      "Bash(pip:*)",
+      "Bash(pip3:*)",
+      "Bash(poetry:*)",
+      "Bash(pipenv:*)",
+      "Bash(conda:*)",
+      "Bash(uv:*)",
+      "Bash(uvx:*)",
+
+      "# ============================================",
+      "# Virtual Environments",
+      "# ============================================",
+      "Bash(virtualenv:*)",
+      "Bash(venv:*)",
+
+      "# ============================================",
+      "# Testing & Quality",
+      "# ============================================",
+      "Bash(pytest:*)",
+      "Bash(pytest-cov:*)",
+      "Bash(mypy:*)",
+      "Bash(black:*)",
+      "Bash(isort:*)",
+      "Bash(ruff:*)",
+      "Bash(flake8:*)",
+
+      "# ============================================",
+      "# Jupyter & Notebooks",
+      "# ============================================",
+      "Bash(jupyter:*)",
+      "Bash(ipython:*)",
+
+      "# ============================================",
+      "# Git & GitHub",
+      "# ============================================",
+      "Bash(git:*)",
+      "Bash(gh:*)",
+
+      "# ============================================",
+      "# Docker (for model serving)",
+      "# ============================================",
+      "Bash(docker:*)",
+      "Bash(docker-compose:*)",
+      "Bash(docker compose:*)",
+
+      "# ============================================",
+      "# Project Scripts",
+      "# ============================================",
+      "Bash(./scripts/:*)",
+      "Bash(./*.py:*)",
+      "Bash(./*.sh:*)",
+
+      "# ============================================",
+      "# Web Fetching",
+      "# ============================================",
+      "WebFetch(domain:pypi.org)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:docs.python.org)",
+      "WebSearch"
+    ]
+  }
+}
