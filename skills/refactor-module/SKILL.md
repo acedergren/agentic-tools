@@ -23,6 +23,30 @@ metadata:
 
 ---
 
+## Before Refactoring to Module: Strategic Assessment
+
+**Ask yourself these questions BEFORE extracting a module:**
+
+### 1. Duplication Pain Analysis
+- **How many usages?**: 1-2 usages → Keep inline (wait for third), 3+ → Module candidate
+- **How identical?**: <50% same config → Use locals, >80% same → Module makes sense
+- **Change frequency**: Changes weekly → DON'T modularize (unstable API), Quarterly+ → Module safe
+- **Scope of changes**: Entire resource → Module, Just variables → Locals sufficient
+
+### 2. Team Readiness Assessment
+- **Test coverage**: <50% coverage → TOO RISKY (breaking changes won't be caught)
+- **State backup**: Is state in remote backend? Can we roll back if migration fails?
+- **Consumer count**: 1-3 consumers → Easy to update, 10+ → Module change = 10 PRs
+- **Documentation**: Does team know how to use `terraform state mv`? Need training first?
+
+### 3. Cost/Benefit Analysis
+- **Module overhead**: Versioning strategy + automated tests + migration docs + state migration risk
+- **Duplication pain**: Inconsistent configs + bug fixes need 3+ PRs + compliance drift risk
+- **Break-even point**: Module worth it when 4+ identical usages + stable API + compliance need
+- **Time to value**: Simple module = 2 hours, Complex with state = 2 days planning + 4 hours execution
+
+---
+
 ## Critical Decision: Module vs Inline
 
 ```
@@ -94,6 +118,8 @@ module "vpc" {
 
 **Test**: If module variables match resource arguments 1:1, it's not a real abstraction.
 
+**Why this is deceptively hard to debug**: Module works perfectly—tests pass, terraform apply succeeds. The problem emerges slowly over months: every resource argument becomes a module variable (+50 variables), documentation becomes unwieldy (which of 50 variables do I actually need?), consumers still need to know AWS VPC internals to use the module (defeating abstraction purpose). Takes 3-6 months of maintenance hell—adding new AWS features requires module updates, version bumps, consumer migrations—before team realizes the module isn't abstracting anything, just adding indirection. By then, you have 10+ consumers and unwinding the module is more painful than living with it.
+
 ### ❌ #2: Premature Modularization
 **Problem**: Create module after first usage, becomes wrong abstraction
 
@@ -128,6 +154,8 @@ module "s3_bucket" {
 ```
 
 **Rule**: First time: inline. Second time: copy-paste. Third time: abstract.
+
+**Why this is deceptively hard to debug**: First usage looks clean (simple S3 module, 3 variables). Second usage needs versioning (add 2 variables). Third needs replication (add 5 variables). Fourth needs lifecycle rules (add 8 variables). Each addition seems reasonable in isolation. After 6 months, module has 30 variables, 20 boolean feature flags, complex conditional logic. Nobody uses all features (each consumer uses 30% of variables). Every change risks breaking someone. The wrong abstraction was baked in early (before patterns emerged) and now refactoring requires coordinating 10+ teams. Takes 3-6 months of feature requests to realize the module grew wrong, but reversing it requires migrating all consumers—a 2-month project nobody has time for.
 
 ### ❌ #3: State Migration Nightmare
 **Problem**: Refactor to module without planning state migration
@@ -164,6 +192,8 @@ terraform plan  # Should show: No changes
 terraform state pull > backup-$(date +%s).tfstate
 ```
 
+**Why this is deceptively hard to debug**: NO ERROR MESSAGE. `terraform apply` shows plan to destroy VPC, create "new" VPC with identical config. Looks like Terraform bug or state corruption. You spend 20-30 minutes checking: Terraform version? Backend config? State file corrupted? The error is invisible—state addresses changed (aws_vpc.main → module.network.aws_vpc.main) but Terraform doesn't say "you moved code without moving state." It just says "resource doesn't exist in state, will create new one." Developers approve the plan thinking it's safe (identical config), then production VPC gets destroyed and recreated, taking down all services. The fix (state mv) is 2 minutes, but discovering that's the problem takes 20-30 minutes of debugging—and by then you may have already applied and caused an outage.
+
 ### ❌ #4: Module Version Hell
 **Problem**: 20 consumers on different module versions, breaking changes
 
@@ -196,6 +226,8 @@ variable "legacy_mode" {
 ```
 
 **Rule**: Breaking changes require major version + migration guide.
+
+**Why this is deceptively hard to debug**: Version divergence happens slowly over weeks/months. App1 upgrades to v2.0 (works fine). App2 stays on v1.2 (no time to upgrade). App3 needs bugfix only in v1.x but you're maintaining v2.x now. Takes 2-3 weeks before pattern emerges: every module change requires checking "which versions need this fix?" You're backporting fixes to 3 versions, testing each, cutting multiple releases. CI builds slow down (testing v1.x, v2.x, v3.x). Documentation fragments (README has v1 vs v2 sections). Consumers report bugs fixed in v2 still present in v1—but they can't upgrade due to breaking changes. After 3-6 months you have 5 major versions to support, or you force painful migrations that break production apps.
 
 ---
 
@@ -342,17 +374,56 @@ terraform plan  # Should show: No changes
 
 ---
 
+## Error Recovery Procedures
+
+### When State Migration Causes Destroy/Create Plan
+**Recovery steps**:
+1. **STOP**: Do NOT apply. Run `terraform state pull > emergency-backup.tfstate` immediately
+2. **Diagnose**: Run `terraform state list` to see current addresses vs expected module addresses
+3. **Fix state**: Run `terraform state mv` commands for each resource that moved into module
+4. **Fallback**: If you already applied and destroyed resources, restore from backup: `terraform state push emergency-backup.tfstate`, then import destroyed resources: `terraform import module.network.aws_vpc.main vpc-xxxxx`
+
+### When Module Has Too Many Variables (Leaky Abstraction)
+**Recovery steps**:
+1. **Audit usage**: Survey all consumers—which variables do they actually use? (Often 20% of variables)
+2. **Identify patterns**: Group consumers by usage pattern (data buckets, log buckets, artifact buckets)
+3. **Redesign interface**: Replace 50 variables with `bucket_type` enum + sensible defaults per type
+4. **Fallback**: If redesign too risky, create `v2` module with clean interface, deprecate `v1` over 6 months
+
+### When Premature Module Needs Different Features Per Consumer
+**Recovery steps**:
+1. **Count feature flags**: If >10 boolean toggles, module is wrong abstraction
+2. **Split by usage**: Create separate modules per use case (simple-bucket, versioned-bucket, replicated-bucket)
+3. **Migrate incrementally**: New consumers use new modules, old consumers stay on v1 (deprecate over time)
+4. **Fallback**: If splitting too complex, add `advanced_config` escape hatch allowing raw HCL passthrough for edge cases
+
+### When Multiple Module Versions Cause Maintenance Hell
+**Recovery steps**:
+1. **Audit versions**: Run `grep -r 'source.*?ref=' . | sort | uniq -c` to see version distribution
+2. **Create migration path**: Write automated migration script (sed/awk) to update HCL from v1 → v2
+3. **Coordinate upgrades**: Schedule "module upgrade week" where all teams migrate together
+4. **Fallback**: If coordination impossible, use monorepo with workspace protocol (`source = "../../modules/vpc"`) to eliminate versions—all consumers use same code, breaking changes impossible
+
+---
+
 ## When to Load Full Reference
 
-**LOAD `references/state-migration.md` when:**
-- Need detailed state migration procedures
-- Complex multi-resource module extraction
+**MANDATORY - READ ENTIRE FILE**: `references/state-migration.md` when:
+- Migrating 5+ resources into module with complex dependencies
+- Encountering 3+ state-related errors during migration (resource not found, duplicate)
+- Setting up automated state migration for 10+ similar refactorings
+- Need rollback procedures for failed state migration in production
 
-**LOAD `references/module-testing.md` when:**
-- Setting up automated module tests
-- Terratest patterns
+**MANDATORY - READ ENTIRE FILE**: `references/module-testing.md` when:
+- Module has 3+ consumers and needs automated testing
+- Setting up CI/CD pipeline for module with 5+ test scenarios
+- Implementing contract tests between module versions
+- Need to test 10+ module input combinations
 
-**Do NOT load references** for refactoring decisions - use this framework.
+**Do NOT load references** for:
+- Basic refactoring decisions (use Strategic Assessment section)
+- Single resource state moves (use Error Recovery section above)
+- Deciding whether to create module (use Critical Decision section)
 
 ---
 
