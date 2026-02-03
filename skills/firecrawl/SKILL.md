@@ -1,6 +1,7 @@
 ---
 name: firecrawl
 version: 3.0.0
+license: MIT
 description: |
   Web scraping and search CLI returning clean Markdown from any URL (handles JS-rendered
   pages, SPAs). Use when user requests: (1) "search the web for X", (2) "scrape/fetch

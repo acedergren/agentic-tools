@@ -1,6 +1,7 @@
 ---
 name: shadcn-svelte-skill
 version: 3.0.0
+license: MIT
 description: |
   Expert guidance for shadcn-svelte component architecture and Tailwind CSS v4.1 patterns.
   Use when: (1) choosing between shadcn/Skeleton/Melt UI, (2) debugging TanStack Table

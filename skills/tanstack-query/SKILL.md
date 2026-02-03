@@ -1,6 +1,7 @@
 ---
 name: tanstack-query
 version: 3.0.0
+license: MIT
 description: |
   TanStack Query v5 expert guidance - migration gotchas (v4→v5 breaking changes),
   performance pitfalls (infinite refetch loops, staleness traps), and decision

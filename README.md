@@ -1,10 +1,28 @@
-# Solutions Edge - Agentic Tools
+# Agentic Tools
 
-Comprehensive toolkit for AI-assisted development with Claude Code, including optimized permissions, Git workflows, and automation hooks.
+High-quality AI agent skills for Claude Code, Cursor, Windsurf, and other skills-compatible agents. Focused on expert knowledge, decision frameworks, and anti-patterns that prevent production failures.
 
-## 📦 What's Included
+## 🎯 Featured Skills
 
-### 🔐 Claude Code Permissions (`claude/settings/`)
+### 📚 Agent Skills (`skills/`)
+
+Improved skills following TDD methodology with skill-judge framework (F→C grade, 32% token reduction):
+
+- **humanizer** (v3.0.0) - Remove AI writing patterns and make text sound human
+- **shadcn-svelte-skill** (v3.0.0) - shadcn-svelte + Tailwind v4.1 architecture decisions
+- **firecrawl** (v3.0.0) - Web scraping CLI returning clean Markdown from any URL
+- **tanstack-query** (v3.0.0) - TanStack Query v5 migration gotchas and performance pitfalls
+- **turborepo** (v3.0.0) - Monorepo architecture decisions and anti-patterns
+- **refactor-module** (v3.0.0) - Terraform module extraction decision framework
+
+Each skill includes:
+- ✅ Expert-only knowledge (not Claude's base knowledge)
+- ✅ Decision frameworks with clear criteria
+- ✅ Anti-patterns with WHY explanations
+- ✅ Individual README documenting TDD improvements
+- ✅ <300 lines core content (progressive disclosure)
+
+### 🔐 Claude Code Configuration (`claude/settings/`)
 - **User-Level Config** - Global permissions (400+ commands) for all projects
 - **Project-Level Config** - Project-specific permissions example
 - Covers Node.js, Python, iOS, Android, Go, Rust, C/C++, Ruby, PHP, Perl, and more
@@ -25,7 +43,23 @@ Comprehensive toolkit for AI-assisted development with Claude Code, including op
 
 ---
 
-## 🚀 Quick Start - Claude Permissions
+## 🚀 Quick Start
+
+### Install Skills
+
+Use the skills CLI to install any skill:
+
+```bash
+# Install a specific skill
+npx skills add acedergren/agentic-tools/humanizer
+
+# Or install from the skills directory
+cd ~/.agents/skills
+git clone https://github.com/acedergren/agentic-tools.git
+cp -r agentic-tools/skills/* .
+```
+
+### Claude Code Setup
 
 ### User-Level Setup (Recommended)
 
@@ -284,16 +318,15 @@ Found a missing tool or best practice? PRs welcome!
 
 ## 📜 License
 
-GNU Affero General Public License v3.0 (AGPL-3.0)
+MIT License
 
-This project is licensed under the AGPL-3.0 License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 **Key Points:**
 - ✅ Free to use, modify, and distribute
-- ✅ Must disclose source code
-- ✅ Must use same AGPL-3.0 license for derivatives
-- ✅ Network use triggers copyleft (SaaS/API services must open-source)
-- ✅ Patent grant included
+- ✅ Commercial use allowed
+- ✅ No copyleft restrictions
+- ✅ Attribution required
 
 ---
 

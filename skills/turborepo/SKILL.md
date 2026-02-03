@@ -1,6 +1,7 @@
 ---
 name: turborepo
 version: 3.0.0
+license: MIT
 description: |
   Turborepo monorepo architecture decisions and anti-patterns. Use when: (1) choosing
   between monorepo vs polyrepo, (2) deciding when to split packages, (3) debugging

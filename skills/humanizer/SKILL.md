@@ -1,6 +1,7 @@
 ---
 name: humanizer
 version: 3.0.0
+license: MIT
 description: |
   Detect and fix AI writing patterns including overused phrases (testament to, pivotal,
   landscape, delve), structural tells (rule of three, em dash overuse, negative parallelisms,

@@ -1,6 +1,7 @@
 ---
 name: refactor-module
 version: 3.0.0
+license: MIT
 description: |
   Terraform module extraction decision framework. Use when: (1) deciding whether to
   create module vs keep inline, (2) determining module boundaries, (3) avoiding
