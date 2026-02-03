@@ -1,6 +1,28 @@
-# Agentic Tools
+<div align="center">
 
-High-quality AI agent skills for Claude Code, Cursor, Windsurf, and other skills-compatible agents. Focused on expert knowledge, decision frameworks, and anti-patterns that prevent production failures.
+```
+ █████╗  ██████╗ ███████╗███╗   ██╗████████╗██╗ ██████╗
+██╔══██╗██╔════╝ ██╔════╝████╗  ██║╚══██╔══╝██║██╔════╝
+███████║██║  ███╗█████╗  ██╔██╗ ██║   ██║   ██║██║
+██╔══██║██║   ██║██╔══╝  ██║╚██╗██║   ██║   ██║██║
+██║  ██║╚██████╔╝███████╗██║ ╚████║   ██║   ██║╚██████╗
+╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚═╝ ╚═════╝
+████████╗ ██████╗  ██████╗ ██╗     ███████╗
+╚══██╔══╝██╔═══██╗██╔═══██╗██║     ██╔════╝
+   ██║   ██║   ██║██║   ██║██║     ███████╗
+   ██║   ██║   ██║██║   ██║██║     ╚════██║
+   ██║   ╚██████╔╝╚██████╔╝███████╗███████║
+   ╚═╝    ╚═════╝  ╚═════╝ ╚══════╝╚══════╝
+```
+
+**High-quality AI agent skills and automation tools for modern development**
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Skills](https://img.shields.io/badge/Skills-6%20A--Grade-brightgreen)](#featured-skills)
+[![Claude Code](https://img.shields.io/badge/Claude%20Code-Compatible-blueviolet)](https://claude.com/claude-code)
+[![Community Project](https://img.shields.io/badge/Community-Maintained-success)](https://github.com/acedergren/agentic-tools)
+
+</div>
 
 > **⚠️ Independent Community Project** — This project has **no official affiliation** with Oracle Corporation, Anthropic, or the Claude Code team. The Oracle Cloud (OCI) related skills and tools are community-created integrations that reference compatibility with Oracle's services, not endorsement by Oracle.
 
