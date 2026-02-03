@@ -2,6 +2,8 @@
 
 High-quality AI agent skills for Claude Code, Cursor, Windsurf, and other skills-compatible agents. Focused on expert knowledge, decision frameworks, and anti-patterns that prevent production failures.
 
+> **⚠️ Independent Community Project** — This project has **no official affiliation** with Oracle Corporation, Anthropic, or the Claude Code team. The Oracle Cloud (OCI) related skills and tools are community-created integrations that reference compatibility with Oracle's services, not endorsement by Oracle.
+
 ## 🎯 Featured Skills
 
 ### 📚 Agent Skills (`skills/`)
@@ -316,7 +318,7 @@ Found a missing tool or best practice? PRs welcome!
 
 ---
 
-## 📜 License
+## 📜 License & Disclaimer
 
 MIT License
 
@@ -327,6 +329,15 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - ✅ Commercial use allowed
 - ✅ No copyleft restrictions
 - ✅ Attribution required
+
+**Legal Disclaimer:**
+
+This is an independent community project with **no official affiliation, partnership, or endorsement** from:
+- **Oracle Corporation** — OCI-related skills reference compatibility with Oracle Cloud services
+- **Anthropic** — Skills are designed for Claude Code but are community-created
+- **Any other mentioned products or services** — References indicate compatibility, not affiliation
+
+This software is provided "as is" without warranty of any kind. The authors bear no liability for damages arising from its use. You are responsible for compliance with all applicable laws, terms of service, and licensing requirements.
 
 ---
 
