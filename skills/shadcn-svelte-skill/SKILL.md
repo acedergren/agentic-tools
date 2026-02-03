@@ -79,6 +79,8 @@ Need UI components for Svelte?
 
 **Why it breaks**: Builders are reactive objects that get passed through component tree. Destructuring at module level captures stale references.
 
+**Why this is deceptively hard to debug**: Error message is just "undefined", no mention of builders. Console shows component renders fine, but click handlers silently fail. Takes 30+ minutes to discover the `asChild` pattern.
+
 ### ❌ #2: TanStack Table - Missing `get` Accessors
 
 **Problem**: Svelte 5 runes require `get` accessors in `createSvelteTable`, not direct references.
@@ -110,6 +112,8 @@ const table = createSvelteTable({
 
 **This is THE most common TanStack Table bug with Svelte 5.**
 
+**Why this is deceptively hard to debug**: Table renders correctly with initial data, pagination/sorting UI works, but clicking sort does nothing. DevTools show state updating, but table doesn't re-render. The `get` keyword is mentioned nowhere in TanStack errors—you only discover it from buried GitHub issues.
+
 ### ❌ #3: Tailwind v4.1 Migration - Old `@tailwind` Directives
 
 **Problem**: Tailwind v4.1 changed import syntax.
@@ -134,6 +138,8 @@ export default defineConfig({
 ```
 
 **Why it breaks**: v4.1 uses native CSS imports, no longer PostCSS directives.
+
+**Why this is deceptively hard to debug**: Vite compiles successfully, no errors. Styles appear to work in dev mode (cached from previous build), but production build has zero Tailwind classes. The `@tailwind` directive silently does nothing—Vite doesn't warn about invalid CSS.
 
 ### ❌ #4: Form Validation - Destructuring `superForm` Too Early
 
@@ -240,20 +246,24 @@ onSortingChange: (updater) => {
 
 ## When to Load Full References
 
-**LOAD `references/installation.md` when:**
-- Setting up new project (step-by-step installation)
-- User is unfamiliar with shadcn-svelte CLI
+**MANDATORY - READ ENTIRE FILE: `references/installation.md` when:**
+- User explicitly requests setup instructions
+- Error: "shadcn-svelte not found" or installation failures
+- **Do NOT load** if user already has project running
 
-**LOAD `references/datatable-full.md` when:**
-- Implementing complex data tables (sorting + filtering + selection)
-- Need complete TanStack Table v8 + Svelte 5 examples
-- Debugging row selection or column visibility
+**MANDATORY - READ ENTIRE FILE: `references/datatable-full.md` when:**
+- Implementing tables with 3+ features (sorting + filtering + selection)
+- TanStack Table errors mentioning columnDef or getCoreRowModel
+- Need row selection with checkboxes across paginated data
+- **Do NOT load** for simple static tables (use basic `<table>`)
 
-**LOAD `references/form-patterns.md` when:**
-- Complex form validation (multi-step, conditional fields)
-- Integrating with backend APIs
+**MANDATORY - READ ENTIRE FILE: `references/form-patterns.md` when:**
+- Multi-step forms (wizard pattern) with validation
+- Complex validation (cross-field dependencies, async validation)
+- Backend integration with Zod + superforms
+- **Do NOT load** for single-field forms or basic validation
 
-**Do NOT load references** for simple component usage—handle with this core framework.
+**Never load references** for library choice, anti-pattern debugging, or Tailwind v4.1 migration—handle with this core framework.
 
 ---
 
@@ -284,6 +294,31 @@ Check:
 3. Plugin before sveltekit() in plugins array?
 4. Restarted dev server after vite.config change?
 ```
+
+---
+
+## Error Recovery Procedures
+
+### When Anti-Pattern #1 Fails (Builder Undefined)
+**Recovery steps**:
+1. Search codebase for `const { ` in Dialog/Popover components → Remove destructuring
+2. Find `<Dialog.Trigger>` without `let:builder` → Add `asChild let:builder`
+3. Replace direct props with `builders={[builder]}` array
+4. **Fallback**: If still broken, check `bits-ui` version compatibility (needs v1.0+)
+
+### When Anti-Pattern #2 Fails (TanStack Not Updating)
+**Recovery steps**:
+1. Wrap ALL `createSvelteTable` options in getters: `get data() { return x }`
+2. Check state updaters have typeof guard: `typeof updater === "function"`
+3. Verify imports: `import { createSvelteTable } from "@tanstack/svelte-table"`
+4. **Fallback**: If state still stale, check Svelte version (needs 5.0+), downgrade TanStack to v8.10 if necessary
+
+### When Anti-Pattern #3 Fails (Tailwind Not Loading)
+**Recovery steps**:
+1. Delete `.svelte-kit/` and `node_modules/.vite/` cache directories
+2. Run `npm install @tailwindcss/vite@latest`
+3. Verify `tailwindcss.config.js` NOT `tailwind.config.js` (v4.1 naming)
+4. **Fallback**: If still broken, check Vite version (needs 5.0+), revert to Tailwind v3 if blocked
 
 ---
 

@@ -49,6 +49,24 @@ Transform AI-generated text into human writing by detecting patterns and injecti
 
 **The Core Principle**: Sterile, voiceless writing is just as obvious as slop. Don't just remove bad patterns—add soul.
 
+### 4. Pattern Detection Procedure (Domain-Specific)
+Run these checks BEFORE editing:
+
+**Statistical Density Check**:
+- Count AI vocabulary words per 100 words: >3 = heavy AI signature
+- Count em dashes per paragraph: >2 = structural tell
+- Count "However" paragraph starts: >20% = AI transition overuse
+
+**Structural Signature Check**:
+- All paragraphs same length? = AI rhythm uniformity
+- Every list has exactly 3 items? = rule of three addiction
+- Conclusions use passive voice? = AI hedging pattern
+
+**Context-Specific Preservation**:
+- Academic: Keep formal structure, remove only vocabulary slop
+- Technical: Preserve precision terminology, remove promotional language
+- Marketing: Full humanization except brand voice requirements
+
 ---
 
 ## Critical Anti-Patterns (NEVER Do This)
@@ -102,6 +120,22 @@ models outperformed RNNs by 23% on our benchmark."
 
 **Why this matters**: Formal contexts need clarity over personality. Know your audience.
 
+### ❌ Pattern #4: Batch-Replacing AI Words Without Context
+**Problem**: Blindly replacing "delve" or "landscape" breaks legitimate usage.
+
+```markdown
+Context: Computer vision paper
+
+❌ BAD EDIT:
+"Our model examines the feature landscape" → "Our model examines the feature terrain"
+
+✅ GOOD EDIT:
+"Our model examines the feature landscape" → "Our model analyzes feature space"
+OR keep "landscape" if it's established terminology in CV papers
+```
+
+**Why this matters**: Not every AI word is wrong—check if it's domain-appropriate first. "Landscape" in data science ≠ "business landscape" slop.
+
 ---
 
 ## Most Common AI Patterns (Quick Reference)
@@ -150,61 +184,50 @@ models outperformed RNNs by 23% on our benchmark."
 
 ---
 
-## Adding Human Voice: The Secret Ingredient
+## Humanization Strategy: When to Preserve vs Remove
 
-Removing AI patterns is **half the job**. Injecting personality is the other half.
+**The Decision Framework**: Not all contexts need full humanization.
 
-### Voice Injection Techniques
+| Context | Humanization Level | Remove Patterns | Inject Voice | Example Fix |
+|---------|-------------------|-----------------|--------------|-------------|
+| **Academic/Research** | Low (10-20%) | Delete slop only (delve, testament to) | Minimal | Keep structure, remove AI vocabulary |
+| **Technical Docs** | Medium (30-50%) | Remove promotional language, keep clarity | Light opinions | "This works well" → "This approach handles edge case X" |
+| **Blog/Marketing** | High (70-90%) | Remove most AI tells | Strong voice | Full personality, distinct author presence |
+| **Social/Casual** | Maximum (100%) | Delete all AI patterns | Maximum authenticity | Pure conversational, break all rules |
+| **Formal Business** | Medium (40-60%) | Remove obvious slop, keep professionalism | Controlled confidence | "We believe this represents..." → "This delivers X" |
 
-**1. Have Opinions**
-```markdown
-Neutral: "This approach has pros and cons."
-Human: "This is clever, but I'm not convinced it scales."
-```
-
-**2. Vary Rhythm**
-```markdown
-Monotonous: "The system works well. It has good performance. Users like it."
-Human: "The system works. Fast, reliable, users actually like it—rare these days."
-```
-
-**3. Acknowledge Complexity**
-```markdown
-Oversimplified: "AI is impressive."
-Human: "AI is impressive, but also kind of unsettling when you watch it work at 3am."
-```
-
-**4. Use First Person (When Appropriate)**
-```markdown
-Distant: "One might conclude that the results are mixed."
-Human: "I keep coming back to this—the results don't tell a simple story."
-```
-
-**5. Be Specific About Feelings**
-```markdown
-Generic: "This is concerning."
-Human: "There's something deeply unsettling about agents churning away while nobody's watching."
-```
+**Critical Non-Obvious AI Tells** (beyond the common list):
+- **Paragraph-starting "However"**: AI overuses this transition (appears 3x more in GPT text)
+- **Passive voice in conclusions**: "It can be concluded that..." (AI hedges at the end)
+- **Symmetric sentence structure**: Every paragraph follows same length/rhythm pattern
+- **"Importantly" mid-sentence**: AI uses this more than humans (statistical quirk)
+- **Abstract "landscape" metaphors**: "the technology landscape", "the business landscape"
 
 ---
 
 ## When to Load Full Pattern References
 
-**For detailed pattern catalogs, load:**
+**For comprehensive pattern catalogs, use mandatory loading:**
 
-**LOAD `references/content-patterns.md` when:**
-- Text is promotional or emphasizes significance/legacy heavily
-- Need examples of "symbolism inflation" fixes
+**MANDATORY - READ ENTIRE FILE: `references/content-patterns.md` when:**
+- Text contains 5+ promotional adjectives (stunning, breathtaking, vibrant, rich)
+- Significance inflation detected ("serves as testament", "stands as pivotal")
+- Need complete "symbolism removal" examples
+- **Do NOT load** for casual blog posts or social media text
 
-**LOAD `references/language-patterns.md` when:**
-- Text uses AI vocabulary words extensively (delve, showcase, intricate)
-- Need copula avoidance and elegant variation fixes
+**MANDATORY - READ ENTIRE FILE: `references/language-patterns.md` when:**
+- Text uses 8+ AI vocabulary words (delve, showcase, intricate, foster, garner)
+- Heavy copula avoidance patterns ("serves as" instead of "is")
+- Need elegant variation catalog for substitutions
+- **Do NOT load** for technical documentation where precision matters
 
-**LOAD `references/style-patterns.md` when:**
-- Text has formatting issues (em dashes, bold overuse, title case)
-- Need structural pattern fixes
+**MANDATORY - READ ENTIRE FILE: `references/style-patterns.md` when:**
+- Text has 6+ em dashes in single paragraph
+- Rule of three appears 4+ times
+- Title case headings throughout document
+- **Do NOT load** for academic papers (formatting may be required)
 
-**Do NOT load references** for simple voice injection or opinion addition—handle that with the framework above.
+**Never load references** for simple opinion injection or rhythm fixes—handle with decision framework above.
 
 ---
 
