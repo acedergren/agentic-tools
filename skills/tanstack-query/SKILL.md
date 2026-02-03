@@ -25,6 +25,32 @@ user-invocable: true
 
 ---
 
+## Before Using React Query: Strategic Assessment
+
+**Ask yourself these questions BEFORE adding useQuery:**
+
+### 1. Data Source Analysis
+- **Where does this data come from?**
+  - URL params/path → Framework loader (Next.js, Remix), not React Query
+  - Computation/derivation → useMemo, not React Query
+  - Form input → React Hook Form, not React Query
+  - REST/GraphQL → React Query ✅
+
+### 2. Update Frequency & Caching Strategy
+- **How often does this data change?**
+  - Real-time (>1/sec) → WebSocket + Zustand (React Query overhead too high)
+  - Frequent (<1/min) → React Query with aggressive staleTime (30s-1min)
+  - Moderate (5-30min) → React Query standard (staleTime: 5min)
+  - Infrequent (>1hr) → React Query with long staleTime (30min+)
+
+### 3. Cost of Stale Data
+- **What happens if user sees old data?**
+  - Critical (money, auth tokens) → staleTime: 0 (always fresh)
+  - Important (user content, messages) → staleTime: 1-5min
+  - Nice-to-have (analytics, recommendations) → staleTime: 30min+
+
+---
+
 ## Critical Decision: When NOT to Use React Query
 
 ```
@@ -78,6 +104,8 @@ useQuery({
 
 **Why it breaks**: TypeScript won't error if using `any` or loose types. Cache appears to work but garbage collects immediately.
 
+**Why this is deceptively hard to debug**: No error messages—app runs perfectly. Cache appears functional initially. Only after 5+ minutes in production do you notice data refetching too frequently and Network tab lighting up. DevTools shows query has 0ms gcTime but you SET 10 minutes. The property is silently ignored—no warnings, no TypeScript errors. Takes 20-30 minutes of cache inspection comparing v4 docs to v5 docs to realize the property was renamed. Searches for "cacheTime not working" find v4 results, not v5 migration notes.
+
 ### ❌ #2: `isLoading` Removed, Use `isPending`
 **Problem**: Loading spinners disappear too early
 
@@ -96,6 +124,8 @@ if (isPending) return <Spinner />  // ✅ Shows while query pending
 - `isPending` (v5): `true` for first fetch + refetches (more accurate)
 
 **Migration trap**: If you have cached data and refetch, `isPending` stays `true` but `isLoading` was `false`. UI shows stale data + spinner in v5.
+
+**Why this is deceptively hard to debug**: `isLoading` is undefined but JavaScript doesn't error—`if (undefined)` is falsy, so spinner never shows. UI appears to work in initial testing (data loads fine). Only in specific edge case—user navigates away and back with cached data—does the bug appear: no loading state during refetch. Users report "page feels broken" but can't reproduce consistently. DevTools shows `isLoading: undefined` but that's easy to miss in large state object. Takes 15-20 minutes to realize v5 removed the property entirely and you need `isPending` instead.
 
 ### ❌ #3: `keepPreviousData` Removed, Use `placeholderData`
 **Problem**: Pagination breaks - flickers on page change
@@ -166,6 +196,8 @@ useQuery({
 
 **Detection**: React DevTools shows component re-rendering every frame. Network tab shows identical requests hammering server.
 
+**Why this is deceptively hard to debug**: Page loads fine initially—first query succeeds. Then browser tab becomes unresponsive. CPU spikes to 100%. Network tab shows 50+ identical requests per second. React DevTools Profiler is unusable (too many renders). The cause—object reference in queryKey—is invisible in the network requests (they all look identical). Error isn't obvious: no stack trace, no warning, just performance death. Takes 10-15 minutes to realize it's React Query, then another 10-15 to isolate which query. Only after adding `console.log` to every query do you see one logging hundreds of times. The fix (extract primitive from object) is obvious once found, but finding the culprit query in a codebase with 50+ queries is the hard part.
+
 ### ❌ Stale Data Trap
 **Problem**: Data never updates despite changes on server
 
@@ -191,6 +223,8 @@ useQuery({
 - `staleTime: 0` → Refetch on every focus/mount (expensive)
 - `staleTime: Infinity` → Never refetch (stale data)
 - `staleTime: 5min` → Balance (refetch after 5min of inactivity)
+
+**Why this is deceptively hard to debug**: Works perfectly in development—you refresh constantly, clearing cache. In production, users keep tabs open for hours. They report "data doesn't update" but you can't reproduce (your dev habits differ). When you check DevTools, query shows fresh data (because you just opened DevTools, triggering window focus refetch if you have default settings). The user's `staleTime: Infinity` is buried in a hook 3 files deep. No error, no warning. You check the API—returns fresh data. You check network—no requests being made (that's the clue, but easy to miss). Takes 20-30 minutes of user reproduction videos to notice they never see network requests after initial load. Only then do you search the codebase for `staleTime` settings.
 
 ### ❌ Over-Invalidation
 **Problem**: Unrelated data refetches on every mutation
@@ -357,17 +391,102 @@ console.log(state?.isInvalidated)  // true = will refetch on next mount
 
 ---
 
+## Error Recovery Procedures
+
+### When Hydration Mismatch Occurs (SSR)
+**Recovery steps**:
+1. Verify data equality: Add `console.log(JSON.stringify(data))` in server and client components
+2. Check prefetch completion: Inspect `dehydrate(queryClient)` output—should contain queries object
+3. Confirm queryKey match: Server and client must use EXACT same key (including array order)
+4. **Fallback**: If still mismatching, bypass prefetch and use `initialData` from server props:
+   ```typescript
+   // Server passes data via props
+   export default function Page() {
+     const data = await fetchTodos()
+     return <TodoList initialTodos={data} />
+   }
+
+   // Client receives and uses as initialData
+   function TodoList({ initialTodos }) {
+     const { data } = useQuery({
+       queryKey: ['todos'],
+       queryFn: fetchTodos,
+       initialData: initialTodos,  // Hydrates without mismatch
+     })
+   }
+   ```
+
+### When Infinite Refetch Loop Detected
+**Recovery steps**:
+1. Add refetch logging: `console.count(\`Refetch: \${JSON.stringify(queryKey)}\`)` in queryFn
+2. Identify the culprit: Check which count exceeds 10 in first 2 seconds
+3. Extract primitives from queryKey: Replace objects/arrays with IDs/strings
+4. **Fallback**: If key MUST contain object (rare), memoize it AND disable `structuralSharing`:
+   ```typescript
+   const stableKey = useMemo(() => ['user', user], [user.id])
+   useQuery({
+     queryKey: stableKey,
+     queryFn: () => fetchUser(user.id),
+     structuralSharing: false,  // Prevents reference comparison issues
+   })
+   ```
+
+### When Stale Data Persists
+**Recovery steps**:
+1. Check `staleTime` setting: Search codebase for `staleTime: Infinity` or very large values
+2. Force invalidation: `queryClient.invalidateQueries({ queryKey: ['your-key'] })`
+3. Verify refetch: Check Network tab for request after invalidation
+4. **Fallback**: If data still stale, cache may be corrupted → clear and refetch:
+   ```typescript
+   queryClient.removeQueries({ queryKey: ['your-key'] })
+   queryClient.refetchQueries({ queryKey: ['your-key'] })
+   ```
+   Or nuclear option: `queryClient.clear()` (clears entire cache)
+
+### When v4→v5 Migration Breaks Silently
+**Recovery steps**:
+1. Enable strict TypeScript: Add `strict: true` to `tsconfig.json` to catch removed properties
+2. Search for v4 property names: `grep -r "cacheTime\|isLoading\|keepPreviousData" src/`
+3. Replace with v5 equivalents: Use find-replace for codebase-wide fixes
+4. **Fallback**: If TypeScript still doesn't catch it, add runtime warning in development:
+   ```typescript
+   // In QueryClient setup
+   const queryClient = new QueryClient({
+     defaultOptions: {
+       queries: {
+         // @ts-ignore - intentionally check for v4 props
+         ...(process.env.NODE_ENV === 'development' && {
+           // Warn if someone passes v4 props
+           onError: (err, query) => {
+             if ('cacheTime' in query) console.warn('⚠️ cacheTime removed in v5, use gcTime')
+             if ('isLoading' in query) console.warn('⚠️ isLoading removed in v5, use isPending')
+           }
+         })
+       }
+     }
+   })
+   ```
+
+---
+
 ## When to Load Full Reference
 
-**LOAD `references/v5-features.md` when:**
-- User needs code examples for new v5 features (useMutationState, throwOnError)
-- Complete API reference needed
+**MANDATORY - READ ENTIRE FILE**: `references/v5-features.md` when:
+- Using 3+ v5-specific features simultaneously (useMutationState, throwOnError, infinite queries)
+- Need complete API reference for 5+ advanced hook options (select, placeholderData, notifyOnChangeProps)
+- Implementing complex patterns (optimistic updates with rollback, parallel/dependent queries, suspense mode)
+- Building custom hooks wrapping React Query with 4+ configuration options
 
-**LOAD `references/migration-guide.md` when:**
-- Migrating large codebase from v4 to v5
-- Need exhaustive breaking changes list
+**MANDATORY - READ ENTIRE FILE**: `references/migration-guide.md` when:
+- Migrating codebase with 10+ query usages from v4 to v5
+- Need exhaustive breaking changes checklist (20+ items to verify)
+- Encountering 3+ different v4→v5 migration errors
+- Setting up automated migration with codemods for large codebase (100+ queries)
 
-**Do NOT load references** for troubleshooting - use this core framework.
+**Do NOT load references** for:
+- Single breaking change fix (use this core framework's Breaking Changes section)
+- Basic troubleshooting (infinite loops, stale data, hydration—covered in core)
+- Simple optimistic update (use Decision Frameworks section)
 
 ---
 
