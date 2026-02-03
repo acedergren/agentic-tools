@@ -1,6 +1,8 @@
-# Improved Skills - TDD Refactored
+# Improved Agent Skills - TDD Refactored
 
-This directory contains skills that have been improved using Test-Driven Development (TDD) methodology and the skill-judge framework.
+This directory contains **agent-agnostic skills** that have been improved using Test-Driven Development (TDD) methodology and the skill-judge framework.
+
+Skills follow a standard format compatible with multiple agent frameworks (Claude Code, Cursor, Windsurf, etc.).
 
 ## Improvements Applied
 
