@@ -895,6 +895,19 @@ curl -X PUT \
 - **Browser:** When API doesn't support feature, visual verification needed
 
 
+## API Automation
+
+**MANDATORY when automating via Cloudflare API, CI/CD pipelines, or GitOps:**
+Load [`api-automation.md`](references/api-automation.md) for complete API reference including Access applications, policies, tunnel management, service tokens, IdP configuration, device posture, and analytics.
+
+**Quick reference:**
+- Base URL: `https://api.cloudflare.com/client/v4/`
+- Auth: `Authorization: Bearer ${API_TOKEN}`
+- Rate limit: 1200 requests per 5 minutes
+- All tunnel config updates apply immediately (no restart)
+
+**Do NOT load** if using dashboard or Terraform (use terraform.md instead).
+
 
 ## Local Development Workflows
 
