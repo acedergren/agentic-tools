@@ -1,6 +1,6 @@
 ---
 name: cloudflare-zero-trust
-description: Comprehensive Cloudflare Zero Trust reference. Use when - Setting up tunnels for HTTP or private networks (SSH, RDP, databases), configuring Access authentication (Azure AD, Okta, OIDC/SSO, service tokens), running cloudflared in Docker/Kubernetes with replicas/scaling, troubleshooting (502 errors, WebSocket/gRPC issues, performance), managing with Terraform/IaC, local development workflows (quick tunnels), audit logging/compliance (Logpush, SIEM), advanced network debugging. Keywords - cloudflared, 502 Bad Gateway, service tokens, terraform, replica scaling, metrics port 20241, WARP routing, quick tunnel, Logpush. CRITICAL - Authentication mandatory not optional.
+description: Use when working with Cloudflare Tunnel or Access - tunnel setup, authentication configuration, 502 Bad Gateway errors, Docker/Kubernetes deployment, service token management, private network routing (SSH/RDP/databases), WebSocket/gRPC connection issues, replica scaling problems, WARP routing, Terraform/IaC automation, local development with quick tunnels, audit logging setup, compliance requirements (SOC2/HIPAA), or advanced network debugging. Keywords - cloudflared, 502 error, service tokens, terraform, metrics port 20241, trycloudflare, Logpush, SIEM. CRITICAL - Authentication mandatory not optional.
 ---
 
 # Cloudflare Zero Trust
