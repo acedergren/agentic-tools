@@ -150,15 +150,19 @@ digraph tunnel_setup {
 
 2. **Create config file** (`~/.cloudflared/config.yml`):
    ```yaml
+   # === REQUIRED FIELDS (tunnel breaks without these) ===
    tunnel: <TUNNEL_ID>
    credentials-file: /etc/cloudflared/<TUNNEL_ID>.json
 
    ingress:
      # Route myapp.example.com to local service
      - hostname: myapp.example.com
-       service: http://localhost:8080
+       service: http://localhost:8080  # REQUIRED: origin URL
        originRequest:
-         noTLSVerify: false  # Verify origin certs
+         # === DANGEROUS (wrong value = security risk or outage) ===
+         noTLSVerify: false  # NEVER set true without specific reason (security risk)
+
+         # === SAFE (tune based on your needs) ===
          connectTimeout: 30s
          httpHostHeader: myapp.example.com
 
@@ -168,11 +172,11 @@ digraph tunnel_setup {
      - hostname: admin.example.com
        service: http://localhost:3000
 
-     # Catch-all (required, must be last)
+     # REQUIRED: Catch-all rule (must be last)
      - service: http_status:404
 
-   # Logging
-   loglevel: info
+   # === SAFE (change freely) ===
+   loglevel: info  # or: debug, warn, error
    ```
 
 3. **Route DNS:**
@@ -225,155 +229,82 @@ Load [`protocols.md`](references/protocols.md) for complete protocol configurati
 - Kubernetes/orchestration
 - Portable deployments
 
-### Docker Compose Example
+### Container-Specific Patterns
 
-**Directory structure:**
-```
-project/
-├── docker-compose.yml
-├── cloudflared/
-│   ├── config.yml
-│   └── credentials.json  # From cloudflared tunnel create
-```
+**Critical networking difference (Docker/Kubernetes):**
 
-**docker-compose.yml:**
 ```yaml
-version: '3.8'
-
-services:
-  # Your application
-  myapp:
-    image: myapp:latest
-    ports:
-      - "8080:8080"
-    networks:
-      - app-network
-
-  # Cloudflare Tunnel
-  cloudflared:
-    image: cloudflare/cloudflared:latest
-    command: tunnel --config /etc/cloudflared/config.yml run
-    volumes:
-      - ./cloudflared/config.yml:/etc/cloudflared/config.yml:ro
-      - ./cloudflared/credentials.json:/etc/cloudflared/credentials.json:ro
-    networks:
-      - app-network
-    restart: unless-stopped
-    depends_on:
-      - myapp
-    healthcheck:
-      test: ["CMD", "cloudflared", "tunnel", "info"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
-networks:
-  app-network:
-    driver: bridge
-```
-
-**cloudflared/config.yml:**
-```yaml
-tunnel: <TUNNEL_ID>
-credentials-file: /etc/cloudflared/credentials.json
-
+# ❌ WRONG - localhost doesn't resolve in containers
 ingress:
   - hostname: myapp.example.com
-    service: http://myapp:8080  # Use container name
-    originRequest:
-      noTLSVerify: false
-  - service: http_status:404
+    service: http://localhost:8080
 
-loglevel: info
+# ✅ RIGHT - use service/pod name
+# Docker Compose:
+    service: http://myapp:8080  # Container name from docker-compose.yml
+
+# Kubernetes:
+    service: http://myapp-service:8080  # Service name
 ```
 
-**Setup steps:**
-1. Create tunnel: `cloudflared tunnel create myapp-tunnel`
-2. Copy `~/.cloudflared/<TUNNEL_ID>.json` to `cloudflared/credentials.json`
-3. Update `config.yml` with `<TUNNEL_ID>`
-4. Route DNS: `cloudflared tunnel route dns myapp-tunnel myapp.example.com`
-5. Start: `docker-compose up -d`
-6. Configure Access (dashboard)
+**Credential mounting patterns:**
 
-**Health checks:**
-```bash
-# Check tunnel status
-docker-compose logs cloudflared
-
-# Verify connections
-docker-compose exec cloudflared cloudflared tunnel info
-```
-
-### Kubernetes Example
-
-**cloudflared-deployment.yaml:**
 ```yaml
-apiVersion: v1
-kind: Secret
-metadata:
-  name: cloudflared-credentials
-type: Opaque
-stringData:
-  credentials.json: |
-    <contents of tunnel credentials>
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: cloudflared-config
-data:
-  config.yml: |
-    tunnel: <TUNNEL_ID>
-    credentials-file: /etc/cloudflared/credentials.json
-    ingress:
-      - hostname: myapp.example.com
-        service: http://myapp-service:8080
-      - service: http_status:404
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: cloudflared
+# Docker Compose:
+volumes:
+  - ./cloudflared/config.yml:/etc/cloudflared/config.yml:ro  # Read-only
+  - ./cloudflared/credentials.json:/etc/cloudflared/credentials.json:ro
+
+# Kubernetes:
+# Use ConfigMap for config, Secret for credentials
+```
+
+**Health check setup:**
+
+```yaml
+# Docker Compose:
+healthcheck:
+  test: ["CMD", "cloudflared", "tunnel", "info"]
+  interval: 30s
+  timeout: 10s
+  retries: 3
+
+# Kubernetes:
+livenessProbe:
+  exec:
+    command: ["cloudflared", "tunnel", "info"]
+  initialDelaySeconds: 30
+  periodSeconds: 30
+```
+
+**Redundancy for production:**
+
+```yaml
+# Docker Compose - use multiple instances behind load balancer
+# Kubernetes - use replicas:
 spec:
-  replicas: 2  # Redundancy
-  selector:
-    matchLabels:
-      app: cloudflared
-  template:
-    metadata:
-      labels:
-        app: cloudflared
-    spec:
-      containers:
-      - name: cloudflared
-        image: cloudflare/cloudflared:latest
-        args:
-          - tunnel
-          - --config
-          - /etc/cloudflared/config.yml
-          - run
-        volumeMounts:
-          - name: config
-            mountPath: /etc/cloudflared/config.yml
-            subPath: config.yml
-          - name: credentials
-            mountPath: /etc/cloudflared/credentials.json
-            subPath: credentials.json
-        livenessProbe:
-          exec:
-            command:
-              - cloudflared
-              - tunnel
-              - info
-          initialDelaySeconds: 30
-          periodSeconds: 30
-      volumes:
-        - name: config
-          configMap:
-            name: cloudflared-config
-        - name: credentials
-          secret:
-            secretName: cloudflared-credentials
+  replicas: 2  # Minimum 2 for zero-downtime updates
+```
+
+**Setup workflow:**
+
+1. Create tunnel: `cloudflared tunnel create myapp-tunnel`
+2. Get credentials: `~/.cloudflared/<TUNNEL_ID>.json`
+3. Mount config + credentials in container
+4. Set service URL to container/service name (NOT localhost)
+5. Configure Access authentication
+6. Deploy with health checks enabled
+
+**Verification:**
+
+```bash
+# Docker Compose
+docker-compose logs cloudflared
+docker-compose exec cloudflared cloudflared tunnel info
+
+# Kubernetes
+kubectl logs -l app=cloudflared
+kubectl exec deploy/cloudflared -- cloudflared tunnel info
 ```
 
 ## Private Network Routing (Non-HTTP Services)
@@ -580,68 +511,118 @@ Load [`service-auth.md`](references/service-auth.md) for service token creation,
 
 **Meaning:** Tunnel is connected to Cloudflare, but can't reach your origin.
 
-**Troubleshooting steps:**
+**Systematic diagnosis:**
 
-1. **Check origin service is running:**
-   ```bash
-   curl http://localhost:8080
-   ```
+```dot
+digraph troubleshoot_502 {
+    rankdir=TD;
+    node [shape=box, style=rounded];
 
-2. **Check cloudflared logs:**
-   ```bash
-   sudo journalctl -u cloudflared -n 50 --no-pager  # Systemd
-   docker logs cloudflared  # Docker
-   ```
+    start [label="502 Bad Gateway", shape=ellipse, style=filled, fillcolor="#ffcccc"];
+    check_origin [label="Can you curl origin\nlocally?", shape=diamond];
+    origin_down [label="Origin service down\nRestart service", style=filled, fillcolor="#ffcccc"];
+    check_docker [label="Is cloudflared\nin Docker?", shape=diamond];
+    wrong_service [label="Using localhost?\nChange to container name:\nhttp://myapp:8080", style=filled, fillcolor="#ccffcc"];
+    check_tls [label="Origin uses\nHTTPS?", shape=diamond];
+    tls_issue [label="Self-signed cert?\nSet noTLSVerify: true\nOR add caPool", style=filled, fillcolor="#ccffcc"];
+    check_port [label="Port correct\nin config?", shape=diamond];
+    wrong_port [label="Fix port number\nin config.yml", style=filled, fillcolor="#ccffcc"];
+    firewall [label="Check firewall\nrules/logs", style=filled, fillcolor="#ffffcc"];
 
-3. **Common causes:**
-
-**Wrong port in config:**
-```yaml
-# Check config.yml
-ingress:
-  - hostname: app.example.com
-    service: http://localhost:8080  # Port correct?
+    start -> check_origin;
+    check_origin -> origin_down [label="No"];
+    check_origin -> check_docker [label="Yes"];
+    check_docker -> wrong_service [label="Yes"];
+    check_docker -> check_tls [label="No"];
+    check_tls -> tls_issue [label="Yes"];
+    check_tls -> check_port [label="No"];
+    check_port -> wrong_port [label="No"];
+    check_port -> firewall [label="Yes"];
+}
 ```
 
-**Docker network issue (non-obvious):**
-```yaml
-# In Docker Compose, use service name not localhost
-service: http://myapp:8080  # NOT http://localhost:8080
-```
+**Quick diagnostic commands:**
 
-**TLS verification failure:**
-```yaml
-originRequest:
-  noTLSVerify: true  # Only if origin uses self-signed cert
-```
+```bash
+# 1. Test origin locally
+curl -v http://localhost:8080
+# Success? Continue. Connection refused? Origin is down.
 
-4. **Test tunnel independently:**
-   ```bash
-   sudo systemctl stop cloudflared
-   cloudflared tunnel run myapp-tunnel  # See real-time logs
-   ```
+# 2. Check cloudflared logs
+sudo journalctl -u cloudflared -n 50 --no-pager  # Systemd
+docker logs cloudflared  # Docker
+# Look for: "dial tcp", "connection refused", "context deadline exceeded"
+
+# 3. Test from cloudflared container (if Docker)
+docker exec cloudflared curl http://myapp:8080
+# Fails? Wrong service name or network issue
+
+# 4. Run tunnel in foreground (see real-time errors)
+sudo systemctl stop cloudflared
+cloudflared tunnel run myapp-tunnel
+```
 
 ### Authentication Loop (Redirect Loop)
 
 **Symptom:** Browser keeps redirecting to login, never reaches app
 
-**Causes:**
+**Systematic diagnosis:**
 
-1. **Access policy too restrictive:**
-   - Check Zero Trust → Access → Applications → Your App → Policies
-   - Ensure at least one Allow policy matches your user
+```dot
+digraph troubleshoot_auth_loop {
+    rankdir=TD;
+    node [shape=box, style=rounded];
 
-2. **IdP misconfiguration:**
-   - Verify redirect URI in IdP matches Cloudflare
-   - Check group claims are being sent
+    start [label="Authentication Loop", shape=ellipse, style=filled, fillcolor="#ffcccc"];
+    check_policy [label="Does an Allow policy\nmatch your user?", shape=diamond];
+    policy_issue [label="Add/update Allow policy\nCheck email/groups match", style=filled, fillcolor="#ccffcc"];
+    check_idp [label="IdP redirect URI\nmatches Cloudflare?", shape=diamond];
+    idp_issue [label="Fix redirect URI:\nhttps://<team>.cloudflareaccess.com\n/cdn-cgi/access/callback", style=filled, fillcolor="#ccffcc"];
+    check_groups [label="Using group-based\npolicies?", shape=diamond];
+    groups_issue [label="Verify IdP sends group claims\nCheck 'Support groups' enabled", style=filled, fillcolor="#ccffcc"];
+    check_cookies [label="Try incognito mode\nClear all cookies", shape=diamond];
+    cookie_issue [label="Browser blocking 3rd-party\ncookies or privacy mode active", style=filled, fillcolor="#ffffcc"];
+    check_session [label="Session duration\nadequate?", shape=diamond];
+    session_issue [label="Increase session duration\nDefault 24h may be too short", style=filled, fillcolor="#ccffcc"];
+    escalate [label="Check Cloudflare Access logs\nfor specific error", style=filled, fillcolor="#ffffcc"];
 
-3. **Cookie issues:**
-   - Clear cookies for `*.cloudflareaccess.com` and your domain
-   - Check browser isn't blocking third-party cookies
+    start -> check_policy;
+    check_policy -> policy_issue [label="No"];
+    check_policy -> check_idp [label="Yes"];
+    check_idp -> idp_issue [label="No"];
+    check_idp -> check_groups [label="Yes"];
+    check_groups -> groups_issue [label="Yes"];
+    check_groups -> check_cookies [label="No"];
+    check_cookies -> cookie_issue [label="Still loops"];
+    check_cookies -> check_session [label="Works in\nincognito"];
+    check_session -> session_issue [label="No"];
+    check_session -> escalate [label="Yes"];
+}
+```
 
-4. **Session expired:**
-   - Session duration set too short
-   - Increase in Access → Applications → Your App → Session Duration
+**Quick diagnostic steps:**
+
+```bash
+# 1. Verify Access policy matches you
+# Dashboard → Zero Trust → Access → Applications → <Your App> → Policies
+# Check: Does an Allow policy include your email/domain/group?
+
+# 2. Test in incognito window (eliminates cookie issues)
+# If works in incognito → Clear cookies
+# If still loops → Policy or IdP issue
+
+# 3. Check IdP redirect URI
+# Must exactly match: https://<your-team-name>.cloudflareaccess.com/cdn-cgi/access/callback
+
+# 4. Verify group claims (if using group-based policies)
+# Azure AD: Token configuration → Add groups claim
+# Okta: Profile → Edit → Include in token
+# Cloudflare: Settings → Authentication → <IdP> → Support groups ✓
+
+# 5. Check Access logs for specific error
+# Dashboard → Zero Trust → Logs → Access
+# Look for: policy evaluation failures, IdP errors
+```
 
 ### Tunnel Not Connecting
 
