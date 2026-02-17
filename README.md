@@ -32,7 +32,20 @@ The core pipeline takes you from requirements to merged PR:
 
 ## Quick Start
 
-### Install Everything
+### Via npx (recommended)
+
+```bash
+# Install into current project
+npx agentic-tools init
+
+# Install into a specific project
+npx agentic-tools init ./my-project
+
+# See what's included
+npx agentic-tools list
+```
+
+### Via git clone
 
 ```bash
 git clone https://github.com/acedergren/agentic-tools.git
@@ -45,7 +58,7 @@ This copies skills to `.claude/skills/`, agents to `.claude/agents/`, and hook e
 ### Install Individual Skills
 
 ```bash
-# Copy a single skill
+# Copy a single skill from a cloned repo
 cp -r skills/implement /path/to/project/.claude/skills/
 
 # Or symlink for development
