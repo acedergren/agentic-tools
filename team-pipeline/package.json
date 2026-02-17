@@ -1,0 +1,40 @@
+{
+  "name": "@acedergren/team-pipeline",
+  "version": "1.0.0",
+  "description": "Agent team orchestration pipeline for Claude Code — from PRD to merged PR",
+  "type": "module",
+  "bin": {
+    "agent-pipeline": "./bin/cli.js"
+  },
+  "files": [
+    "bin/",
+    "skills/",
+    "agents/",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "claude-code",
+    "ai-agent",
+    "pipeline",
+    "orchestration",
+    "tdd",
+    "code-review",
+    "multi-agent",
+    "workflow"
+  ],
+  "author": "Alex Cedergren",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/acedergren/agentic-tools.git",
+    "directory": "team-pipeline"
+  },
+  "homepage": "https://github.com/acedergren/agentic-tools/tree/main/team-pipeline#readme",
+  "bugs": {
+    "url": "https://github.com/acedergren/agentic-tools/issues"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

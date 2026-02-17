@@ -30,6 +30,21 @@ The core pipeline takes you from requirements to merged PR:
 /prd → /prd --to-plan → /orchestrate → agents use /implement → /review-all → /health-check → PR
 ```
 
+## Packages
+
+| Package                             | What it includes                                             |
+| ----------------------------------- | ------------------------------------------------------------ |
+| **[agentic-tools](.)** (this repo)  | Everything — all skills, agents, hooks, configs              |
+| **[team-pipeline](team-pipeline/)** | Pipeline skills + agents only — for agent team orchestration |
+
+```bash
+# Install everything
+npx agentic-tools init
+
+# Install just the pipeline
+npx @acedergren/team-pipeline init
+```
+
 ## Quick Start
 
 ### Via npx (recommended)
