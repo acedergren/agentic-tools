@@ -8,365 +8,335 @@
        |___/
 ```
 
-**High-quality AI agent skills and automation tools for modern development**
+**Production-grade AI agent skills, workflows, and automation for Claude Code**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Skills](https://img.shields.io/badge/Skills-6%20A--Grade-brightgreen)](#featured-skills)
+[![Skills](https://img.shields.io/badge/Skills-17-brightgreen)](#skills)
+[![Agents](https://img.shields.io/badge/Agents-2-blue)](#agents)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Compatible-blueviolet)](https://claude.com/claude-code)
 [![Community Project](https://img.shields.io/badge/Community-Maintained-success)](https://github.com/acedergren/agentic-tools)
 
 </div>
 
-> **⚠️ Independent Community Project** — This project has **no official affiliation** with Oracle Corporation, Anthropic, or the Claude Code team. The Oracle Cloud (OCI) related skills and tools are community-created integrations that reference compatibility with Oracle's services, not endorsement by Oracle.
+> **Independent Community Project** — No official affiliation with Anthropic or the Claude Code team. Skills are designed for Claude Code but are community-created.
 
-## 🎯 Featured Skills
+## What This Is
 
-### 📚 Agent Skills (`skills/`)
+A battle-tested collection of Claude Code skills, custom agents, hooks, and configuration templates that form a complete development workflow pipeline. Built from real production use across 276 sessions, 435 commits, and 1,700+ passing tests.
 
-Improved skills following TDD methodology with skill-judge framework (F→C grade, 32% token reduction):
+The core pipeline takes you from requirements to merged PR:
 
-- **humanizer** (v3.0.0) - Remove AI writing patterns and make text sound human
-- **shadcn-svelte-skill** (v3.0.0) - shadcn-svelte + Tailwind v4.1 architecture decisions
-- **firecrawl** (v3.0.0) - Web scraping CLI returning clean Markdown from any URL
-- **tanstack-query** (v3.0.0) - TanStack Query v5 migration gotchas and performance pitfalls
-- **turborepo** (v3.0.0) - Monorepo architecture decisions and anti-patterns
-- **refactor-module** (v3.0.0) - Terraform module extraction decision framework
+```
+/prd → /prd --to-plan → /orchestrate → agents use /implement → /review-all → /health-check → PR
+```
 
-Each skill includes:
-- ✅ Expert-only knowledge (not Claude's base knowledge)
-- ✅ Decision frameworks with clear criteria
-- ✅ Anti-patterns with WHY explanations
-- ✅ Individual README documenting TDD improvements
-- ✅ <300 lines core content (progressive disclosure)
+## Quick Start
 
-### 🔐 Claude Code Configuration (`claude/settings/`)
-- **User-Level Config** - Global permissions (400+ commands) for all projects
-- **Project-Level Config** - Project-specific permissions example
-- Covers Node.js, Python, iOS, Android, Go, Rust, C/C++, Ruby, PHP, Perl, and more
-- Full DevOps stack: Docker, Kubernetes, Terraform, Ansible
-- All cloud platforms: AWS, GCP, Azure, OCI, Cloudflare
-
-### 🔄 Git Workflows (`git-workflow/`)
-- **Workflow Guides** - Trunk-Based, GitHub Flow, GitFlow strategies
-- **Commit Templates** - 8 templates for Conventional Commits
-- **PR Templates** - 6 templates for different change types
-- **Branch Naming** - Conventions and enforcement strategies
-
-### 🪝 Claude Hooks (`claude/hooks/`)
-- **5 Example Hooks** - Security, pre-commit, cost tracking, session logging, backups
-- **4 Hook Templates** - Starter templates for custom hooks
-- **Hookify Guide** - Using /hookify command to create hooks from conversations
-- **Full Documentation** - Configuration, testing, best practices
-
----
-
-## 🚀 Quick Start
-
-### Install Skills
-
-Use the skills CLI to install any skill:
+### Install Everything
 
 ```bash
-# Install a specific skill
-npx skills add acedergren/agentic-tools/humanizer
-
-# Or install from the skills directory
-cd ~/.agents/skills
 git clone https://github.com/acedergren/agentic-tools.git
-cp -r agentic-tools/skills/* .
+cd agentic-tools
+./install.sh /path/to/your/project
 ```
 
-### Claude Code Setup
+This copies skills to `.claude/skills/`, agents to `.claude/agents/`, and hook examples to `.claude/hooks/`.
 
-### User-Level Setup (Recommended)
-
-Global permissions that apply to **all** Claude Code projects:
+### Install Individual Skills
 
 ```bash
-# 1. Create Claude config directory
-mkdir -p ~/.config/claude
+# Copy a single skill
+cp -r skills/implement /path/to/project/.claude/skills/
 
-# 2. Copy user-level config
+# Or symlink for development
+ln -s $(pwd)/skills/implement /path/to/project/.claude/skills/
+```
+
+### Try It
+
+```bash
+# In your project with Claude Code:
+/implement add validation to the user signup endpoint
+/tdd add rate limiting to POST /api/search
+/health-check
+/review-all
+```
+
+---
+
+## Skills
+
+### Development Pipeline
+
+These skills chain together into a full implementation workflow.
+
+| Skill                                         | What It Does                  | Key Feature                                      |
+| --------------------------------------------- | ----------------------------- | ------------------------------------------------ |
+| **[/implement](skills/implement/)**           | End-to-end feature pipeline   | Pre-flight → TDD → scope guard → commit          |
+| **[/tdd](skills/tdd/)**                       | Test-driven development cycle | Mock bootstrap phase catches wiring issues early |
+| **[/write-tests](skills/write-tests/)**       | Add tests to existing code    | Module-type-aware mock strategy selection        |
+| **[/quality-commit](skills/quality-commit/)** | Quality gates + commit        | Lint, typecheck, test, then commit               |
+
+### Review & Quality
+
+| Skill                                     | What It Does                      | Key Feature                                       |
+| ----------------------------------------- | --------------------------------- | ------------------------------------------------- |
+| **[/review-all](skills/review-all/)**     | Parallel multi-reviewer pipeline  | Security + API audit + scope check agents         |
+| **[/health-check](skills/health-check/)** | Full codebase diagnostic          | 7+ gates: types, tests, lint, security, dead code |
+| **[/api-audit](skills/api-audit/)**       | Route-to-type contract validation | Finds auth gaps, missing schemas, type drift      |
+| **[/doc-sync](skills/doc-sync/)**         | Documentation drift detection     | Compares docs against actual codebase state       |
+
+### Planning & Orchestration
+
+| Skill                                       | What It Does                       | Key Feature                                    |
+| ------------------------------------------- | ---------------------------------- | ---------------------------------------------- |
+| **[/prd](skills/prd/)**                     | PRD creation with validation gates | 10-gate validation checklist, `--to-plan` mode |
+| **[/orchestrate](skills/orchestrate/)**     | Multi-agent team coordination      | Wave-based execution, heartbeat monitoring     |
+| **[/phase-kickoff](skills/phase-kickoff/)** | Phase scaffolding                  | Branch + test shells + roadmap entry           |
+
+### Content & Utilities
+
+| Skill                                             | What It Does                | Key Feature                               |
+| ------------------------------------------------- | --------------------------- | ----------------------------------------- |
+| **[/humanizer](skills/humanizer/)**               | Remove AI writing patterns  | Diagnostic framework + voice injection    |
+| **[/firecrawl](skills/firecrawl/)**               | Web scraping CLI            | Parallel scraping, clean markdown output  |
+| **[/shadcn-svelte](skills/shadcn-svelte-skill/)** | shadcn-svelte architecture  | Tailwind v4.1 patterns, library selection |
+| **[/tanstack-query](skills/tanstack-query/)**     | TanStack Query v5 patterns  | Migration gotchas, performance pitfalls   |
+| **[/turborepo](skills/turborepo/)**               | Monorepo architecture       | Build optimization, workspace patterns    |
+| **[/refactor-module](skills/refactor-module/)**   | Terraform module extraction | Decision framework for when to extract    |
+
+---
+
+## Agents
+
+Custom agents for specialized tasks. Use with Claude Code's Task tool.
+
+| Agent                                                       | Model  | Purpose                                                          |
+| ----------------------------------------------------------- | ------ | ---------------------------------------------------------------- |
+| **[mock-debugger](claude/agents/mock-debugger.md)**         | Sonnet | Diagnoses Vitest mock wiring failures — 6 anti-pattern checklist |
+| **[security-reviewer](claude/agents/security-reviewer.md)** | Opus   | OWASP Top 10 review with file:line references                    |
+
+### Using Agents
+
+Agents are automatically available when placed in `.claude/agents/`. Claude Code uses them via the Task tool:
+
+```
+# In Claude Code, the /review-all skill automatically spawns the security-reviewer agent
+# Or reference directly: "Use the mock-debugger agent to diagnose why my tests fail"
+```
+
+---
+
+## Hooks
+
+Pre-built automation that runs on Claude Code tool events. See [`claude/hooks/README.md`](claude/hooks/README.md) for full documentation.
+
+### Examples (5 production-ready)
+
+| Hook                  | Trigger               | What It Does                  |
+| --------------------- | --------------------- | ----------------------------- |
+| `commit-preflight.sh` | Pre-Bash (git commit) | Lint + typecheck staged files |
+| `security-scan.sh`    | Pre-Bash (git push)   | Semgrep security scan         |
+| `cost-tracker.sh`     | Post-Bash             | Track cloud resource costs    |
+| `session-summary.sh`  | Session end           | Log session activity          |
+| `file-backup.sh`      | Pre-Edit              | Backup files before editing   |
+
+### Templates (4 starters)
+
+Quick-start templates for building your own hooks: `bash-pre.sh`, `edit-pre.sh`, `session-start.sh`, `user-prompt-submit.sh`.
+
+---
+
+## Configuration
+
+### User-Level Permissions (`claude/settings/`)
+
+Global permissions covering 400+ commands across 30+ categories:
+
+- **Languages**: Node.js, Python, Go, Rust, Java, Ruby, PHP, C/C++, Swift
+- **Cloud**: AWS, GCP, Azure, OCI, Cloudflare
+- **DevOps**: Docker, Kubernetes, Terraform, Ansible
+- **Testing**: Vitest, Jest, Playwright, Cypress
+- **Security**: Semgrep, Snyk, Trivy
+
+```bash
+# Install global permissions
 cp claude/settings/user-level/config.json ~/.config/claude/config.json
-
-# 3. Verify
-ls -lh ~/.config/claude/config.json
 ```
 
-### Project-Level Setup (Optional)
+### Git Workflows (`git-workflow/`)
 
-For project-specific permissions:
+- 3 workflow strategies (Trunk-Based, GitHub Flow, GitFlow)
+- 8 commit templates (Conventional Commits)
+- 6 PR templates
+- Branch naming conventions
 
-```bash
-# In your project directory
-mkdir -p .claude
-cp claude/settings/project-level/settings.local.json .claude/settings.local.json
+---
+
+## The Pipeline
+
+How the skills work together for a complete feature lifecycle:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    PLANNING PHASE                           │
+│                                                             │
+│  /prd ──────────► PRD.md ──────────► /prd --to-plan        │
+│  (interactive      (validated         (generates            │
+│   discovery)       requirements)       task plan)           │
+└────────────────────────┬────────────────────────────────────┘
+                         │
+                         ▼
+┌─────────────────────────────────────────────────────────────┐
+│                   EXECUTION PHASE                           │
+│                                                             │
+│  /orchestrate ──► spawn agent team ──► each agent runs:     │
+│  (coordinates      (haiku/sonnet       /implement           │
+│   waves)            per task)           (full TDD pipeline)  │
+│                                                             │
+│  /implement phases:                                         │
+│    0. Pre-flight (git clean? types compile? tests green?)   │
+│    1. Understand & Plan                                     │
+│    2. Bootstrap Mock (1 test to validate wiring)            │
+│    3. Red — write failing tests                             │
+│    4. Green — minimum implementation                        │
+│    5. Scope Guard (revert out-of-scope changes)             │
+│    6. Full Suite + Quality Gates                            │
+│    7. Commit                                                │
+└────────────────────────┬────────────────────────────────────┘
+                         │
+                         ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    REVIEW PHASE                             │
+│                                                             │
+│  /review-all ──► parallel agents:                           │
+│                  • security-reviewer (OWASP Top 10)         │
+│                  • API route auditor (schema coverage)      │
+│                  • scope auditor (drift detection)          │
+│                                                             │
+│  /health-check ► types ✓ tests ✓ lint ✓ security ✓         │
+│                  dead code ✓ circular deps ✓ audit ✓        │
+│                                                             │
+│  Verdict: READY TO MERGE / NEEDS FIXES / NEEDS DISCUSSION  │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 🎯 Claude Permissions - What's Covered
+## Customization
 
-### Development Tools (400+ commands)
+These skills are designed to be adapted to your project. Common customizations:
 
-#### Core Development
-- **Node.js**: pnpm, npm, npx, node, yarn, bun, deno, turbo, nx
-- **Python**: python3, pip, pytest, mypy, black, isort, ruff, poetry, pipenv
-- **iOS/macOS**: xcodebuild, swift, xcrun, swiftlint, fastlane, pod
-- **Android**: gradle, adb, emulator
-- **Java/JVM**: java, maven, gradle, kotlin, scala
-- **Ruby**: ruby, gem, bundle, rails, rspec, rubocop
-- **Go**: go, gofmt, golangci-lint
-- **Rust**: cargo, rustc, rustfmt, clippy
-- **C/C++**: gcc, clang, make, cmake, gdb, lldb, valgrind
-- **Perl**: perl, cpan
-- **PHP**: php, composer, phpunit
+### Project-Specific Paths
 
-#### Version Managers
-- nvm, pyenv, rbenv, asdf, tfenv, goenv, jenv, sdkman
+Update file paths in skills to match your project structure:
 
-#### Infrastructure as Code
-- **Terraform**: terraform, terragrunt, tflint, tfsec
-- **Ansible**: ansible, ansible-playbook, ansible-vault
-- **Pulumi**: pulumi
+```markdown
+# In skills/health-check/SKILL.md, update workspace paths:
 
-#### Cloud Platforms
-- **Oracle Cloud (OCI)**: oci, sqlcl, sql, sqlplus
-- **AWS**: aws
-- **Google Cloud**: gcloud
-- **Azure**: az
-- **Others**: doctl, fly, vercel, netlify, railway
-- **Cloudflare**: wrangler, cloudflare, cloudflared
-
-#### Containers & Orchestration
-- **Docker**: docker, docker-compose, podman
-- **Kubernetes**: kubectl, k9s, helm, minikube, kind, skaffold
-
-#### Databases
-- PostgreSQL, MySQL, SQLite, MongoDB, Redis, InfluxDB, Cassandra
-
-#### Testing & Quality
-- **Testing**: vitest, jest, playwright, cypress, selenium
-- **Linting**: eslint, prettier, shellcheck, shfmt
-- **Security**: snyk, semgrep, trivy, grype, syft
-
-#### Observability
-- grafana-cli, prometheus, alertmanager, loki, tempo, opentelemetry
-
-#### System Package Managers
-- brew, apt, dnf, yum, pacman, snap, flatpak, nix
-
-#### Modern CLI Tools
-- **File Operations**: exa, eza, lsd, fd, ripgrep, bat
-- **Navigation**: zoxide, fzf
-- **Monitoring**: procs, dust, duf, btop, glances
-- **Performance**: hyperfine, tokei
-
-#### System Tools
-- **Terminal**: tmux, screen, byobu, zellij
-- **SSH/Security**: ssh-keygen, gpg, age, sops
-- **Debugging**: strace, ltrace, perf, gdb, lldb
-- **Network**: tcpdump, nmap, mtr, speedtest
-- **Compression**: tar, zip, gzip, zstd, lz4, 7z
-
-#### All Standard Unix Commands
-- ls, cat, grep, find, sed, awk, base64, cut, sort, uniq, diff, chmod, chown, mkdir, cp, mv, rm, ln, ps, kill, curl, wget, ssh, rsync, and 100+ more
-
----
-
-## 📊 Configuration Stats
-
-### User-Level Config
-- **Size**: 615 lines (21 KB)
-- **Bash Commands**: 400+ permission patterns
-- **Categories**: 30+ organized sections
-- **Scope**: All Claude Code projects
-
-### Project-Level Example
-- **Size**: 296 lines (9.6 KB)
-- **Focus**: Project-specific tools, scripts, MCP servers
-- **Includes**: Serena MCP, Snyk, Playwright, custom skills
-
----
-
-## 🔒 Security Philosophy
-
-### Two-Tier Permission Strategy
-
-```
-User-Level (~/.config/claude/config.json)
-    ↓ Global baseline - safe everywhere
-    ↓
-Project-Level (.claude/settings.local.json)
-    ↓ Project-specific extensions
-    ↓
-Final Permission Set (merged)
+cd apps/api && npx tsc --noEmit → cd src && npx tsc --noEmit
 ```
 
-**User-Level**: Conservative, universal tools safe across all projects
-**Project-Level**: Aggressive, project-specific tools and scripts
+### Additional Review Agents
 
-### What's NOT Included (By Design)
+Add project-specific reviewers to `/review-all`:
 
-- ❌ Destructive operations without wildcards (rm -rf /, dd, mkfs)
-- ❌ System modification commands (reboot, shutdown, init)
-- ❌ Direct file path permissions (antipattern - use Read/Write tools instead)
+```markdown
+# In skills/review-all/SKILL.md, add to the agent table:
 
----
-
-## 📝 Customization
-
-### Adding New Commands
-
-Edit your local config and add to the appropriate section:
-
-```json
-{
-  "permissions": {
-    "allow": [
-      "# ============================================",
-      "# Your Custom Section",
-      "# ============================================",
-      "Bash(your-tool:*)",
-      "Bash(another-tool:*)"
-    ]
-  }
-}
+| **DB Reviewer** | `oracle-query-reviewer` (custom) | Changed SQL files | Bind params, atomic ops |
 ```
 
-### Permission Patterns
+### Custom Quality Gates
 
-- `Bash(tool:*)` - Allow all subcommands
-- `Bash(tool subcommand:*)` - Allow specific subcommand with arguments
-- `WebFetch(domain:example.com)` - Allow fetching from domain
-- `mcp__server__tool` - Allow specific MCP server tool
+Extend `/health-check` with project-specific checks:
 
----
+```markdown
+# Add to skills/health-check/SKILL.md:
 
-## 🔍 Comparison: Before vs After
+### 8. OpenAPI Lint
 
-### Before Optimization
-- **Entries**: 432 granular permissions
-- **Size**: 40 KB
-- **Issues**:
-  - Missing 91 common commands
-  - Hardcoded file paths
-  - Duplicate patterns
-  - No organization
-
-### After Optimization
-- **Entries**: 400+ organized patterns
-- **Size**: 21 KB (48% reduction)
-- **Improvements**:
-  - ✅ All common dev tools covered
-  - ✅ Organized into 30+ categories
-  - ✅ Consolidated patterns
-  - ✅ Best practices applied
+npx spectral lint openapi.json --ruleset .spectral.yaml
+```
 
 ---
 
-## 🎓 Learning Resources
-
-- [Claude Code Documentation](https://claude.com/claude-code)
-- [Claude Code GitHub](https://github.com/anthropics/claude-code)
-- [Permissions Best Practices](https://docs.anthropic.com/claude-code/permissions)
-
----
-
-## 📁 Repository Structure
+## Repository Structure
 
 ```
-solutionsedge-agentic-tools/
+agentic-tools/
 ├── README.md
-├── LICENSE (AGPL-3.0)
+├── install.sh                        # One-command installer
+├── LICENSE
+│
+├── skills/                           # Claude Code skills
+│   ├── implement/SKILL.md            # Full TDD pipeline
+│   ├── tdd/SKILL.md                  # Test-driven development
+│   ├── write-tests/SKILL.md          # Test generation
+│   ├── review-all/SKILL.md           # Parallel review pipeline
+│   ├── health-check/SKILL.md         # Codebase diagnostics
+│   ├── api-audit/SKILL.md            # Route-type contract audit
+│   ├── doc-sync/SKILL.md             # Documentation drift
+│   ├── phase-kickoff/SKILL.md        # Phase scaffolding
+│   ├── prd/                          # PRD management
+│   │   ├── SKILL.md
+│   │   ├── template.md
+│   │   ├── validation.md
+│   │   └── drift-prevention.md
+│   ├── orchestrate/                  # Multi-agent coordination
+│   │   ├── SKILL.md
+│   │   ├── wave-template.md
+│   │   ├── agent-roles.md
+│   │   └── headless-runner.md
+│   ├── quality-commit/SKILL.md       # Quality gates + commit
+│   ├── humanizer/                    # AI pattern removal
+│   ├── firecrawl/                    # Web scraping
+│   ├── shadcn-svelte-skill/          # shadcn-svelte patterns
+│   ├── tanstack-query/               # TanStack Query v5
+│   ├── turborepo/                    # Monorepo patterns
+│   └── refactor-module/              # Terraform extraction
+│
 ├── claude/
-│   ├── settings/
-│   │   ├── user-level/
-│   │   │   └── config.json              # Global permissions (400+ commands)
-│   │   ├── project-level/
-│   │   │   └── settings.local.json      # Project example
-│   │   └── templates/                    # 4 use-case templates
-│   └── hooks/
-│       ├── README.md                     # Hooks documentation
-│       ├── hookify-rules.md              # Using /hookify command
-│       ├── examples/                     # 5 ready-to-use hooks
-│       │   ├── commit-preflight.sh
-│       │   ├── security-scan.sh
-│       │   ├── cost-tracker.sh
-│       │   ├── session-summary.sh
-│       │   └── file-backup.sh
-│       └── hook-templates/               # 4 starter templates
-│           ├── bash-pre.sh
-│           ├── edit-pre.sh
-│           ├── user-prompt-submit.sh
-│           └── session-start.sh
-├── git-workflow/
-│   ├── README.md                         # Workflow comparison & setup
-│   ├── workflows/                        # 3 workflow strategies
-│   │   ├── trunk-based.md
-│   │   ├── github-flow.md
-│   │   └── gitflow.md
-│   ├── commit-templates/                 # 8 commit templates
-│   │   ├── conventional-commits.md
-│   │   ├── feature-template.txt
-│   │   ├── fix-template.txt
-│   │   └── ... (5 more templates)
-│   ├── pr-templates/                     # 6 PR templates
-│   │   ├── feature-pr.md
-│   │   ├── bugfix-pr.md
-│   │   └── ... (4 more templates)
-│   └── branch-naming/                    # Branch naming guide
-│       └── conventions.md
-└── .gitignore
+│   ├── agents/                       # Custom agent definitions
+│   │   ├── mock-debugger.md
+│   │   └── security-reviewer.md
+│   ├── hooks/                        # Hook scripts + templates
+│   │   ├── README.md
+│   │   ├── examples/                 # 5 production-ready hooks
+│   │   └── hook-templates/           # 4 starter templates
+│   └── settings/                     # Permission configs
+│       ├── user-level/config.json    # 400+ command permissions
+│       └── templates/                # Platform-specific configs
+│
+└── git-workflow/                     # Git strategy guides
+    ├── workflows/                    # 3 workflow strategies
+    ├── commit-templates/             # 8 conventional commit templates
+    ├── pr-templates/                 # 6 PR templates
+    └── branch-naming/                # Naming conventions
 ```
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
-Found a missing tool or best practice? PRs welcome!
+Found a missing pattern or have a battle-tested skill? PRs welcome.
 
-1. Add the tool to the appropriate category
-2. Follow existing naming patterns
-3. Add to this README
-4. Test the configuration
+1. Follow the existing skill format (YAML frontmatter + markdown body)
+2. Include anti-patterns with WHY explanations
+3. Keep core content under 300 lines (use progressive disclosure with reference files)
+4. Test the skill in a real project before submitting
 
----
-
-## 📜 License & Disclaimer
-
-MIT License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-**Key Points:**
-- ✅ Free to use, modify, and distribute
-- ✅ Commercial use allowed
-- ✅ No copyleft restrictions
-- ✅ Attribution required
-
-**Legal Disclaimer:**
-
-This is an independent community project with **no official affiliation, partnership, or endorsement** from:
-- **Oracle Corporation** — OCI-related skills reference compatibility with Oracle Cloud services
-- **Anthropic** — Skills are designed for Claude Code but are community-created
-- **Any other mentioned products or services** — References indicate compatibility, not affiliation
-
-This software is provided "as is" without warranty of any kind. The authors bear no liability for damages arising from its use. You are responsible for compliance with all applicable laws, terms of service, and licensing requirements.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for full guidelines.
 
 ---
 
-## 🙏 Acknowledgments
+## License
 
-**Solutions Edge** - Agentic Tools for Modern Development
+MIT License — see [LICENSE](LICENSE) for details.
 
-- Optimized for solo developers, small teams, and enterprise use
-- Covers 10+ programming languages and frameworks
-- Includes modern DevOps tools (Docker, Kubernetes, Terraform, Ansible)
-- Full cloud platform support (AWS, GCP, Azure, OCI, Cloudflare)
-- Security-focused with Snyk, Semgrep, Trivy integration
+**Legal Disclaimer**: This is an independent community project with no official affiliation, partnership, or endorsement from Anthropic or any other mentioned products or services. References indicate compatibility, not affiliation.
 
 ---
 
-**Last Updated**: January 2026
+**Last Updated**: February 2026
 **Claude Code Version**: Compatible with latest CLI
