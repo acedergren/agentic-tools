@@ -34,6 +34,10 @@
   "bugs": {
     "url": "https://github.com/acedergren/agentic-tools/issues"
   },
+  "scripts": {
+    "prepack": "node scripts/resolve-symlinks.js",
+    "postpack": "node scripts/restore-symlinks.js"
+  },
   "engines": {
     "node": ">=18"
   }

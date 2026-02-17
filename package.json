@@ -4,7 +4,7 @@
   "description": "Production-grade AI agent skills, workflows, and automation for Claude Code",
   "type": "module",
   "bin": {
-    "agentic-tools": "./bin/cli.js"
+    "agentic-tools": "bin/cli.js"
   },
   "files": [
     "bin/",
@@ -29,7 +29,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/acedergren/agentic-tools.git"
+    "url": "git+https://github.com/acedergren/agentic-tools.git"
   },
   "homepage": "https://github.com/acedergren/agentic-tools#readme",
   "bugs": {
