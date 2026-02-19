@@ -11,7 +11,7 @@
 **Production-grade AI agent skills, workflows, and automation for Claude Code**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Skills](https://img.shields.io/badge/Skills-17-brightgreen)](#skills)
+[![Skills](https://img.shields.io/badge/Skills-20-brightgreen)](#skills)
 [![Agents](https://img.shields.io/badge/Agents-2-blue)](#agents)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Compatible-blueviolet)](https://claude.com/claude-code)
 [![Community Project](https://img.shields.io/badge/Community-Maintained-success)](https://github.com/acedergren/agentic-tools)
@@ -86,8 +86,11 @@ ln -s $(pwd)/skills/implement /path/to/project/.claude/skills/
 # In your project with Claude Code:
 /implement add validation to the user signup endpoint
 /tdd add rate limiting to POST /api/search
+/bugfix "TypeError: Cannot read property 'userId' of undefined"
+/migrate "@old/pkg/utils → @new/pkg/core"
 /health-check
 /review-all
+/prod-readiness
 ```
 
 ---
@@ -98,21 +101,24 @@ ln -s $(pwd)/skills/implement /path/to/project/.claude/skills/
 
 These skills chain together into a full implementation workflow.
 
-| Skill                                         | What It Does                  | Key Feature                                      |
-| --------------------------------------------- | ----------------------------- | ------------------------------------------------ |
-| **[/implement](skills/implement/)**           | End-to-end feature pipeline   | Pre-flight → TDD → scope guard → commit          |
-| **[/tdd](skills/tdd/)**                       | Test-driven development cycle | Mock bootstrap phase catches wiring issues early |
-| **[/write-tests](skills/write-tests/)**       | Add tests to existing code    | Module-type-aware mock strategy selection        |
-| **[/quality-commit](skills/quality-commit/)** | Quality gates + commit        | Lint, typecheck, test, then commit               |
+| Skill                                         | What It Does                    | Key Feature                                                            |
+| --------------------------------------------- | ------------------------------- | ---------------------------------------------------------------------- |
+| **[/implement](skills/implement/)**           | End-to-end feature pipeline     | Pre-flight → TDD → scope guard → commit                                |
+| **[/tdd](skills/tdd/)**                       | Test-driven development cycle   | Mock bootstrap phase catches wiring issues early                       |
+| **[/write-tests](skills/write-tests/)**       | Add tests to existing code      | Module-type-aware mock strategy selection                              |
+| **[/quality-commit](skills/quality-commit/)** | Quality gates + commit          | Lint, typecheck, test, then commit                                     |
+| **[/bugfix](skills/bugfix/)**                 | Autonomous bug fix pipeline     | Evidence → hypothesis → minimal fix → verify → commit, no hand-holding |
+| **[/migrate](skills/migrate/)**               | Codebase migration orchestrator | Dedup check → scripted bulk `sed` → typecheck → residual scan → commit |
 
 ### Review & Quality
 
-| Skill                                     | What It Does                      | Key Feature                                       |
-| ----------------------------------------- | --------------------------------- | ------------------------------------------------- |
-| **[/review-all](skills/review-all/)**     | Parallel multi-reviewer pipeline  | Security + API audit + scope check agents         |
-| **[/health-check](skills/health-check/)** | Full codebase diagnostic          | 7+ gates: types, tests, lint, security, dead code |
-| **[/api-audit](skills/api-audit/)**       | Route-to-type contract validation | Finds auth gaps, missing schemas, type drift      |
-| **[/doc-sync](skills/doc-sync/)**         | Documentation drift detection     | Compares docs against actual codebase state       |
+| Skill                                         | What It Does                        | Key Feature                                                                         |
+| --------------------------------------------- | ----------------------------------- | ----------------------------------------------------------------------------------- |
+| **[/review-all](skills/review-all/)**         | Parallel multi-reviewer pipeline    | Security + API audit + scope check agents                                           |
+| **[/health-check](skills/health-check/)**     | Full codebase diagnostic            | 7+ gates: types, tests, lint, security, dead code                                   |
+| **[/api-audit](skills/api-audit/)**           | Route-to-type contract validation   | Finds auth gaps, missing schemas, type drift                                        |
+| **[/doc-sync](skills/doc-sync/)**             | Documentation drift detection       | Compares docs against actual codebase state                                         |
+| **[/prod-readiness](skills/prod-readiness/)** | 5-agent production readiness review | Security + test coverage + perf + observability + code quality → prioritized report |
 
 ### Planning & Orchestration
 
@@ -301,8 +307,11 @@ agentic-tools/
 │   ├── implement/SKILL.md            # Full TDD pipeline
 │   ├── tdd/SKILL.md                  # Test-driven development
 │   ├── write-tests/SKILL.md          # Test generation
+│   ├── bugfix/SKILL.md               # Autonomous bug fix pipeline
+│   ├── migrate/SKILL.md              # Bulk import/module migration
 │   ├── review-all/SKILL.md           # Parallel review pipeline
 │   ├── health-check/SKILL.md         # Codebase diagnostics
+│   ├── prod-readiness/SKILL.md       # 5-agent pre-release review
 │   ├── api-audit/SKILL.md            # Route-type contract audit
 │   ├── doc-sync/SKILL.md             # Documentation drift
 │   ├── phase-kickoff/SKILL.md        # Phase scaffolding
