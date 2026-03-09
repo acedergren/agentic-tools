@@ -21,6 +21,18 @@ metadata:
 
 **Assumption**: You know Terraform syntax. This covers when to modularize vs keep inline.
 
+## Load this skill when
+
+- the user is deciding whether Terraform code should become a reusable module
+- module boundaries, state migration risk, or abstraction pressure are the hard part
+- the goal is to prevent module sprawl while extracting the right seams
+
+## Do NOT load this skill when
+
+- the user only needs Terraform syntax or provider help
+- the modularization decision is already made and only implementation remains
+- the code in question is not Terraform infrastructure
+
 ---
 
 ## Before Refactoring to Module: Strategic Assessment
@@ -431,3 +443,10 @@ terraform plan  # Should show: No changes
 
 - **Official Docs**: https://developer.hashicorp.com/terraform/language/modules (for syntax)
 - **This Skill**: When to modularize, module boundaries, anti-patterns
+
+## Arguments
+
+- `$ARGUMENTS`: Terraform path, resource group, or module decision prompt
+  - Example: `/refactor-module infrastructure/networking`
+  - Example: `/refactor-module should these 8 resources become a module`
+  - If empty: ask which Terraform slice is under consideration

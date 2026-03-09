@@ -5,6 +5,32 @@ description: "Scaffold a new development phase with branch, test shells, and roa
 
 # Phase Kickoff
 
+## Load this skill when
+
+- the user is starting a new implementation phase or sprint
+- branch, test shell, and roadmap setup should happen together
+- the goal is consistent phase scaffolding before work begins
+
+## Do NOT load this skill when
+
+- the phase already exists and now needs execution rather than setup
+- the task is a one-off fix with no roadmap or branch scaffolding
+- the user only wants planning, not repository setup
+
+## NEVER
+
+- Never begin implementation before the branch and verification shell exist.
+- Never create a phase entry without a concrete milestone or feature goal.
+- Never mix unrelated cleanup into the kickoff commit.
+
+## Scripts
+
+Use the scaffold helper to generate the branch name, test file path, and roadmap stub:
+
+```bash
+bash scripts/scaffold-phase.sh "3 - User Authentication"
+```
+
 Scaffold a new phase of development following a structured phase-based workflow.
 
 ## Steps

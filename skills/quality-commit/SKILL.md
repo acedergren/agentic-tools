@@ -1,11 +1,45 @@
 ---
 name: quality-commit
-description: Stage, lint, scan, review, and commit changes with full quality gates in a single standardized flow.
+description: |
+  Stage, lint, scan, review, and commit changes with full quality gates in one workflow.
+
+  Use when user mentions:
+  - "run quality gates before commit"
+  - "commit this safely"
+  - "lint typecheck test and commit"
 ---
 
 # Quality Commit
 
 Run all quality gates (lint, typecheck, Semgrep, CodeRabbit, tests) on staged changes, then commit. This replaces the manual multi-step process that frequently causes pre-commit hook friction.
+
+## Load this skill when
+
+- the user wants one safe path from staged changes to commit
+- lint, typecheck, test, semgrep, and commit all belong to one atomic workflow
+- the task is to commit code without skipping verification
+
+## Do NOT load this skill when
+
+- the user only wants a single gate like `/health-check` or `/api-audit`
+- there are no staged files yet and the task is still active implementation
+- the user wants a read-only review with no commit side effects
+
+## NEVER
+
+- Never run a bulk stage like `git add .` or `git add -A` inside this flow.
+- Never commit after partial gate failures just because hooks can be bypassed.
+- Never let optional review tools block the whole workflow when they are not installed.
+- Never widen scope from staged files to unrelated repo cleanup during commit prep.
+
+## Scripts
+
+Use the helpers to reduce manual diff handling:
+
+```bash
+bash scripts/classify-staged-files.sh
+node scripts/find-related-tests.js apps/api/src/routes/auth.ts
+```
 
 ## Steps
 

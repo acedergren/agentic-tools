@@ -1,11 +1,46 @@
 ---
 name: api-audit
-description: "Audit API routes against shared types — scan routes, plugins, and types for mismatches. Read-only, no changes. Use before PRs, after adding routes, or for periodic API contract validation."
+description: |
+  Audit API routes against shared types to find schema drift, auth gaps, and missing request or response validation.
+
+  Use when user mentions:
+  - "audit API routes against types"
+  - "check schema drift"
+  - "validate route contracts"
 ---
 
 # API Route & Type Audit Skill
 
 Scan API routes and plugins, catalog every endpoint, and cross-reference against type definitions to find mismatches. **Read-only — do not modify any files.**
+
+## Load this skill when
+
+- the user added or changed routes and wants contract verification
+- shared schemas may have drifted from route handlers
+- auth hooks, request validation, or response typing may be inconsistent
+
+## Do NOT load this skill when
+
+- the user wants fixes applied instead of a read-only report
+- the goal is a general health sweep rather than API-specific contract checking
+- there is no API surface in scope
+
+## NEVER
+
+- Never report a missing schema without checking whether the framework uses inline validation.
+- Never flag auth gaps without confirming the route should be protected.
+- Never treat orphaned types as critical when they may be planned or transitional.
+- Never modify route or type files during the audit.
+
+## Scripts
+
+Use the helpers to build the two audit inventories before synthesis:
+
+```bash
+bash scripts/inventory-api-surface.sh
+bash scripts/inventory-api-surface.sh admin
+bash scripts/find-shared-schemas.sh packages
+```
 
 ## Steps
 

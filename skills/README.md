@@ -40,6 +40,9 @@ These skills chain into a complete implementation workflow:
 | **tanstack-query**      | TanStack Query v5 patterns    | v3.0.0  |
 | **turborepo**           | Monorepo architecture         | v3.0.0  |
 | **refactor-module**     | Terraform module extraction   | v3.0.0  |
+| **oracle-idcs-better-auth-setup** | Oracle + IDCS auth setup | v1.0.0  |
+| **fastify-better-auth-bridge** | Fastify Better Auth bridge | v1.0.0  |
+| **oracle-idcs-org-provisioning** | IDCS org provisioning | v1.0.0  |
 
 ## Skill Quality Standards
 

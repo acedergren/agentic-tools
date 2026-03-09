@@ -1,6 +1,12 @@
 ---
 name: orchestrate
-description: Coordinate parallel agent teams to execute multi-task implementation plans. Use when running phase tasks from the task plan, parallelizing independent implementation work, or executing custom plan files. Supports interactive (in-session TeamCreate agents) and headless (claude -p fire-and-forget processes) execution modes with task ledger tracking, heartbeat monitoring, budget control, and wave-based quality gates.
+description: |
+  Coordinate parallel agent teams to execute multi-task implementation plans in interactive or headless mode.
+
+  Use when user mentions:
+  - "orchestrate this plan"
+  - "run tasks in parallel"
+  - "execute this phase with agents"
 ---
 
 # Orchestrate
@@ -11,6 +17,27 @@ Supports two execution modes:
 
 - **Interactive** (default): In-session agents via TeamCreate/Task/SendMessage — good for complex tasks needing inter-agent coordination
 - **Headless** (`--headless`): Independent `claude -p` processes — good for parallelizable tasks with clear scope boundaries, ~54% less coordination overhead
+
+## Load this skill when
+
+- a written plan has multiple independent tasks that can run in waves
+- task ownership, monitoring, and verification must be coordinated centrally
+- the user wants multi-agent execution rather than solo implementation
+
+## Do NOT load this skill when
+
+- the task is small enough for one agent to finish directly
+- there is no written plan or no separable workstreams yet
+- parallel execution would create more overlap than speedup
+
+## Scripts
+
+Use the helpers for session setup and overlap detection:
+
+```bash
+bash scripts/setup-session-dir.sh
+node scripts/check-file-overlap.js "apps/api/src/a.ts,apps/api/src/b.ts" "apps/api/src/b.ts,apps/web/src/c.ts"
+```
 
 ## Resource Loading
 

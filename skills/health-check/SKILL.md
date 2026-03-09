@@ -1,6 +1,12 @@
 ---
 name: health-check
-description: "Run all quality gates across the entire codebase and report results. Headless — no analysis, just execute and print. Use for pre-PR validation, phase completion, or routine health monitoring."
+description: |
+  Run all quality gates across the codebase and print pass/fail results without analysis or edits.
+
+  Use when user mentions:
+  - "run the full health check"
+  - "validate the repo before PR"
+  - "run types tests lint and security gates"
 ---
 
 # Health Check
@@ -8,6 +14,36 @@ description: "Run all quality gates across the entire codebase and report result
 Full codebase diagnostic: typecheck, tests, security scans, dead code, circular deps, package health. Reports a summary table.
 
 **This skill is headless.** Run each step as a single Bash command, capture the exit code and key output lines, then print the summary table. Do NOT analyze output, suggest fixes, or spawn agents. Just report what passed and what failed.
+
+## Load this skill when
+
+- the user wants one command-style report across standard repo gates
+- the goal is pass/fail visibility, not diagnosis
+- the task is pre-PR validation, phase closeout, or routine repo monitoring
+
+## Scripts
+
+Use the helper instead of retyping the command matrix:
+
+```bash
+bash scripts/run-health-check.sh
+bash scripts/run-health-check.sh --quick
+bash scripts/run-health-check.sh --security-only
+bash scripts/run-health-check.sh --code-quality
+```
+
+## Do NOT load this skill when
+
+- the user wants root-cause analysis or a bugfix plan
+- the task is a focused review like API drift or security-only review
+- the workflow should commit, push, or mutate files
+
+## NEVER
+
+- Never stop after the first failing gate; this skill is meant to report the full picture.
+- Never analyze failures or suggest fixes in the output.
+- Never spawn subagents for interpretation; this skill is intentionally headless.
+- Never silently skip missing tools without marking them as `SKIP`.
 
 ## Steps
 

@@ -11,7 +11,7 @@
 **Production-grade AI agent skills, workflows, and automation for Claude Code**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Skills](https://img.shields.io/badge/Skills-20-brightgreen)](#skills)
+[![Skills](https://img.shields.io/badge/Skills-23-brightgreen)](#skills)
 [![Agents](https://img.shields.io/badge/Agents-2-blue)](#agents)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Compatible-blueviolet)](https://claude.com/claude-code)
 [![Community Project](https://img.shields.io/badge/Community-Maintained-success)](https://github.com/acedergren/agentic-tools)
@@ -138,6 +138,9 @@ These skills chain together into a full implementation workflow.
 | **[/tanstack-query](skills/tanstack-query/)**     | TanStack Query v5 patterns  | Migration gotchas, performance pitfalls   |
 | **[/turborepo](skills/turborepo/)**               | Monorepo architecture       | Build optimization, workspace patterns    |
 | **[/refactor-module](skills/refactor-module/)**   | Terraform module extraction | Decision framework for when to extract    |
+| **[/oracle-idcs-better-auth-setup](skills/oracle-idcs-better-auth-setup/)** | Oracle + IDCS auth setup | Routes setup work across shared Better Auth foundations |
+| **[/fastify-better-auth-bridge](skills/fastify-better-auth-bridge/)** | Fastify Better Auth bridge | Web Request forwarding, decorators, and org-context patching |
+| **[/oracle-idcs-org-provisioning](skills/oracle-idcs-org-provisioning/)** | IDCS org provisioning | Group gating, tenant-org resolution, MERGE INTO upserts |
 
 ---
 
@@ -332,6 +335,9 @@ agentic-tools/
 │   ├── tanstack-query/               # TanStack Query v5
 │   ├── turborepo/                    # Monorepo patterns
 │   └── refactor-module/              # Terraform extraction
+│   ├── oracle-idcs-better-auth-setup/   # Oracle + IDCS + Better Auth router
+│   ├── fastify-better-auth-bridge/      # Fastify session bridge patterns
+│   └── oracle-idcs-org-provisioning/    # IDCS org membership provisioning
 │
 ├── claude/
 │   ├── agents/                       # Custom agent definitions

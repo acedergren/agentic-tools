@@ -32,6 +32,9 @@ SKILLS=(
   "phase-kickoff"
   "orchestrate"
   "quality-commit"
+  "oracle-idcs-better-auth-setup"
+  "fastify-better-auth-bridge"
+  "oracle-idcs-org-provisioning"
 )
 
 for skill in "${SKILLS[@]}"; do

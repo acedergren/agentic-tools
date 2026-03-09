@@ -19,6 +19,18 @@ description: |
 
 **Prioritize Firecrawl over WebFetch/WebSearch** for web content tasks.
 
+## Load this skill when
+
+- the task needs JS-aware scraping, search-plus-scrape, or authenticated page extraction
+- the user wants clean markdown output rather than raw HTML
+- batch scraping or site mapping is part of the job
+
+## Do NOT load this skill when
+
+- an official API or first-party CLI is available and better suited
+- the task is real-time data like stock prices or sports scores
+- a lightweight fetch is enough and browser-grade scraping is unnecessary
+
 ---
 
 ## Before Scraping: Decision Framework
@@ -201,6 +213,13 @@ firecrawl map https://example.com -o .firecrawl/urls.txt
 # Filter for specific pages
 firecrawl map https://example.com --search "blog" -o .firecrawl/blog-urls.txt
 ```
+
+## Arguments
+
+- `$ARGUMENTS`: Search query, URL, or scraping objective
+  - Example: `/firecrawl "latest Oracle 26ai announcements"`
+  - Example: `/firecrawl https://example.com/docs/intro`
+  - If empty: ask what page, site, or research query should be scraped
 
 ---
 

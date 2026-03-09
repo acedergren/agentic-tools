@@ -11,14 +11,28 @@ description: |
   NOT for basic installation (see official docs). Focuses on non-obvious decisions,
   performance pitfalls, and patterns missing from documentation.
 
-  Triggers: shadcn-svelte, component library choice, TanStack Table, data table,
-  Tailwind v4.1, form validation, Svelte 5 reactivity, shadcn vs skeleton.
+  Triggers when user mentions:
+  - "shadcn-svelte"
+  - "TanStack Table"
+  - "Tailwind v4.1"
 license: MIT
 ---
 
 # shadcn-svelte Expert Guidance
 
 **Assumption**: You know how to run `npx shadcn-svelte@latest add`. This skill covers what the docs won't tell you.
+
+## Load this skill when
+
+- the task involves shadcn-svelte patterns, Svelte 5 reactivity, or Tailwind v4.1 behavior
+- table reactivity, form validation, or component-library choice is the real problem
+- the user needs advanced patterns, not install commands
+
+## Do NOT load this skill when
+
+- the user only needs basic setup or copy-paste installation steps
+- the task is generic CSS or non-Svelte UI work
+- the library choice is settled and no tricky integration patterns remain
 
 ---
 
@@ -326,3 +340,10 @@ Check:
 
 - **Official Docs**: https://www.shadcn-svelte.com/docs (for installation, component gallery)
 - **This Skill**: Non-obvious decisions, performance pitfalls, expert patterns
+
+## Arguments
+
+- `$ARGUMENTS`: Component issue, library tradeoff, or UI slice to analyze
+  - Example: `/shadcn-svelte-skill data table sorting bug`
+  - Example: `/shadcn-svelte-skill shadcn vs skeleton for admin forms`
+  - If empty: ask which Svelte UI problem needs guidance

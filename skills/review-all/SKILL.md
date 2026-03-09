@@ -1,6 +1,12 @@
 ---
 name: review-all
-description: "Pre-PR review pipeline — runs security, API audit, and scope check agents in parallel. Read-only, no changes. Use before creating PRs or after completing a phase of work."
+description: |
+  Pre-PR review pipeline that runs security, API audit, and scope review in parallel without changing files.
+
+  Use when user mentions:
+  - "review everything before PR"
+  - "run all reviewers"
+  - "full pre-merge review"
 ---
 
 # Review All
@@ -12,6 +18,27 @@ Comprehensive pre-PR review that runs specialized reviewers in parallel and synt
 - Before creating a PR
 - After completing a phase of work
 - When you want a full-spectrum code quality check beyond what linting covers
+
+## Do NOT load this skill when
+
+- the user wants implementation, fixes, or auto-remediation
+- only one focused review is needed, such as security-only or API-only
+- the task is a headless gate run with no agent synthesis
+
+## NEVER
+
+- Never let reviewers edit files during this pipeline.
+- Never report duplicate findings separately when they point to the same issue.
+- Never use this as a substitute for tests, lint, or typecheck; it complements them.
+- Never review the whole repository when the user only changed a narrow diff.
+
+## Scripts
+
+Use the helper to derive the default review range:
+
+```bash
+bash scripts/detect-review-range.sh
+```
 
 ## Pipeline
 

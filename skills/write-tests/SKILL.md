@@ -1,13 +1,27 @@
 ---
 name: write-tests
 description: >-
-  Add test coverage to existing code with correct mock patterns. Use when adding
-  tests to untested modules, writing regression tests for bugs, or user asks to
-  test a specific file. Handles mockReset:true, vi.hoisted(), forwarding
-  pattern, and test app builder utilities.
+  Add test coverage to existing code with correct mock patterns.
+
+  Use when user mentions:
+  - "write tests for this file"
+  - "add regression coverage"
+  - "cover this untested module"
 ---
 
 # Write Tests for Existing Code
+
+## Load this skill when
+
+- the source already exists and the task is to add or improve tests only
+- the module type dictates a specific mock strategy
+- regression coverage is needed without changing production behavior
+
+## Do NOT load this skill when
+
+- the task is full feature implementation from scratch
+- the user wants to modify source logic as part of the same workflow
+- the request is just to run existing tests and report outcomes
 
 ## Before Writing, Ask Yourself
 

@@ -7,6 +7,18 @@ description: "Full feature pipeline — pre-flight checks, TDD cycle, scope guar
 
 End-to-end feature implementation pipeline. Runs pre-flight validation, TDD cycle, scope enforcement, and quality commit as a single orchestrated flow.
 
+## Load this skill when
+
+- the user wants a full implementation workflow instead of one isolated step
+- the task is a non-trivial feature, endpoint, or code change
+- pre-flight, TDD, scope control, and commit quality all belong to one path
+
+## Do NOT load this skill when
+
+- the user only wants a focused subflow like `/tdd` or `/quality-commit`
+- the task is read-only analysis or review
+- the work is already finished and only needs verification or commit handling
+
 ## Pipeline Phases
 
 ### Phase 0: Pre-flight (< 30 seconds)

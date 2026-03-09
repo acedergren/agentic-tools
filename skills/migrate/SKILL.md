@@ -1,11 +1,38 @@
 ---
 name: migrate
-description: Monorepo migration orchestrator — scripted bulk import path changes, package renames, and file moves with deduplication, type verification, and atomic commits. Use for @portal/* package migrations, import path refactors, and module reorganizations.
+description: |
+  Monorepo migration orchestrator for scripted import path changes, package renames, and module moves with verification gates.
+
+  Use when user mentions:
+  - "migrate import paths"
+  - "rename this workspace package"
+  - "bulk module reorganization"
 ---
 
 # Migrate
 
 Orchestrates monorepo migrations: import path changes, package renames, module moves. Uses scripted bulk operations (never file-by-file edits), deduplicates against existing work, verifies types at each step, and commits atomically.
+
+## Load this skill when
+
+- the same import or package rename must be applied across many files
+- the task includes module moves plus path updates
+- verification and atomic commits matter more than hand-editing a few files
+
+## Scripts
+
+Prefer the packaged helpers for manifest building and bulk replacement:
+
+```bash
+bash scripts/build-manifest.sh @old/pkg/name
+bash scripts/replace-imports.sh @old/pkg/name @new/pkg/name /tmp/migration-manifest.txt
+```
+
+## Do NOT load this skill when
+
+- the change only touches one or two files
+- the user wants exploratory refactoring instead of a defined migration
+- the package boundary decision itself is still unresolved
 
 ## Pipeline
 

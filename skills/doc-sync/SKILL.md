@@ -1,11 +1,38 @@
 ---
 name: doc-sync
-description: "Audit project documentation against the codebase and fix drift. Run before PRs or after major changes. Compares documented architecture, test counts, and file paths against actual state."
+description: |
+  Audit project documentation against the codebase and optionally fix drift in architecture, testing, and workflow docs.
+
+  Use when user mentions:
+  - "sync the docs with the codebase"
+  - "check for documentation drift"
+  - "update docs after this change"
 ---
 
 # Documentation Sync Audit
 
 Audit all project documentation against the actual codebase and report (or fix) any drift.
+
+## Load this skill when
+
+- the task is specifically about code-to-doc drift
+- architecture, security, testing, or roadmap docs may be stale
+- the user wants either a report-only audit or targeted doc fixes
+
+## Do NOT load this skill when
+
+- the user wants implementation changes instead of documentation work
+- the task is a general repo health sweep with no doc focus
+- the request is only to write a brand-new document from scratch
+
+## Scripts
+
+Use the helpers to inventory docs and detect stale path references:
+
+```bash
+bash scripts/list-doc-targets.sh
+node scripts/check-doc-paths.js README.md docs/ARCHITECTURE.md
+```
 
 ## Steps
 

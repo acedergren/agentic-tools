@@ -9,6 +9,27 @@ Produce comprehensive, drift-proof Product Requirements Documents through iterat
 
 Output: `.claude/reference/PRD.md` (the living requirements document for the project).
 
+## Load this skill when
+
+- the user wants to create, update, validate, or phase a PRD
+- the task needs interactive requirements work rather than immediate implementation
+- technical architecture, phasing, and dependency analysis belong in one artifact
+
+## Do NOT load this skill when
+
+- the user already has a final spec and only wants implementation planning
+- the task is just a code review or repo health check
+- the request is a lightweight note or issue rather than a full requirements document
+
+## Scripts
+
+Use the helpers to verify the PRD package and inspect phase headings:
+
+```bash
+bash scripts/check-prd-assets.sh skills/prd
+node scripts/list-prd-phases.js .claude/reference/PRD.md
+```
+
 ## Mode Routing
 
 Parse `$ARGUMENTS` to determine the mode:

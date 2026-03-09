@@ -26,6 +26,18 @@ allowed-tools:
 
 Transform AI-generated text into human writing by detecting patterns and injecting authentic voice.
 
+## Load this skill when
+
+- the user wants AI-generated writing made more natural, specific, or human
+- the text shows obvious AI tells like overused transitions, sterile cadence, or em-dash abuse
+- the task is rewriting existing prose for voice, not creating a whole new messaging strategy
+
+## Do NOT load this skill when
+
+- the user needs exact legal, compliance, or policy wording preserved
+- the task is basic proofreading with no voice or style concerns
+- the output should stay intentionally formal, templated, or mechanical
+
 ---
 
 ## Before You Edit: Diagnostic Framework
@@ -267,3 +279,10 @@ Based on [Wikipedia:Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia
 **Key insight**: "LLMs use statistical algorithms to guess what should come next. The result tends toward the most statistically likely result that applies to the widest variety of cases."
 
 Translation: AI writing is optimized for average acceptability, not authentic voice.
+
+## Arguments
+
+- `$ARGUMENTS`: Text, file path, or rewrite goal to humanize
+  - Example: `/humanizer "make this sound less like ChatGPT"`
+  - Example: `/humanizer docs/launch-email.md`
+  - If empty: ask for the text to rewrite

@@ -1,11 +1,39 @@
 ---
 name: bugfix
-description: Autonomous bug fix workflow — diagnose from evidence, fix root cause, verify with tests, commit. No hand-holding. Use when given a bug report, failing test, error log, or broken CI.
+description: |
+  Autonomous bug fix workflow that diagnoses from evidence, fixes root cause, verifies with tests, and commits.
+
+  Use when user mentions:
+  - "fix this failing test"
+  - "debug this error log"
+  - "broken CI on this file"
 ---
 
 # Bugfix
 
 Autonomous end-to-end bug fix pipeline. Diagnoses from evidence, finds root cause, implements minimal fix, verifies correctness, and commits.
+
+## Load this skill when
+
+- the user provides a bug report, stack trace, failing test, or CI failure
+- the goal is diagnosis plus repair, not just review
+- the problem is narrow enough to fix without a larger architecture decision
+
+## Do NOT load this skill when
+
+- the user only wants a read-only root-cause analysis
+- the issue is really a broad feature request or refactor disguised as a bug
+- the failure is security-sensitive enough that the fix path needs approval first
+
+## Scripts
+
+Use the helpers to gather context and rerun the narrow failing test:
+
+```bash
+bash scripts/collect-bugfix-context.sh apps/api/src/tests/routes/auth.test.ts
+bash scripts/run-targeted-test.sh apps/api/src/tests/routes/auth.test.ts
+bash scripts/run-targeted-test.sh apps/api/src/tests/routes/auth.test.ts "returns 500"
+```
 
 ## Pipeline
 

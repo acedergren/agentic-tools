@@ -14,14 +14,23 @@ description: |
   NOT for basic setup (see official docs). Focuses on non-obvious decisions and
   patterns that cause production issues.
 
-  Triggers: React Query, TanStack Query, v5 migration, refetch loop, stale data,
-  SSR hydration, query invalidation, optimistic updates debugging.
+  Triggers when user mentions:
+  - "React Query"
+  - "TanStack Query"
+  - "refetch loop"
 user-invocable: true
 ---
 
 # TanStack Query v5 - Expert Troubleshooting
 
 **Assumption**: You know `useQuery` basics. This covers what breaks in production.
+
+## Arguments
+
+- `$ARGUMENTS`: Query bug, migration issue, or caching decision to analyze
+  - Example: `/tanstack-query infinite refetch loop on dashboard`
+  - Example: `/tanstack-query v4 to v5 cacheTime issue`
+  - If empty: ask which TanStack Query issue is in scope
 
 ---
 

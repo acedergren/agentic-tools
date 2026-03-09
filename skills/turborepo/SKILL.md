@@ -10,8 +10,10 @@ description: |
   NOT for CLI syntax (see turbo --help). Focuses on architectural decisions that
   prevent monorepo sprawl and maintenance nightmares.
 
-  Triggers: turborepo, monorepo, package boundaries, when to split packages, turbo
-  cache miss, circular dependency, workspace organization, task dependencies.
+  Triggers when user mentions:
+  - "turborepo"
+  - "turbo cache miss"
+  - "package boundaries"
 metadata:
   version: 2.7.6
 ---
@@ -19,6 +21,18 @@ metadata:
 # Turborepo - Monorepo Architecture Expert
 
 **Assumption**: You know `turbo run build`. This covers architectural decisions.
+
+## Load this skill when
+
+- the user is making monorepo structure decisions, not just running Turbo commands
+- cache misses, package splits, or dependency boundaries are the real problem
+- the goal is long-term monorepo health rather than one-off config edits
+
+## Do NOT load this skill when
+
+- the user only needs basic CLI syntax or one command explained
+- the project is not using Turborepo or similar package graph constraints
+- the task is an isolated app bug unrelated to repo structure or caching
 
 ---
 
@@ -118,6 +132,13 @@ turbo run build  # Fails with: "Could not resolve dependency graph"
 ```
 
 **Fix**: Extract shared code to third package
+
+## Arguments
+
+- `$ARGUMENTS`: Monorepo decision, package boundary, or cache issue to analyze
+  - Example: `/turborepo why is turbo cache missing in CI`
+  - Example: `/turborepo should packages/ui be split from packages/web-core`
+  - If empty: ask which Turborepo architecture problem is in scope
 ```
 packages/ui → packages/shared
 packages/utils → packages/shared

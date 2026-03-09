@@ -7,6 +7,18 @@ description: "Test-driven development workflow — write failing tests first, im
 
 Enforce a strict test-driven development cycle: Red → Green → Refactor → Commit.
 
+## Load this skill when
+
+- the user wants behavior built or fixed through failing tests first
+- mock wiring is non-trivial and needs a bootstrap pass
+- the task is feature work, bug fixing, or deliberate test coverage expansion
+
+## Do NOT load this skill when
+
+- the code already exists and only needs a read-only review
+- the user explicitly wants to skip tests and do a hotfix
+- the task is just to run existing test suites and report results
+
 ## Steps
 
 ### 1. Understand the Requirement

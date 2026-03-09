@@ -1,11 +1,37 @@
 ---
 name: prod-readiness
-description: Autonomous production readiness review pipeline — spawns 5 parallel specialist agents (security, testing, performance, observability, code quality) and synthesizes findings into a prioritized remediation plan. Use before major releases or milestone completions.
+description: |
+  Autonomous production readiness review that runs security, testing, performance, observability, and code quality specialists in parallel.
+
+  Use when user mentions:
+  - "production readiness review"
+  - "are we ready to ship"
+  - "pre-release readiness check"
 ---
 
 # Prod-Readiness
 
 Spawns 5 specialist review agents in parallel, each writing findings to a dedicated report file. Synthesizes into a prioritized production readiness report with executive summary, blockers, and remediation plan.
+
+## Load this skill when
+
+- the user wants a release-readiness verdict rather than a single-dimension review
+- the codebase is close to a milestone, launch, or major handoff
+- parallel specialist review is worth the overhead
+
+## Do NOT load this skill when
+
+- the user only wants one narrow review such as security-only or API-only
+- the repo is mid-implementation with a knowingly broken baseline
+- the task is to fix issues rather than assess readiness first
+
+## Scripts
+
+Use the summarizer after the specialist agents finish writing `REVIEW_*.md` files:
+
+```bash
+node scripts/summarize-review-reports.js
+```
 
 ## Pipeline
 

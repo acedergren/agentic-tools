@@ -19,6 +19,9 @@ const SKILLS = [
   "phase-kickoff",
   "orchestrate",
   "quality-commit",
+  "oracle-idcs-better-auth-setup",
+  "fastify-better-auth-bridge",
+  "oracle-idcs-org-provisioning",
 ];
 
 const AGENTS = ["mock-debugger.md", "security-reviewer.md"];
