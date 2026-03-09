@@ -36,9 +36,11 @@ const patterns = [
   'AIza[0-9A-Za-z_-]{20,}',
 ];
 
+const excludedPaths = [":(exclude)scripts/ci/secret-scan.mjs"];
+
 for (const pattern of patterns) {
   try {
-    execFileSync('rg', ['-n', '--pcre2', '--hidden', '--glob', '!.git/**', pattern, ...tracked], {
+    execFileSync('git', ['grep', '-n', '-I', '-P', '-e', pattern, '--', '.', ...excludedPaths], {
       stdio: 'pipe',
       encoding: 'utf8',
       maxBuffer: 1024 * 1024 * 10,
