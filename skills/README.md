@@ -12,6 +12,8 @@ These skills chain into a complete implementation workflow:
 | **tdd**            | Test-driven development cycle | Mock bootstrap phase validates wiring before full suite |
 | **write-tests**    | Add tests to existing code    | Module-type-aware mock strategy selection               |
 | **quality-commit** | Quality gates + atomic commit | Lint, typecheck, test gates before every commit         |
+| **bugfix**         | Autonomous bug fix pipeline   | Evidence → hypothesis → minimal fix → verify → commit |
+| **migrate**        | Codebase migration orchestration | Scripted bulk changes with dedupe and residual scans |
 
 ## Review & Quality Skills
 
@@ -29,6 +31,7 @@ These skills chain into a complete implementation workflow:
 | **prd**           | PRD creation + validation     | 10-gate checklist, `--to-plan` generates task plans |
 | **orchestrate**   | Multi-agent team coordination | Wave-based execution with heartbeat monitoring      |
 | **phase-kickoff** | Phase scaffolding             | Creates branch, test shells, roadmap entry          |
+| **prod-readiness** | 5-agent release readiness review | Security + tests + perf + observability synthesis |
 
 ## Content & Framework Skills
 
@@ -43,6 +46,11 @@ These skills chain into a complete implementation workflow:
 | **oracle-idcs-better-auth-setup** | Oracle + IDCS auth setup | v1.0.0  |
 | **fastify-better-auth-bridge** | Fastify Better Auth bridge | v1.0.0  |
 | **oracle-idcs-org-provisioning** | IDCS org provisioning | v1.0.0  |
+
+## Full Library Coverage
+
+The install surfaces (`bin/cli.js`, `install.sh`, and `npx skills add`) are expected to expose every directory in `skills/`.
+CI validates that registry coverage stays in sync with the filesystem and docs.
 
 ## Skill Quality Standards
 
@@ -67,4 +75,4 @@ Skills placed in `.claude/skills/` are automatically available as `/skill-name` 
 
 ---
 
-**Last Updated**: February 2026
+**Last Updated**: March 2026

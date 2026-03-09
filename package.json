@@ -37,5 +37,11 @@
   },
   "engines": {
     "node": ">=18"
+  },
+  "scripts": {
+    "skills:validate": "node scripts/ci/validate-skill-library.mjs",
+    "skills:install-smoke": "node scripts/ci/install-smoke.mjs",
+    "skills:secrets-check": "node scripts/ci/secret-scan.mjs",
+    "skills:ci": "node scripts/ci/run-all.mjs"
   }
 }
