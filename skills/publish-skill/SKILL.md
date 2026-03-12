@@ -1,6 +1,6 @@
 ---
 name: publish-skill
-description: "Use when creating a new skill and adding it to the acedergren/agentic-tools repo so others can install it with npx skills add. Covers init, spec compliance, commit, push, and install verification. Keywords: publish skill, add skill to repo, npx skills init, share skill, agentic-tools."
+description: "Use when creating a new skill and publishing it to a GitHub repo for installation via npx skills add. Covers scaffold, spec compliance, skill-judge evaluation, commit, push, and install verification. Keywords: publish skill, add skill to repo, npx skills init, share skill, agentic-tools, skills.sh."
 ---
 
 # Publish Skill

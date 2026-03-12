@@ -1,5 +1,5 @@
 ---
-name: shadcn-svelte-skill
+name: shadcn-svelte
 description: "Use when working with shadcn-svelte components, TanStack Table in Svelte 5, or Tailwind v4.1. Covers non-obvious reactivity bugs, library selection trade-offs, and migration pitfalls not in the official docs. Keywords: shadcn-svelte, TanStack Table, Tailwind v4.1, Svelte 5 runes, bits-ui, superforms, data table, svelte-check."
 ---
 

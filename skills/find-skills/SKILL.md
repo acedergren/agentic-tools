@@ -35,11 +35,24 @@ npx skills add acedergren/agentic-tools@oracle-dba
 npx skills add acedergren/agentic-tools@prd
 ```
 
+## Install vs Answer Directly
+
+| Situation | Decision |
+|-----------|----------|
+| User explicitly asks for a skill | Install |
+| Specialized domain (OCI, Stitch, TDD workflow) | Install — domain skills have non-obvious knowledge |
+| General programming question | Answer directly — no skill needed |
+| User says "can you do X" | Check for skill first, answer directly if none found |
+
+**Default**: check before assuming no skill exists.
+
 ## Search Strategy
 
 1. Run `npx skills find [domain] [task]` — specific beats generic ("react testing" > "testing")
 2. If no results: try synonyms ("deploy" / "deployment" / "ci-cd")
 3. Check `acedergren/agentic-tools` directly for OCI, auth, and workflow skills
+
+If `npx` isn't available: `npm i -g skills` then retry.
 
 ## When No Results Found
 
