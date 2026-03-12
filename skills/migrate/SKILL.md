@@ -1,131 +1,104 @@
 ---
 name: migrate
-description: |
-  Monorepo migration orchestrator for scripted import path changes, package renames, and module moves with verification gates.
-
-  Use when user mentions:
-  - "migrate import paths"
-  - "rename this workspace package"
-  - "bulk module reorganization"
+description: "Use when bulk-migrating import paths, renaming workspace packages, or reorganizing modules across many files in a monorepo. Uses scripted bulk operations with verification gates and atomic commits. Keywords: migrate imports, rename package, bulk import path change, module reorganization, monorepo refactor."
 ---
 
 # Migrate
 
 Orchestrates monorepo migrations: import path changes, package renames, module moves. Uses scripted bulk operations (never file-by-file edits), deduplicates against existing work, verifies types at each step, and commits atomically.
 
-## Load this skill when
+Do NOT load this skill when the change only touches one or two files, the user wants exploratory refactoring, or the package boundary decision is still unresolved.
 
-- the same import or package rename must be applied across many files
-- the task includes module moves plus path updates
-- verification and atomic commits matter more than hand-editing a few files
+## NEVER
+
+- Never use the Edit tool file-by-file for bulk migrations — use `grep | xargs sed` instead (10x faster, no missed files).
+- Never start without a deduplication check — duplicate migrations cause import conflicts that are hard to debug.
+- Never commit without typecheck — silent import breakage is worse than a failed commit.
+- Never skip the residual check — 2 files left pointing to the old path cause subtle runtime errors.
+- Never migrate without a manifest — you must know the blast radius before touching anything.
+- Never run bulk sed without confirming the manifest count with the user if > 20 files or if `packages/` is touched.
+
+## Decision Tree
+
+```
+Does the new import path already exist in the codebase?
+├── Yes (many files) → Already migrated; verify or skip
+├── Yes (some files) → Partial migration; check what's left
+└── No → Proceed with full migration
+
+How many files are affected?
+├── 1-2 files → Don't use this skill; use Edit tool directly
+├── 3-20 files → Proceed with manifest + scripted sed
+└── > 20 files → Show manifest, get user confirmation before sed
+
+Does the change touch packages/ (shared across workspaces)?
+├── Yes → Get user confirmation before running sed
+└── No → Proceed
+```
 
 ## Scripts
-
-Prefer the packaged helpers for manifest building and bulk replacement:
 
 ```bash
 bash scripts/build-manifest.sh @old/pkg/name
 bash scripts/replace-imports.sh @old/pkg/name @new/pkg/name /tmp/migration-manifest.txt
 ```
 
-## Do NOT load this skill when
-
-- the change only touches one or two files
-- the user wants exploratory refactoring instead of a defined migration
-- the package boundary decision itself is still unresolved
-
 ## Pipeline
 
-### Step 1: Deduplication Check (always first)
-
-Before writing a single line, check if this migration was already done:
+### Step 1: Deduplication Check
 
 ```bash
 git log --oneline -20
 grep -r "<new-import-path>" apps/ packages/ --include="*.ts" --include="*.svelte" -l | head -10
 ```
 
-If the migration is already complete (or partially done), report what exists and ask the user whether to verify/clean up or skip.
+If migration is already complete or partial: report what exists, ask whether to verify/clean up or skip.
 
 ### Step 2: Build Migration Manifest
 
-Produce a complete inventory before touching any files:
-
 ```bash
-# Find all files needing migration
 grep -rl "<old-import-path>" apps/ packages/ --include="*.ts" --include="*.tsx" --include="*.svelte" > /tmp/migration-manifest.txt
 echo "Files to migrate: $(wc -l < /tmp/migration-manifest.txt)"
 cat /tmp/migration-manifest.txt
 ```
 
-Group files by workspace for parallel execution planning:
-
-- `apps/api/` — backend
-- `apps/frontend/` — frontend + SvelteKit
-- `packages/` — shared libraries
-
-Print summary:
-
-```
-Migration: @portal/shared/server/auth → @portal/server/auth
-  apps/api: 12 files
-  apps/frontend: 8 files
-  packages/server: 3 files
-  Total: 23 files
-```
-
-Ask the user to confirm before proceeding if total > 20 files or if the change touches `packages/server` or `packages/types` (shared across workspaces).
+Print summary grouped by workspace. Ask user to confirm before proceeding if > 20 files or `packages/` is affected.
 
 ### Step 3: Scripted Bulk Replacement
 
-Use `sed -i` for each workspace (NOT file-by-file Edit calls):
-
 ```bash
-# API workspace
-grep -rl "@portal/shared/server/auth" apps/api/ --include="*.ts" | \
-  xargs sed -i '' "s|@portal/shared/server/auth|@portal/server/auth|g"
+grep -rl "@old/pkg" apps/api/ --include="*.ts" | \
+  xargs sed -i '' "s|@old/pkg|@new/pkg|g"
 
-# Frontend workspace
-grep -rl "@portal/shared/server/auth" apps/frontend/ --include="*.ts" --include="*.svelte" | \
-  xargs sed -i '' "s|@portal/shared/server/auth|@portal/server/auth|g"
+grep -rl "@old/pkg" apps/frontend/ --include="*.ts" --include="*.svelte" | \
+  xargs sed -i '' "s|@old/pkg|@new/pkg|g"
 ```
 
-Note: macOS `sed` requires `sed -i ''` (empty string for in-place edit without backup).
+**macOS note:** `sed -i ''` (empty string required for in-place edit without backup). Linux uses `sed -i` without the empty string.
 
 ### Step 4: Verification Gate
 
-After bulk replacement, verify each workspace compiles:
-
 ```bash
-# API typecheck
 cd apps/api && npx tsc --noEmit 2>&1 | head -30
-
-# Frontend typecheck
 cd apps/frontend && npx svelte-check --threshold error 2>&1 | tail -20
-
-# Shared packages
 cd packages/server && npx tsc --noEmit 2>&1 | head -20
 ```
 
-Fix any type errors introduced by the migration. Common causes:
-
-- Import path changed but the exported symbol name also differs → check the actual export
-- Package hasn't been built yet → `pnpm --filter @portal/server build`
-- Circular dependency introduced → check with `pnpm run check:circular`
+Common causes of type errors after migration:
+- Import path changed but exported symbol name also differs → check the actual export
+- Package not yet built → `pnpm --filter @portal/server build`
+- Circular dependency introduced → `pnpm run check:circular`
 
 ### Step 5: Residual Check
-
-Verify no old import paths remain:
 
 ```bash
 grep -r "<old-import-path>" apps/ packages/ --include="*.ts" --include="*.svelte" -l
 ```
 
-If any remain, they may be in:
-
-- Dynamically constructed import strings (require manual inspection)
-- Test fixture data (strings, not imports — may be intentional)
-- Comments or docs (update if they describe the API)
+Remaining occurrences may be in:
+- Dynamically constructed import strings → manual inspection required
+- Test fixture data (strings, not imports) → may be intentional
+- Comments or docs → update if they describe the API
 
 ### Step 6: Run Tests
 
@@ -134,31 +107,29 @@ npx vitest run apps/api --reporter=dot
 npx vitest run apps/frontend --reporter=dot
 ```
 
-If tests fail, determine if it's a mock issue (mock path still points to old module) or a real regression.
+If tests fail: check if mock paths still point to the old module path (common missed case in test files).
 
 ### Step 7: Atomic Commit
 
-Stage only the migrated files. Commit with a scope that identifies the migration:
+```bash
+git commit -m "refactor(imports): migrate @old/pkg → @new/pkg
 
-```
-refactor(imports): migrate @portal/shared/server/auth → @portal/server/auth
-
-Affects 23 files across apps/api, apps/frontend, packages/server.
+Affects N files across apps/api, apps/frontend, packages/server.
 All typechecks pass. Full test suite green.
 
-Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>"
 ```
+
+Stage only migrated files — never `git add -A`.
 
 ## Common Migration Patterns
 
-Before running, map out your project's source-to-target pairs. Document these in your project-level CLAUDE.md. Examples:
-
-| Pattern             | From (old)          | To (new)           |
-| ------------------- | ------------------- | ------------------ |
-| Package rename      | `@company/old-pkg`  | `@company/new-pkg` |
-| Path restructure    | `@app/shared/utils` | `@app/core/utils`  |
-| Index consolidation | `./auth/helpers`    | `./auth/index`     |
-| Framework alias     | `$lib/server/*`     | `src/lib/server/*` |
+| Pattern | From | To |
+|---------|------|----|
+| Package rename | `@company/old-pkg` | `@company/new-pkg` |
+| Path restructure | `@app/shared/utils` | `@app/core/utils` |
+| Index consolidation | `./auth/helpers` | `./auth/index` |
+| Framework alias | `$lib/server/*` | `src/lib/server/*` |
 
 ## Arguments
 
@@ -166,11 +137,4 @@ Before running, map out your project's source-to-target pairs. Document these in
   - `"@old/pkg/utils → @new/pkg/utils"` — import path migration
   - `"move packages/server/src/auth.ts to packages/server/src/auth/index.ts"` — file move
   - `"rename @company/old-shared → @company/core"` — package rename
-  - If empty, ask for source and target
-
-## Anti-Patterns
-
-- **Never use Edit tool file-by-file** for bulk migrations — use `grep | xargs sed` instead
-- **Never migrate before deduplication check** — duplicate migrations cause import conflicts
-- **Never commit without typecheck** — silent import breakage is worse than a failed commit
-- **Never skip the residual check** — 2 files left pointing to the old path can cause subtle runtime errors
+  - If empty: ask for source and target

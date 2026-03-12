@@ -1,158 +1,112 @@
 ---
 name: stitch-design-system
-description: Extract and synthesize design systems from Stitch projects into DESIGN.md files. Use when analyzing existing designs to create a semantic design system for consistent multi-screen generation. Creates the source of truth for design language with color palettes, typography rules, and component styling.
-allowed-tools:
-  - "stitch*:*"
-  - "Read"
-  - "Write"
-  - "web_fetch"
+description: "Use when extracting a design system from a Stitch project to create a DESIGN.md source-of-truth for consistent multi-screen generation. Covers semantic translation of technical design assets into descriptive language Stitch interprets for visual consistency. Keywords: stitch, DESIGN.md, design system, design tokens, color palette, typography, component styling, design governance, multi-screen consistency."
 ---
 
-# Stitch Design System Skill
+# Stitch Design System
 
-Extract and synthesize Stitch designs into semantic design systems (`DESIGN.md`) that serve as authoritative references for consistent UI generation.
+Extract Stitch designs into semantic `DESIGN.md` files that serve as authoritative references for generating new screens with consistent visual language.
 
-## When to Use
+## NEVER
 
-- **Analyzing a Stitch project** to establish visual language
-- **Creating multi-screen consistency** across generated pages
-- **Documenting design tokens** (colors, typography, spacing, components)
-- **Establishing design governance** for a project
+- Never use technical CSS values in DESIGN.md without semantic translation — `rounded-xl` means nothing to Stitch; write "generously rounded corners" so visual intent is clear.
+- Never omit hex codes — color names are ambiguous; `Ocean-deep Cerulean (#0077B6)` enables exact replication, `"blue"` does not.
+- Never omit functional roles — "blue button" is unusable; "Deep Ocean Blue (#0077B6) for primary call-to-action" is actionable.
+- Never use unspecific atmosphere words like "modern", "nice", or "clean" — every design is these things; write sensory descriptions like "airy and minimal with generous whitespace" or "dense, information-rich, utilitarian".
+- Never name colors by appearance alone — name them by purpose: primary, secondary, destructive, surface, muted.
+- Never skip shadows and spacing — these define perceived elevation and hierarchy, which Stitch uses to understand visual weight.
 
-## Overview
+## What Makes a Good DESIGN.md
 
-This skill helps create `DESIGN.md` files that serve as the "source of truth" for prompting Stitch to generate new screens aligned with existing design language. The analysis transforms technical design assets (HTML, CSS, colors) into semantic, descriptive language that Stitch interprets for visual consistency.
+Stitch generates new screens from natural language descriptions. DESIGN.md is the bridge between technical assets (HTML/CSS) and Stitch's language model. The quality of translation directly determines consistency of generated screens.
 
-## Prerequisites
+**Good translation:**
+- Technical: `box-shadow: 0 1px 3px rgba(0,0,0,0.08)`
+- Semantic: "Whisper-soft diffused shadows, barely perceptible, creating gentle elevation"
 
-- Stitch MCP Server with project access
-- At least one designed screen in the target Stitch project
-- Stitch Effective Prompting Guide: https://stitch.withgoogle.com/docs/learn/prompting/
+**Poor translation:**
+- Technical: `box-shadow: 0 1px 3px rgba(0,0,0,0.08)`
+- Semantic: "Light shadow" (too vague for Stitch to reproduce)
 
 ## Retrieval Workflow
 
-### Step 1: Discover Namespace
+1. Call `[prefix]:list_projects` (filter: `view=owned`) — extract numeric Project ID from `name` field
+2. Call `[prefix]:list_screens` with `projectId` — identify target screen by title
+3. Call `[prefix]:get_screen` with `projectId` + `screenId` — get `screenshot.downloadUrl`, `htmlCode.downloadUrl`, `designTheme`
+4. Call `[prefix]:get_project` with full `name` path (`projects/{id}`) — get `designTheme` object (colors, fonts, roundness)
+5. `web_fetch` the `htmlCode.downloadUrl` — parse Tailwind classes, custom CSS, component patterns
+6. Optionally `web_fetch` screenshot for visual verification of atmosphere
 
-Run `list_tools` to find Stitch MCP prefix (typically `mcp_stitch:` or `stitch:`). Use this prefix for all subsequent calls.
+## Semantic Translation Guide
 
-### Step 2: Find Target Project
+### Colors
+For each color: Descriptive name conveying character + hex code + functional role.
+```
+Deep Muted Teal-Navy (#294056) — primary surface, navigation backgrounds
+Warm Ivory (#F5F0E8) — content background, card surfaces
+Coral Red (#E84B3A) — destructive actions, error states
+```
 
-Call `[prefix]:list_projects` with `filter: "view=owned"` to retrieve all projects. Extract Project ID from the `name` field (format: `projects/{numeric-id}`).
+### Geometry
+| CSS value | DESIGN.md language |
+|---|---|
+| `rounded-full` | Pill-shaped, fully circular |
+| `rounded-2xl` | Generously rounded corners |
+| `rounded-lg` | Subtly rounded corners |
+| `rounded-md` | Slight corner softening |
+| `rounded-none` | Sharp, squared-off edges |
 
-### Step 3: Find Target Screen
+### Elevation / Shadows
+| CSS value | DESIGN.md language |
+|---|---|
+| No shadow | Flat, no elevation distinction |
+| `shadow-sm` | Whisper-soft diffused shadows |
+| `shadow-md` | Gentle card elevation |
+| `shadow-lg` | Pronounced depth, layered UI |
+| `shadow-2xl` | Heavy, high-contrast drop shadows |
 
-Call `[prefix]:list_screens` with numeric `projectId`. Identify the screen by title (e.g., "Home", "Landing Page"). Extract Screen ID from the screen's `name` field.
+### Typography
+Describe: font family character ("humanist sans-serif with geometric undertones"), weight hierarchy ("bold 700 for headings, regular 400 for body, never medium 500"), letter-spacing ("tight -0.02em tracking on headings").
 
-### Step 4: Fetch Screen Metadata
-
-Call `[prefix]:get_screen` with both numeric `projectId` and `screenId`. Response includes:
-
-- `screenshot.downloadUrl` - Visual design reference
-- `htmlCode.downloadUrl` - Full HTML/CSS source
-- `width`, `height`, `deviceType` - Screen dimensions
-- Project `designTheme` - Colors, fonts, roundness
-
-### Step 5: Download Assets
-
-Use `web_fetch` to download HTML from `htmlCode.downloadUrl`. Optionally download screenshot for visual verification. Parse HTML to extract Tailwind classes, custom CSS, and component patterns.
-
-### Step 6: Extract Project Metadata
-
-Call `[prefix]:get_project` with full `name` path (e.g., `projects/{id}`) to retrieve:
-
-- `designTheme` object (colors, fonts, roundness)
-- Project guidelines and descriptions
-- Device preferences and layout principles
-
-## Analysis & Synthesis
-
-### 1. Extract Project Identity
-
-- Project Title
-- Project ID (from JSON `name` field)
-
-### 2. Define Atmosphere
-
-Evaluate screenshot and HTML to capture overall "vibe" using evocative adjectives:
-
-- Airy, Minimal, Dense, Utilitarian, Sophisticated, Playful, etc.
-
-### 3. Map Color Palette
-
-For each color, document:
-
-- **Descriptive name** conveying character (e.g., "Deep Muted Teal-Navy")
-- **Hex code** for precision (e.g., "#294056")
-- **Functional role** (e.g., "Primary actions", "Secondary text")
-
-### 4. Translate Geometry & Shape
-
-Convert technical `border-radius` values to physical descriptions:
-
-- `rounded-full` → "Pill-shaped"
-- `rounded-lg` → "Subtly rounded corners"
-- `rounded-none` → "Sharp, squared-off edges"
-
-### 5. Describe Depth & Elevation
-
-Explain how UI handles layering. Describe shadow quality:
-
-- "Flat" (no shadows)
-- "Whisper-soft diffused shadows" (subtle elevation)
-- "Heavy, high-contrast drop shadows" (pronounced depth)
-
-## Output Format: DESIGN.md
+## DESIGN.md Output Format
 
 ```markdown
 # Design System: [Project Title]
 
-**Project ID:** [Insert Project ID Here]
+**Project ID:** [numeric-id]
 
 ## 1. Visual Theme & Atmosphere
 
-(Description of the mood, density, and aesthetic philosophy.)
+[2–3 sentences using sensory, evocative language. Capture density, mood, and aesthetic philosophy.]
 
 ## 2. Color Palette & Roles
 
-(List colors by Descriptive Name + Hex Code + Functional Role.)
+| Name | Hex | Role |
+|---|---|---|
+| Deep Muted Teal-Navy | #294056 | Primary actions, navigation |
+| ... | | |
 
 ## 3. Typography Rules
 
-(Description of font family, weight usage, and letter-spacing character.)
+[Font family character, weight usage, letter-spacing, size hierarchy.]
 
-## 4. Component Stylings
+## 4. Component Styling
 
-- **Buttons:** (Shape description, color assignment, behavior).
-- **Cards/Containers:** (Corner roundness, background color, shadow depth).
-- **Inputs/Forms:** (Stroke style, background, focus state).
+- **Buttons:** [Shape, color assignment, hover/active behavior]
+- **Cards/Containers:** [Corner roundness, background, shadow depth]
+- **Inputs/Forms:** [Border style, background, focus ring]
 
 ## 5. Layout Principles
 
-(Description of whitespace strategy, margins, grid alignment.)
+[Whitespace strategy, grid alignment, spacing rhythm, margin philosophy.]
 ```
 
-## Best Practices
+## Decision: Atmosphere Description
 
-- **Be Descriptive:** Avoid generic terms. Use "Ocean-deep Cerulean (#0077B6)" instead of "blue"
-- **Be Functional:** Always explain what each element is used for
-- **Be Consistent:** Use the same terminology throughout
-- **Be Visual:** Help readers visualize the design through descriptions
-- **Be Precise:** Include exact hex codes and pixel values in parentheses
+Before writing atmosphere, ask:
+- What is the information density? (airy/dense)
+- What emotion does it evoke? (calm/energetic/authoritative/playful)
+- Who is the audience? (consumer/enterprise/developer)
+- What is the visual weight? (lightweight/substantial)
 
-## Anti-Patterns to Avoid
-
-- **NEVER** use technical jargon without translation — `rounded-xl` means nothing to Stitch; use "generously rounded" so the visual intent is clear
-- **NEVER** omit hex codes or use only color names — names are ambiguous; hex codes enable exact replication
-- **NEVER** forget functional roles of design elements — "blue button" is generic; "Deep Ocean Blue (#0077B6) for primary actions" is actionable
-- **NEVER** be vague in atmosphere descriptions — avoid "nice" or "cool"; use sensory language like "airy, minimal" or "dense, utilitarian"
-- **NEVER** ignore subtle design details like shadows and spacing — these affect perceived elevation and visual hierarchy
-- **NEVER** use clichés like "modern" without specificity — every design is "modern"; say what actually makes it distinctive
-- **NEVER** name colors by appearance alone — colors should reflect their PURPOSE (primary, secondary, error) not just their hue
-
-## Tips for Success
-
-1. Start with the big picture before diving into details
-2. Look for patterns in spacing, sizing, and styling
-3. Name colors by purpose, not just appearance
-4. Document how visual weight communicates hierarchy
-5. Reference the Stitch Effective Prompting Guide for language patterns
+These answers should generate 2–3 specific sentences — not adjective lists.

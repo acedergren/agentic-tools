@@ -1,47 +1,38 @@
 ---
 name: write-tests
-description: >-
-  Add test coverage to existing code with correct mock patterns.
-
-  Use when user mentions:
-  - "write tests for this file"
-  - "add regression coverage"
-  - "cover this untested module"
+description: "Use when adding or improving test coverage for existing source code without changing production behavior. Selects mock strategy by module type (route handler, repository, plugin, utility, service), handles mockReset:true environments, and prevents common vitest/jest mock wiring failures. Triggers on: write tests, add tests, test coverage, regression coverage, untested module, *.test.ts."
 ---
 
 # Write Tests for Existing Code
 
-## Load this skill when
+## NEVER
 
-- the source already exists and the task is to add or improve tests only
-- the module type dictates a specific mock strategy
-- regression coverage is needed without changing production behavior
-
-## Do NOT load this skill when
-
-- the task is full feature implementation from scratch
-- the user wants to modify source logic as part of the same workflow
-- the request is just to run existing tests and report outcomes
+- **NEVER chain `mockResolvedValueOnce`** when `mockReset: true` — the chain clears between tests. Use counter-based `mockImplementation` instead.
+- **NEVER define mock variables at module scope then reference them inside `vi.mock()` factories** — hoisting creates a temporal dead zone. Use `vi.hoisted()` or globalThis registry.
+- **NEVER `vi.importActual()` for modules with side effects** — use selective re-exports instead.
+- **NEVER test implementation details** (private state, internal call order) — test observable behavior through the public API.
+- **NEVER copy mock patterns from other projects** — check YOUR test runner config first (`mockReset`, `mockClear`, `restoreMocks`).
+- **NEVER modify source code** — this skill writes tests only; production behavior is fixed.
 
 ## Before Writing, Ask Yourself
 
-- **Module type?** Route handler, repository, plugin, utility, or service — each has a different mock strategy
-- **Blast radius?** Does this module have side effects (DB writes, API calls) that need isolation?
-- **Nearest test file?** Find the closest `*.test.ts` and match its structure exactly
+- **Module type?** Each has a different mock strategy (see table below).
+- **Blast radius?** Does this module have side effects (DB writes, API calls, filesystem) that need isolation?
+- **Nearest test file?** Find the closest `*.test.ts` and match its exact mock structure — don't invent a new pattern.
 
 ## Mock Strategy by Module Type
 
-| Module Type      | Strategy                                               |
-| ---------------- | ------------------------------------------------------ |
-| Route handler    | Test app builder + session simulation + `app.inject()` |
-| Repository       | Mock DB connection + counter-based `execute`           |
-| Framework plugin | Real framework instance + selective dependency mocks   |
-| Pure utility     | No mocks — test inputs/outputs directly                |
-| Service w/ DI    | Mock injected deps via forwarding pattern              |
+| Module Type        | Strategy                                               |
+| ------------------ | ------------------------------------------------------ |
+| Route handler      | Test app builder + session simulation + `app.inject()` |
+| Repository         | Mock DB connection + counter-based `execute`           |
+| Framework plugin   | Real framework instance + selective dependency mocks   |
+| Pure utility       | No mocks — test inputs/outputs directly                |
+| Service w/ DI      | Mock injected deps via forwarding pattern              |
 
 ## Mock Setup (mockReset: true)
 
-If your test runner uses `mockReset: true`, most examples from the internet will **silently fail**.
+If your test runner uses `mockReset: true`, most examples from the internet will **silently fail** — return values clear between tests.
 
 ```typescript
 const { mockFn } = vi.hoisted(() => ({
@@ -58,20 +49,21 @@ beforeEach(() => {
 });
 ```
 
-For complex TDZ cases (multiple interdependent mocks), use the **globalThis registry pattern**.
+For complex TDZ cases (multiple interdependent mocks), use the **globalThis registry pattern**:
 
-## NEVER
-
-- **NEVER chain `mockResolvedValueOnce`** — `mockReset` clears the chain between tests. Use counter-based `mockImplementation` instead.
-- **NEVER define mock variables at module scope then reference in `vi.mock()` factories** — hoisting creates a temporal dead zone. Use `vi.hoisted()` or globalThis.
-- **NEVER `vi.importActual()` for modules with side effects** — use selective re-exports.
-- **NEVER test implementation details** (private state, internal call order) — test behavior through the public API.
-- **NEVER copy mock patterns from other projects** — check YOUR test runner config first.
-- **NEVER modify source code** — this skill writes tests only.
+```typescript
+vi.mock("./dep", () => {
+  if (!(globalThis as any).__mocks) (globalThis as any).__mocks = {};
+  const m = { dep: vi.fn() };
+  (globalThis as any).__mocks.dep = m;
+  return { dep: (...a: unknown[]) => m.dep(...a) };
+});
+// In tests: const mocks = (globalThis as any).__mocks;
+```
 
 ## Metacognitive Rule
 
-**If >3 tests fail on first run**: STOP. The root cause is almost certainly a mock wiring issue affecting all tests, not individual test logic errors. Re-examine the mock setup strategy holistically before fixing tests one by one.
+**If >3 tests fail on first run**: STOP. Root cause is almost certainly a mock wiring issue affecting all tests — not individual test logic. Re-examine the mock setup holistically before fixing tests one by one.
 
 ## Run
 
@@ -83,4 +75,4 @@ npx vitest run <test-file> --reporter=verbose
 
 - `$ARGUMENTS`: Path to the source file or module to cover
   - Example: `/write-tests src/routes/admin/settings.ts`
-  - If empty, ask the user which file needs test coverage
+  - If empty: ask the user which file needs test coverage

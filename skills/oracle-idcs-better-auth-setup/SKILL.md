@@ -1,89 +1,77 @@
 ---
 name: oracle-idcs-better-auth-setup
-description: |
-  Route Oracle Database, OCI IDCS, OIDC callback, trusted-origin, and Better Auth setup work across Fastify and Next.js without duplicating bridge or provisioning logic.
-
-  Triggers when user mentions:
-  - "wire IDCS into Better Auth"
-  - "configure Fastify + Next.js shared auth model"
-  - "bootstrap OCI IAM provider config and callback URL"
+description: "Use when setting up Better Auth with Oracle IDCS/OCI IAM, configuring OIDC callback URLs, trusted origins, provider bootstrap order, or sharing an auth model between Fastify and Next.js. Entry point for the full auth foundation — routes to bridge or provisioning skills when narrowed. Keywords: Oracle IDCS, OCI IAM, Better Auth, OIDC, Fastify auth, Next.js auth, callback URL, trusted origins, provider bootstrap."
 ---
 
 # Oracle IDCS + Better Auth Setup
 
-Use this as the entry skill when the task spans the whole auth foundation: Oracle adapter, OIDC config, trusted origins, callback URLs, provider bootstrap, and cross-app consistency.
+Entry skill for the full auth foundation: Oracle adapter, OIDC config, trusted origins, callback URLs, provider bootstrap, and cross-app consistency.
 
-Do **not** use this skill as the deep implementation guide for every auth bug. It is the router.
+This is a router, not a deep implementation guide. Use it to diagnose where the problem lives, then hand off to the right skill.
 
-## Load this skill when
+## NEVER
 
-- the user is setting up Better Auth against Oracle for the first time
-- Fastify and Next.js must share one auth model
-- the user needs to validate callback URLs, trusted origins, or provider bootstrap order
-- the user is unsure whether the bug is setup, bridge, or provisioning
+- Never mix full-stack setup guidance with Fastify bridge internals or org provisioning internals — each skill owns its domain.
+- Never bootstrap providers from DB on cold-start — seed from env first, then reflect into Oracle provider tables for operator visibility.
+- Never write provider bootstrap that overwrites existing operator-managed rows — idempotent create-if-missing only.
+- Never skip `urn:opc:idm:__myscopes__` from IDCS scopes — its absence silently removes the `groups` claim from tokens, breaking all role-based logic downstream.
+- Never trust that OAuth success means local session success — wrong callback URL produces OAuth success followed by local session failure, a misleading failure mode.
 
-## Do NOT load this skill when
+## Decision Tree: Which Skill Owns This?
 
-- the problem is specifically Fastify request/session bridging → load `fastify-better-auth-bridge`
-- the problem is specifically IDCS groups, org mapping, or `org_members` writes → load `oracle-idcs-org-provisioning`
-- the issue is purely UI login behavior after auth state already exists
+```
+Is the problem in the auth foundation (setup, config, bootstrap)?
+├── Yes → Stay in this skill
 
-## Decision tree
+Is the problem in runtime request/session handling in Fastify?
+├── Yes → Switch to: fastify-better-auth-bridge
 
-### If the problem is foundation setup
+Is the problem in post-login membership, groups, or org_members writes?
+├── Yes → Switch to: oracle-idcs-org-provisioning
 
-Stay in this skill and verify, in order:
+Is the user unsure which layer the bug is in?
+├── Yes → Use this skill to verify setup checklist first
+```
 
-1. Oracle adapter and Better Auth tables exist.
-2. IDCS confidential application uses the right callback URL.
-3. Scopes include `openid,email,profile,urn:opc:idm:__myscopes__`.
-4. Trusted origins and cookie attributes match the deployed app topology.
-5. Env config can cold-start auth before DB-managed provider settings are edited.
-6. Env-to-DB bootstrap is idempotent and never overwrites existing provider rows.
+## Foundation Verification Order
 
-### If the problem is runtime request handling
+When diagnosing setup issues, verify in this exact order (later items depend on earlier ones):
 
-Switch to `fastify-better-auth-bridge`.
+1. Oracle adapter and Better Auth tables exist in DB
+2. IDCS confidential application uses the correct callback URL
+3. Scopes include `openid,email,profile,urn:opc:idm:__myscopes__`
+4. Trusted origins and cookie attributes match the deployed app topology
+5. Env config can cold-start auth before DB-managed provider settings are edited
+6. Env-to-DB bootstrap is idempotent and never overwrites existing provider rows
 
-### If the problem is post-login membership or role state
+## Non-Obvious Setup Rules
 
-Switch to `oracle-idcs-org-provisioning`.
+**Env-first bootstrap:** Auth must be functional from env vars alone before provider rows exist in DB. Provider rows are for operator visibility, not for cold-start. If you invert this, auth breaks on first deploy before any DB seed runs.
 
-## Non-obvious setup rules
+**Shared building blocks:** Oracle adapter, cookie rules, IDCS profile mapper, and session hook behavior must be shared across Fastify and Next.js apps. Diverging these two causes subtle token/session inconsistencies that are hard to trace.
 
-- Seed auth from env first, then reflect it into Oracle provider tables for operator visibility.
-- Share building blocks across apps: Oracle adapter, cookie rules, IDCS profile mapper, and session hook behavior.
-- Keep naming stable when the codebase already uses IDCS and `OCI_IAM_*` env vars.
+**Naming stability:** When the codebase already uses IDCS and `OCI_IAM_*` env var naming, keep it. Mixing naming schemes (e.g., introducing `ORACLE_*` vars) breaks scripts and makes the env matrix confusing.
+
+**Callback URL failure mode:** A wrong callback URL looks like OAuth flow succeeds (IDCS redirects back) but local session creation fails immediately after. Check this before debugging anything else if login appears to "complete" but the user isn't authenticated.
+
+## Common Gotchas
+
+| Symptom | Likely Cause |
+|---------|-------------|
+| No `groups` claim in token | Missing `urn:opc:idm:__myscopes__` scope |
+| OAuth succeeds, session fails | Wrong callback URL in IDCS app config |
+| Provider rows wiped on deploy | Bootstrap logic not idempotent |
+| Auth works locally, fails in prod | Trusted origins missing prod domain |
 
 ## Scripts
 
-### Validate setup env vars
-
 ```bash
+# Validate all required env vars are set
 node scripts/validate-idcs-env.js
-```
 
-### Print the setup checklist
-
-```bash
+# Print full setup checklist with current state
 node scripts/print-auth-checklist.js
 ```
-
-## Common gotchas
-
-- Missing `urn:opc:idm:__myscopes__` usually means no `groups` claim later.
-- Wrong callback URL often looks like OAuth success followed by local session failure.
-- Provider bootstrap should create missing rows, not replace operator-managed ones.
-- Do not mix full-stack setup guidance with Fastify bridge internals or org provisioning internals.
-
-## First-time setup
-
-1. Copy `.env.example` to `.env`.
-2. Fill in Better Auth and IDCS values.
-3. Run `node scripts/validate-idcs-env.js`.
-4. Confirm callback URL and trusted origins.
-5. Confirm provider bootstrap is idempotent.
-6. Hand off to the bridge or provisioning skill only if the problem is now isolated there.
 
 ## Arguments
 

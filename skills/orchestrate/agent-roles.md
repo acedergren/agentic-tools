@@ -2,89 +2,145 @@
 
 Maps task characteristics to specialist roles with model selection, budget caps, and domain-specific system prompts.
 
+**This file is a template.** On first use in a new project, run the discovery process below to generate project-specific rules. Until then, the generic rules are used as fallback.
+
+---
+
 ## Role Definitions
 
 | Role                | Model  | Budget | Prompt Template                         | Description                             |
 | ------------------- | ------ | ------ | --------------------------------------- | --------------------------------------- |
-| `backend-impl`      | sonnet | $5     | `prompt-templates/backend-impl.md`      | Fastify 5 routes, plugins, services     |
-| `frontend-impl`     | sonnet | $5     | `prompt-templates/frontend-impl.md`     | SvelteKit pages, components, stores     |
-| `mastra-impl`       | sonnet | $5     | `prompt-templates/mastra-impl.md`       | Mastra agents, RAG, tools, workflows    |
-| `security-reviewer` | opus   | $8     | `prompt-templates/security-reviewer.md` | OWASP + Oracle security review          |
-| `qa-lead`           | haiku  | $2     | `prompt-templates/qa-lead.md`           | TDD, test writing, QA watching          |
-| `doc-sync`          | haiku  | $2     | `prompt-templates/doc-sync.md`          | Documentation, README, migration guides |
+| `backend`           | sonnet | $5     | `prompt-templates/backend-impl.md`      | Server-side routes, services, APIs, DB  |
+| `frontend`          | sonnet | $5     | `prompt-templates/frontend-impl.md`     | UI components, pages, client state      |
+| `security-reviewer` | opus   | $8     | `prompt-templates/security-reviewer.md` | OWASP review, auth, secrets audit       |
+| `qa`                | haiku  | $2     | `prompt-templates/qa-lead.md`           | TDD, test writing, QA watching          |
+| `docs`              | haiku  | $2     | `prompt-templates/doc-sync.md`          | Documentation, README, changelogs       |
 
-## Assignment Rules
+---
 
-The orchestrator assigns roles based on file paths and task metadata. Rules are evaluated top-to-bottom; first match wins.
+## Project Discovery (run once per new project)
 
-### By File Path
+At orchestration start, if no `.claude/orchestrate-roles.md` exists:
+
+1. Aggregate all `files` fields from the task plan
+2. Scan `package.json` (or equivalent) to detect frameworks
+3. Examine top-level directory structure
+4. Generate project-specific assignment rules and write to `.claude/orchestrate-roles.md`
+5. Use `.claude/orchestrate-roles.md` for this and all future runs in the project
+
+**Discovery prompt to run as a subagent:**
+```
+Analyze this project and generate agent-roles assignment rules.
+Steps:
+1. Read package.json (or Cargo.toml / go.mod / pyproject.toml)
+2. Run: ls -1 src/ apps/ packages/ 2>/dev/null | head -30
+3. Read the task plan file paths from: {task_plan_path}
+4. Output a markdown table mapping file glob patterns to roles: backend, frontend, qa, docs, security-reviewer
+Format: same as agent-roles.md Assignment Rules section.
+Write result to: .claude/orchestrate-roles.md
+```
+
+---
+
+## Generic Assignment Rules (fallback)
+
+Rules are evaluated top-to-bottom; first match wins.
+
+### By File Path Pattern
 
 ```
-apps/api/src/routes/**          → backend-impl
-apps/api/src/plugins/**         → backend-impl
-apps/api/src/services/**        → backend-impl
-apps/api/src/app.ts             → backend-impl
-apps/frontend/src/**            → frontend-impl
-apps/api/src/mastra/**          → mastra-impl
-packages/shared/src/tools/**    → mastra-impl (tool wrappers)
-packages/shared/src/server/**   → backend-impl (shared server utilities)
-packages/shared/src/workflows/**→ backend-impl
-docs/**                         → doc-sync
-*.test.ts                       → qa-lead
+# Backend / Server
+src/routes/**              → backend
+src/api/**                 → backend
+src/services/**            → backend
+src/controllers/**         → backend
+src/server/**              → backend
+src/db/**                  → backend
+server/**                  → backend
+api/**                     → backend
+
+# Frontend / UI
+src/components/**          → frontend
+src/pages/**               → frontend
+src/app/**                 → frontend
+src/views/**               → frontend
+src/ui/**                  → frontend
+*.tsx                      → frontend
+*.svelte                   → frontend
+*.vue                      → frontend
+
+# Tests
+*.test.*                   → qa
+*.spec.*                   → qa
+__tests__/**               → qa
+test/**                    → qa
+
+# Documentation
+docs/**                    → docs
+*.md                       → docs
+README*                    → docs
+CHANGELOG*                 → docs
+
+# Infrastructure / Config
+terraform/**               → backend
+.github/**                 → docs
+Dockerfile*                → backend
 ```
 
 ### By Task Metadata
 
 ```
-tag: "security"                 → security-reviewer
-tag: "test"                     → qa-lead
-tag: "docs"                     → doc-sync
-verify_command contains "semgrep"→ security-reviewer
+tag: "security"            → security-reviewer
+tag: "test"                → qa
+tag: "docs"                → docs
+verify_command has "semgrep"→ security-reviewer
+title contains "review"    → security-reviewer
+title contains "audit"     → security-reviewer
+title contains "migration" → backend
 ```
 
-### By Task Content
+### Fallback
 
-```
-title contains "migration"      → backend-impl (Oracle migrations)
-title contains "review"         → security-reviewer
-title contains "audit"          → security-reviewer
-```
+If no rule matches → `backend` (sonnet, $5). Broadest coverage of unknown codebases.
 
-## Fallback
-
-If no rule matches, assign `backend-impl` (sonnet, $5) as the default — it has the broadest knowledge of the monorepo.
-
-## Budget Overrides
-
-The `--budget-per-task N` flag overrides the role-based budget for all tasks. Per-session budget cap is calculated as:
-
-```
-session_budget = sum(task_budgets) * 1.5  (50% headroom for retries)
-```
+---
 
 ## Model Escalation Path
 
 When a task fails and requires model escalation:
 
 ```
-haiku  → sonnet  (qa-lead, doc-sync tasks that fail)
-sonnet → opus    (backend-impl, frontend-impl, mastra-impl tasks that fail)
-opus   → opus    (security-reviewer stays at opus, gets extended budget: $12)
+haiku  → sonnet  (qa, docs tasks that fail)
+sonnet → opus    (backend, frontend tasks that fail)
+opus   → opus    (security-reviewer stays at opus; budget escalates to $12)
 ```
 
-Budget is also escalated: failed task budget × 1.5 for the retry.
+Budget also escalates: failed task budget × 1.5.
+
+---
 
 ## Interactive Mode Naming
 
-When spawning in-session agents (interactive mode), use role-based names:
-
 ```
-backend-impl   → "backend-{N}"      (e.g., backend-1, backend-2)
-frontend-impl  → "frontend-{N}"
-mastra-impl    → "mastra-{N}"
+backend           → "backend-{N}"      (e.g., backend-1, backend-2)
+frontend          → "frontend-{N}"
 security-reviewer → "security-{N}"
-qa-lead        → "qa-{N}"
-doc-sync       → "docs-{N}"
+qa                → "qa-{N}"
+docs              → "docs-{N}"
 ```
 
-This replaces the old generic `sonnet-impl-N` / `haiku-deps-N` naming, making status reports immediately readable.
+---
+
+## Customizing for Your Project
+
+Copy the generic rules above into `.claude/orchestrate-roles.md` and replace with your actual paths. Example for a monorepo:
+
+```
+apps/api/**                → backend
+apps/web/**                → frontend
+packages/shared/**         → backend    (shared server utilities)
+packages/ui/**             → frontend
+e2e/**                     → qa
+```
+
+Remove roles that don't apply. Add roles for domain-specific work (e.g., `ml-engineer` for model training tasks).

@@ -1,120 +1,83 @@
 ---
 name: shadcn-svelte-skill
-version: 3.0.0
-license: MIT
-description: |
-  Expert guidance for shadcn-svelte component architecture and Tailwind CSS v4.1 patterns.
-  Use when: (1) choosing between shadcn/Skeleton/Melt UI, (2) debugging TanStack Table
-  reactivity, (3) fixing Tailwind v4.1 migration issues, (4) implementing complex data
-  tables with sorting/filtering, (5) troubleshooting form validation patterns.
-
-  NOT for basic installation (see official docs). Focuses on non-obvious decisions,
-  performance pitfalls, and patterns missing from documentation.
-
-  Triggers when user mentions:
-  - "shadcn-svelte"
-  - "TanStack Table"
-  - "Tailwind v4.1"
-license: MIT
+description: "Use when working with shadcn-svelte components, TanStack Table in Svelte 5, or Tailwind v4.1. Covers non-obvious reactivity bugs, library selection trade-offs, and migration pitfalls not in the official docs. Keywords: shadcn-svelte, TanStack Table, Tailwind v4.1, Svelte 5 runes, bits-ui, superforms, data table, svelte-check."
 ---
 
 # shadcn-svelte Expert Guidance
 
 **Assumption**: You know how to run `npx shadcn-svelte@latest add`. This skill covers what the docs won't tell you.
 
-## Load this skill when
+## NEVER
 
-- the task involves shadcn-svelte patterns, Svelte 5 reactivity, or Tailwind v4.1 behavior
-- table reactivity, form validation, or component-library choice is the real problem
-- the user needs advanced patterns, not install commands
+- Never destructure Bits UI builders at module level (`const { trigger } = Dialog`) — builders are reactive objects, destructuring captures stale references. Use `asChild let:builder` pattern.
+- Never pass `data: myData` directly to `createSvelteTable` — Svelte 5 runes require getter accessors or data never updates.
+- Never use `@tailwind base/components/utilities` in Tailwind v4.1 — directives silently do nothing; use `@import "tailwindcss"`.
+- Never expect `npm update` to patch shadcn components — they're forked into your codebase; you own maintenance.
+- Never start with TanStack Table for a simple display table — the complexity cliff is steep (each feature adds 100–200 lines).
 
-## Do NOT load this skill when
-
-- the user only needs basic setup or copy-paste installation steps
-- the task is generic CSS or non-Svelte UI work
-- the library choice is settled and no tricky integration patterns remain
-
----
-
-## Critical Decision: Which UI Library?
+## Library Selection
 
 ```
-Need UI components for Svelte?
+Need Svelte UI components?
 │
-├─ Maximum customization needed (own the code)
-│   ├─ Complex data tables → shadcn-svelte (TanStack integration)
-│   ├─ Unique design system → shadcn-svelte (copy-paste, modify freely)
-│   └─ Moderate customization → Consider Skeleton UI (easier)
+├─ Own the code, heavy customization → shadcn-svelte
+│   ├─ Complex data tables → TanStack integration built-in
+│   └─ Unique design system → copy-paste, modify freely
 │
-├─ Rapid prototyping (ship fast, customize later)
-│   └─ Skeleton UI - pre-built themes, npm package
+├─ Ship fast, customize later → Skeleton UI
+│   └─ Pre-built themes, npm package (auto-updates)
 │
-├─ Accessibility-first (maximum control)
-│   └─ Melt UI - headless primitives (bring your own styles)
+├─ Accessibility-first, bring own styles → Melt UI
+│   └─ Headless primitives only
 │
-└─ Unique requirements (nothing fits)
-    └─ Build from scratch with Bits UI primitives
+└─ Nothing fits → Build from Bits UI primitives
 ```
 
-**Key insight**: shadcn is **NOT a library**, it's copy-paste infrastructure. You fork components into `$lib/components/ui/` and own maintenance.
+**Key trade-off**: shadcn is NOT a library — you fork components into `$lib/components/ui/` and own security patches, bug fixes, and upgrades permanently.
 
----
+**Data table complexity cliff:**
+```
+Simple table: ~50 lines
++ sorting:    +100 lines
++ filtering:  +150 lines
++ selection:  +200 lines
++ visibility: +100 lines
+```
+Start with `<table>`, upgrade to TanStack only when you need 2+ features.
 
-## Anti-Patterns (Things That Will Break)
+## Critical Anti-Patterns
 
-### ❌ #1: Early Destructuring of Builders
-
-**Problem**: Bits UI uses builders that must be passed down, not destructured early.
+### #1: Early Builder Destructuring (Bits UI)
 
 ```svelte
-<!-- WRONG - will break -->
+<!-- WRONG - breaks all click handlers silently -->
 <script>
-  import * as Dialog from "$lib/components/ui/dialog";
-  const { trigger, content } = Dialog;  // ❌ Breaks reactivity
+  const { trigger } = Dialog;  // stale reference
 </script>
 
-<Dialog.Root>
-  <Dialog.Trigger {trigger}>Open</Dialog.Trigger>  <!-- ❌ Undefined -->
-</Dialog.Root>
-
-<!-- CORRECT - use asChild pattern -->
-<script>
-  import * as Dialog from "$lib/components/ui/dialog";
-  import { Button } from "$lib/components/ui/button";
-</script>
-
+<!-- CORRECT -->
 <Dialog.Root>
   <Dialog.Trigger asChild let:builder>
-    <Button builders={[builder]}>Open</Button>  <!-- ✅ Works -->
+    <Button builders={[builder]}>Open</Button>
   </Dialog.Trigger>
-  <Dialog.Content>...</Dialog.Content>
 </Dialog.Root>
 ```
 
-**Why it breaks**: Builders are reactive objects that get passed through component tree. Destructuring at module level captures stale references.
+Symptom: Component renders, click handlers silently fail. Error says `undefined`, no mention of builders.
 
-**Why this is deceptively hard to debug**: Error message is just "undefined", no mention of builders. Console shows component renders fine, but click handlers silently fail. Takes 30+ minutes to discover the `asChild` pattern.
+### #2: TanStack Table — Missing `get` Accessors
 
-### ❌ #2: TanStack Table - Missing `get` Accessors
-
-**Problem**: Svelte 5 runes require `get` accessors in `createSvelteTable`, not direct references.
+**The most common TanStack + Svelte 5 bug.** Table renders correctly, pagination UI works, but sorting/filtering clicks do nothing.
 
 ```typescript
-// WRONG - stale data, no reactivity
-let sorting = $state<SortingState>([]);
+// WRONG - data never updates after init
+const table = createSvelteTable({ data: myData, state: { sorting } });
 
+// CORRECT - reactive getters
 const table = createSvelteTable({
-  data: myData,  // ❌ Static reference
-  state: { sorting }  // ❌ No reactivity
-});
-
-// CORRECT - reactive accessors
-let sorting = $state<SortingState>([]);
-
-const table = createSvelteTable({
-  get data() { return myData; },  // ✅ Getter updates on change
+  get data() { return myData; },
   state: {
-    get sorting() { return sorting; }  // ✅ Reactive
+    get sorting() { return sorting; }
   },
   onSortingChange: (updater) => {
     sorting = typeof updater === "function" ? updater(sorting) : updater;
@@ -122,127 +85,62 @@ const table = createSvelteTable({
 });
 ```
 
-**Why it breaks**: Without getters, TanStack reads data once at initialization and never updates.
+Every `onXChange` handler must handle both function and value: `typeof updater === "function" ? updater(old) : updater`.
 
-**This is THE most common TanStack Table bug with Svelte 5.**
-
-**Why this is deceptively hard to debug**: Table renders correctly with initial data, pagination/sorting UI works, but clicking sort does nothing. DevTools show state updating, but table doesn't re-render. The `get` keyword is mentioned nowhere in TanStack errors—you only discover it from buried GitHub issues.
-
-### ❌ #3: Tailwind v4.1 Migration - Old `@tailwind` Directives
-
-**Problem**: Tailwind v4.1 changed import syntax.
+### #3: Tailwind v4.1 — Silent Migration Failure
 
 ```css
-/* WRONG - v3 syntax */
+/* WRONG - silently does nothing in v4.1 */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* CORRECT - v4.1 syntax */
+/* CORRECT */
 @import "tailwindcss";
 ```
 
-**Also update `vite.config.ts`:**
 ```typescript
+// vite.config.ts - plugin order matters
 import tailwindcss from '@tailwindcss/vite'
-
-export default defineConfig({
-  plugins: [tailwindcss(), sveltekit()],  // ✅ Plugin order matters
-})
+plugins: [tailwindcss(), sveltekit()]  // tailwindcss BEFORE sveltekit
 ```
 
-**Why it breaks**: v4.1 uses native CSS imports, no longer PostCSS directives.
+Symptom: Styles work in dev (cached), production build has zero Tailwind classes. No error.
 
-**Why this is deceptively hard to debug**: Vite compiles successfully, no errors. Styles appear to work in dev mode (cached from previous build), but production build has zero Tailwind classes. The `@tailwind` directive silently does nothing—Vite doesn't warn about invalid CSS.
-
-### ❌ #4: Form Validation - Destructuring `superForm` Too Early
+### #4: superforms — Destructuring Before Bind
 
 ```typescript
-// WRONG - breaks reactivity
-const form = superForm(data.form);
-const { form: formData } = form;  // ❌ Stale reference
-formData.email = value;  // ❌ Doesn't trigger validation
+// WRONG - formData becomes stale reference, validation breaks
+const { form: formData } = superForm(data.form);
+formData.email = value;
 
-// CORRECT - bind or use form store methods
-const form = superForm(data.form);
-const { form: formData } = form;
-
-<Input bind:value={$formData.email} />  // ✅ Two-way binding works
+// CORRECT - use bind: to connect to store
+const { form: formData } = superForm(data.form);
+// In template: <Input bind:value={$formData.email} />
 ```
-
----
-
-## Hidden Costs of shadcn-svelte
-
-**Cost #1: No `npm update`**
-- Every shadcn component is forked into your codebase
-- Bug fixes require manually re-copying components
-- Security patches don't auto-update
-- Trade-off: Customization freedom vs maintenance burden
-
-**Cost #2: Tailwind v4.1 CSS Variables Pattern**
-- Colors defined as HSL triplets: `--color-primary: 0 0% 9%`
-- Used with `bg-[hsl(var(--color-primary))]` syntax
-- **Why this matters**: Allows alpha channel: `bg-[hsl(var(--color-primary)/0.5)]`
-- **Not obvious from docs**: The space-separated format enables `/alpha` syntax
-
-**Cost #3: Data Table Complexity Cliff**
-```
-Simple table: ~50 lines
-+ sorting: +100 lines
-+ filtering: +150 lines
-+ row selection: +200 lines
-+ column visibility: +100 lines
-```
-
-**Decision rule**: Start with simple `<table>`, upgrade to TanStack only when you need 2+ features.
-
----
 
 ## Expert Patterns
 
-### Pattern #1: CSS Variable Theme System
+### CSS Variable Theme (Tailwind v4.1)
 
 ```css
-/* Define theme in app.css using @layer theme */
 @import "tailwindcss";
 
 @layer theme {
   :root {
-    /* HSL format: hue saturation% lightness% */
-    --color-primary: 0 0% 9%;           /* Dark gray */
-    --color-destructive: 0 84% 60%;     /* Red */
+    --color-primary: 0 0% 9%;       /* space-separated HSL enables /alpha */
+    --color-destructive: 0 84% 60%;
   }
-
-  .dark {
-    --color-primary: 0 0% 98%;          /* Light gray */
-    --color-destructive: 0 84% 60%;     /* Red (same) */
-  }
+  .dark { --color-primary: 0 0% 98%; }
 }
 
-/* Use with alpha in utilities */
-@layer utilities {
-  .overlay {
-    @apply bg-[hsl(var(--color-primary)/0.5)];  /* 50% opacity */
-  }
-}
+/* Alpha via / syntax */
+.overlay { @apply bg-[hsl(var(--color-primary)/0.5)]; }
 ```
 
-**Why HSL with spaces**: Tailwind v4.1 parses `hsl(H S L / A)` format, allowing alpha via `/0.5` syntax.
+Space-separated HSL format (not `hsl(H,S,L)`) is required for the `/alpha` Tailwind syntax to work.
 
-### Pattern #2: TanStack Table State Updater Pattern
-
-**All TanStack state updates follow this pattern:**
-
-```typescript
-onSortingChange: (updater) => {
-  sorting = typeof updater === "function" ? updater(sorting) : updater;
-}
-```
-
-**Why**: `updater` can be either a function `(old) => new` or a new value directly. Always handle both cases.
-
-### Pattern #3: Form Field Component Pattern
+### Form Field Pattern
 
 ```svelte
 <Form.Field {form} name="email">
@@ -250,100 +148,40 @@ onSortingChange: (updater) => {
     <Form.Label>Email</Form.Label>
     <Input {...attrs} type="email" bind:value={$formData.email} />
   </Form.Control>
-  <Form.FieldErrors />  <!-- Auto-displays validation errors -->
+  <Form.FieldErrors />
 </Form.Field>
 ```
 
-**Key insight**: `let:attrs` spreads aria attributes, `bind:value` connects to form store, `<FieldErrors />` auto-wires to validation state.
+`let:attrs` spreads aria attributes automatically. `<Form.FieldErrors />` auto-wires to validation state.
 
----
+## Debugging Checklists
 
-## When to Load Full References
+### Table not updating
+1. `get data()` accessor used (not `data: myData`)?
+2. All state wrapped in `get` (sorting, pagination, filters)?
+3. Every `onXChange` has `typeof updater === "function"` guard?
 
-**MANDATORY - READ ENTIRE FILE: `references/installation.md` when:**
-- User explicitly requests setup instructions
-- Error: "shadcn-svelte not found" or installation failures
-- **Do NOT load** if user already has project running
+### Builder undefined
+1. `asChild let:builder` on Trigger?
+2. `builders={[builder]}` array passed to child?
+3. No module-level destructuring?
 
-**MANDATORY - READ ENTIRE FILE: `references/datatable-full.md` when:**
-- Implementing tables with 3+ features (sorting + filtering + selection)
-- TanStack Table errors mentioning columnDef or getCoreRowModel
-- Need row selection with checkboxes across paginated data
-- **Do NOT load** for simple static tables (use basic `<table>`)
+### Tailwind classes missing
+1. `@import "tailwindcss"` (not `@tailwind` directives)?
+2. `@tailwindcss/vite` plugin in `vite.config`?
+3. Plugin before `sveltekit()` in array?
+4. Deleted `.svelte-kit/` and `node_modules/.vite/` cache?
 
-**MANDATORY - READ ENTIRE FILE: `references/form-patterns.md` when:**
-- Multi-step forms (wizard pattern) with validation
-- Complex validation (cross-field dependencies, async validation)
-- Backend integration with Zod + superforms
-- **Do NOT load** for single-field forms or basic validation
+## When to Load References
 
-**Never load references** for library choice, anti-pattern debugging, or Tailwind v4.1 migration—handle with this core framework.
+**Load `references/datatable-tanstack-svelte5.md`** when:
+- Implementing 3+ table features (sorting + filtering + selection)
+- TanStack errors mentioning `columnDef` or `getCoreRowModel`
+- Row selection with checkboxes across paginated data
 
----
+**Load `references/form-patterns.md`** when:
+- Multi-step wizard forms with validation
+- Cross-field dependencies or async validation
+- Zod + superforms backend integration
 
-## Quick Decision Trees
-
-### "My table isn't updating"
-```
-Check in order:
-1. Using `get data()` accessor? (not `data: myData`)
-2. Using `get` for all state? (sorting, pagination, filters)
-3. State updaters handle function AND value? (typeof check)
-4. Importing from correct path? (`$lib/components/ui/data-table`)
-```
-
-### "Builder undefined in component"
-```
-Check:
-1. Using `asChild let:builder` pattern?
-2. Passing `builders={[builder]}` array to child?
-3. NOT destructuring builders at module level?
-```
-
-### "Tailwind classes not applying"
-```
-Check:
-1. Using `@import "tailwindcss"` (not `@tailwind`)?
-2. `@tailwindcss/vite` plugin in vite.config?
-3. Plugin before sveltekit() in plugins array?
-4. Restarted dev server after vite.config change?
-```
-
----
-
-## Error Recovery Procedures
-
-### When Anti-Pattern #1 Fails (Builder Undefined)
-**Recovery steps**:
-1. Search codebase for `const { ` in Dialog/Popover components → Remove destructuring
-2. Find `<Dialog.Trigger>` without `let:builder` → Add `asChild let:builder`
-3. Replace direct props with `builders={[builder]}` array
-4. **Fallback**: If still broken, check `bits-ui` version compatibility (needs v1.0+)
-
-### When Anti-Pattern #2 Fails (TanStack Not Updating)
-**Recovery steps**:
-1. Wrap ALL `createSvelteTable` options in getters: `get data() { return x }`
-2. Check state updaters have typeof guard: `typeof updater === "function"`
-3. Verify imports: `import { createSvelteTable } from "@tanstack/svelte-table"`
-4. **Fallback**: If state still stale, check Svelte version (needs 5.0+), downgrade TanStack to v8.10 if necessary
-
-### When Anti-Pattern #3 Fails (Tailwind Not Loading)
-**Recovery steps**:
-1. Delete `.svelte-kit/` and `node_modules/.vite/` cache directories
-2. Run `npm install @tailwindcss/vite@latest`
-3. Verify `tailwindcss.config.js` NOT `tailwind.config.js` (v4.1 naming)
-4. **Fallback**: If still broken, check Vite version (needs 5.0+), revert to Tailwind v3 if blocked
-
----
-
-## Resources
-
-- **Official Docs**: https://www.shadcn-svelte.com/docs (for installation, component gallery)
-- **This Skill**: Non-obvious decisions, performance pitfalls, expert patterns
-
-## Arguments
-
-- `$ARGUMENTS`: Component issue, library tradeoff, or UI slice to analyze
-  - Example: `/shadcn-svelte-skill data table sorting bug`
-  - Example: `/shadcn-svelte-skill shadcn vs skeleton for admin forms`
-  - If empty: ask which Svelte UI problem needs guidance
+Do NOT load references for library choice, anti-pattern debugging, or Tailwind migration — handle with this file.

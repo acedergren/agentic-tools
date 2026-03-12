@@ -1,115 +1,66 @@
 ---
 name: api-audit
-description: |
-  Audit API routes against shared types to find schema drift, auth gaps, and missing request or response validation.
-
-  Use when user mentions:
-  - "audit API routes against types"
-  - "check schema drift"
-  - "validate route contracts"
+description: "Use when auditing API routes for schema drift, missing auth, or validation gaps. Scans routes against shared TypeScript types to find mismatches, missing middleware, and undocumented endpoints. Read-only — produces a severity-grouped report. Keywords: audit routes, schema drift, auth gaps, missing validation, type mismatch, orphaned schemas."
 ---
 
 # API Route & Type Audit Skill
 
-Scan API routes and plugins, catalog every endpoint, and cross-reference against type definitions to find mismatches. **Read-only — do not modify any files.**
-
-## Load this skill when
-
-- the user added or changed routes and wants contract verification
-- shared schemas may have drifted from route handlers
-- auth hooks, request validation, or response typing may be inconsistent
-
-## Do NOT load this skill when
-
-- the user wants fixes applied instead of a read-only report
-- the goal is a general health sweep rather than API-specific contract checking
-- there is no API surface in scope
+Read-only cross-reference of API routes against shared type definitions. Do NOT modify any files.
 
 ## NEVER
 
-- Never report a missing schema without checking whether the framework uses inline validation.
-- Never flag auth gaps without confirming the route should be protected.
-- Never treat orphaned types as critical when they may be planned or transitional.
-- Never modify route or type files during the audit.
+- Never flag a missing schema without first confirming the framework doesn't use inline validation (Fastify schema objects, Zod in middleware, etc.).
+- Never report an auth gap without verifying the route should actually be protected — not all routes require auth.
+- Never treat orphaned types as critical — they may be planned, transitional, or used by SDK consumers not visible in the route tree.
+- Never make assumptions about auth from route path alone — `/admin/*` prefix doesn't guarantee a route requires auth without inspecting the hook chain.
+
+## Decision: What counts as a real mismatch?
+
+**Schema drift** — only if the shared type and the route handler both exist but disagree on shape (field names, required vs optional, type divergence). A route using its own inline schema is not drift.
+
+**Auth gap** — only if: (a) a sibling or parent route has auth hooks AND (b) the route handles mutations or user-scoped data. Public GET endpoints with no sibling pattern are ambiguous — report as Info, not Critical.
+
+**Orphaned type** — only if the schema has no imports, no references in any route file, and is not in a `types/` package that may serve external consumers.
+
+## Parallel Execution Strategy
+
+Spawn two agents simultaneously:
+
+- **Agent A**: Scan routes + plugins → catalog `(method, path, auth hooks, request schema, response schema)` per endpoint
+- **Agent B**: Scan type/schema directories → catalog all exported schema names and their shapes
+
+Synthesize after both complete. Never do this serially — the two inventories are independent.
 
 ## Scripts
 
-Use the helpers to build the two audit inventories before synthesis:
-
 ```bash
 bash scripts/inventory-api-surface.sh
-bash scripts/inventory-api-surface.sh admin
+bash scripts/inventory-api-surface.sh admin   # scope filter
 bash scripts/find-shared-schemas.sh packages
 ```
 
-## Steps
+## What to Collect (Agent A)
 
-### 1. Scan Route Files
+Per route: HTTP method, path, auth/permission requirements, request validation schema (name or inline), response schema (name or inline). Check both route registration AND plugin/middleware hooks — auth often lives in the plugin, not the handler.
 
-Scan your routes directory recursively. For each route registration, extract:
+## What to Collect (Agent B)
 
-- **HTTP method** (GET, POST, PUT, PATCH, DELETE)
-- **Path** (e.g., `/api/users`, `/api/admin/settings`)
-- **Auth requirements** (public, session-required, RBAC permissions)
-- **Request schema** (Zod/validation schema name, if defined)
-- **Response schema** (Zod/validation schema name, if defined)
+Per shared schema: exported name, file location, TypeScript shape summary, and whether it's referenced by any route import.
 
-Look for framework-specific patterns (e.g., Fastify schema objects, Express middleware chains, Next.js route handlers).
+## Report Format
 
-### 2. Scan Plugin/Middleware Files
+Severity-grouped markdown table:
 
-Scan middleware or plugin directories for:
+| Severity | Category | Route/Type | Issue | File:Line |
+|----------|----------|------------|-------|-----------|
 
-- Auth middleware registration (which routes get auth protection)
-- Permission mappings
-- Rate limiting configurations per route
-- Any route-level decorators or hooks
+Severity levels:
+1. **Critical**: Auth gaps on mutation endpoints, missing request validation on write operations
+2. **Warning**: Type drift between route handler and shared schema, missing response schemas on documented APIs
+3. **Info**: Orphan types, inline schemas that could use shared ones
 
-### 3. Catalog Shared Types
+Include summary counts: total routes, full validation coverage, partial, none, mismatch count.
 
-Scan type definition directories for:
+## Scope Filter
 
-- Validation schemas used as request/response validators
-- TypeScript interfaces/types that correspond to API payloads
-- Exported schema names and their shapes
-
-### 4. Cross-Reference and Detect Mismatches
-
-| Category            | What to check                                                      |
-| ------------------- | ------------------------------------------------------------------ |
-| **Missing schemas** | Routes without request/response validation                         |
-| **Type drift**      | Route handler using a type that differs from the shared schema     |
-| **Orphan types**    | Schemas in types package not referenced by any route               |
-| **Auth gaps**       | Routes missing auth hooks that should have them (e.g., `/admin/*`) |
-
-### 5. Report Findings
-
-Output a markdown table grouped by severity:
-
-1. **Critical**: Auth gaps, missing validation on mutation endpoints
-2. **Warning**: Type drift, missing response schemas
-3. **Info**: Orphan types, routes with inline schemas that could use shared ones
-
-Include summary counts: total routes, full coverage, partial coverage, no validation, mismatches.
-
-## Arguments
-
-- `$ARGUMENTS`: Optional scope filter
-  - Example: `/api-audit admin` — only audit admin routes
-  - If empty, audit all routes
-
-## Execution Strategy
-
-Use **two parallel Explore agents** for speed:
-
-1. **Agent A**: Scan routes + plugins — catalog all endpoints
-2. **Agent B**: Scan types directories — catalog all shared schemas
-
-Then synthesize their findings into the cross-reference table.
-
-## Key Rules
-
-1. **Read-only** — do not create, modify, or delete any files
-2. **Be specific** — report exact file paths and line numbers
-3. **No false positives** — only report genuine mismatches
-4. **Include context** — show the relevant type/schema snippet for each mismatch
+`$ARGUMENTS` — optional path prefix (e.g., `admin` → only audit `/admin/*` routes). Empty = audit all.
