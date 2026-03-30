@@ -24,7 +24,7 @@ Browse: https://skills.sh/
 
 | Source | Skills |
 |--------|--------|
-| `acedergren/agentic-tools` | OCI (compute, IAM, networking, DBA, finops, landing-zones, genai), orchestrate, prd, implement, tdd, health-check, stitch-*, migrate, doc-sync, quality-commit, prod-readiness |
+| `acedergren/agentic-tools` | OCI (compute, IAM, networking, DBA, finops, landing-zones, genai), orchestrate, prd, implement, tdd, health-check, stitch-*, migrate, doc-sync, quality-commit, prod-readiness, sqry-cli |
 | `vercel-labs/agent-skills` | React, Next.js, Vercel deployment, performance |
 | `ComposioHQ/awesome-claude-skills` | General-purpose catalogue |
 
@@ -33,6 +33,7 @@ Install from agentic-tools:
 npx skills add acedergren/agentic-tools@orchestrate
 npx skills add acedergren/agentic-tools@oracle-dba
 npx skills add acedergren/agentic-tools@prd
+npx skills add acedergren/agentic-tools@sqry-cli
 ```
 
 ## Install vs Answer Directly

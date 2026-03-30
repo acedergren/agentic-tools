@@ -40,6 +40,7 @@ These skills chain into a complete implementation workflow:
 | **humanizer**           | Remove AI writing patterns    | v3.0.0  |
 | **firecrawl**           | Web scraping CLI              | v3.0.0  |
 | **shadcn-svelte-skill** | shadcn-svelte + Tailwind v4.1 | v3.0.0  |
+| **sqry-cli**            | Direct sqry CLI code intelligence | v1.0.0  |
 | **tanstack-query**      | TanStack Query v5 patterns    | v3.0.0  |
 | **turborepo**           | Monorepo architecture         | v3.0.0  |
 | **refactor-module**     | Terraform module extraction   | v3.0.0  |

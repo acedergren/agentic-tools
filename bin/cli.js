@@ -27,6 +27,7 @@ const SKILLS = [
   "refactor-module",
   "review-all",
   "shadcn-svelte-skill",
+  "sqry-cli",
   "tanstack-query",
   "tdd",
   "turborepo",
