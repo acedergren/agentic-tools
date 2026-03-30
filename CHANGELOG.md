@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-03-30
+
+### Added
+- Added new `sqry-cli` skill for direct local `sqry` CLI workflows when MCP is unavailable or unreliable.
+- Added bundled helper scripts in `skills/sqry-cli/scripts/`:
+  - `sqry-ask-auto.sh` for non-interactive natural-language execution
+  - `verify-sqry-capabilities.sh` for full capability smoke verification
+
+### Changed
+- Bumped package version to `1.0.1`.
+- Updated install surfaces to include `sqry-cli` in both `bin/cli.js` and `install.sh`.
+
 ## 2026-03-09
 
 ### Added

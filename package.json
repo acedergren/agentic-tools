@@ -1,6 +1,6 @@
 {
   "name": "agentic-tools",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Production-grade AI agent skills, workflows, and automation for Claude Code",
   "type": "module",
   "bin": {
