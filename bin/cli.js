@@ -30,6 +30,7 @@ const SKILLS = [
   "tanstack-query",
   "tdd",
   "turborepo",
+  "write-natural-swedish",
   "write-tests",
 ];
 
