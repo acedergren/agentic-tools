@@ -50,22 +50,30 @@ Use references selectively. Do not turn ordinary editing into research unless ac
      - https://developers.google.com/style
      - https://developers.google.com/style/tone
 
-7. Rivstart
+7. Dialects and regional Swedish
+   - Use Isof dialect pages, the dialect map, and recordings for source-backed regional flavor.
+   - Treat written dialect as stylization; verify local traits when the user asks for a named place such as Linköping.
+   - Start with `references/marquee-dialects.md` for safe writing patterns before browsing.
+   - Links:
+     - https://www.isof.se/dialekter/lar-dig-mer-om-svenska-dialekter/utforska-svenska-dialekter/sveamal/ostergotland
+     - https://dialektkartan.isof.se/
+
+8. Rivstart
    - Use as a learner-progression reference for Swedish as a foreign language, especially A1-C1 level calibration and communicative practice.
    - Do not quote textbook content unless the user provides the excerpt or asks to work with their material.
    - Link: https://www.nok.se/laromedel/serier/Rivstart/
 
-8. Radio Sweden på lätt svenska
+9. Radio Sweden på lätt svenska
    - Use for contemporary clear Swedish with short news texts and audio, especially when the user asks for `lätt svenska` or learner-friendly style.
    - Link: https://www.sverigesradio.se/radio-sweden-pa-latt-svenska
 
-9. SVT Språkplay / Språkkraft caveat
+10. SVT Språkplay / Språkkraft caveat
    - SVT Språkplay was useful historically for interactive subtitles but SVT says the app has been discontinued; use SVT Play for programs and Språkkraft tools for language-learning media support.
    - Links:
      - https://www.svt.se/kontakt/svt-sprakplay
      - https://sprakplay.svt.se/
 
-10. Grammar references
+11. Grammar references
    - Use `Swedish: An Essential Grammar` for compact structure checks and `Swedish: A Comprehensive Grammar` for deeper grammar decisions.
    - Do not reproduce copyrighted explanations; use them as references when available.
 
@@ -80,4 +88,5 @@ Use references selectively. Do not turn ordinary editing into research unless ac
 | English-Swedish candidate | Tyda | SO, Korp, context |
 | Contemporary tech word | Isof Nyordslistan | Korp, target audience |
 | Specialist tech term | Rikstermbanken | Datatermgruppen/TT where relevant |
+| Dialect flavor | Isof dialect pages | Dialect map/recordings, local prompt context |
 | Learner difficulty | Rivstart levels | Radio Sweden på lätt svenska |
