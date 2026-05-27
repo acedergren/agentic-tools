@@ -176,6 +176,8 @@ These skills chain together into a full implementation workflow.
 
 The OCI skills stay individually installable while [skills/oci](skills/oci/) provides the visible ownership boundary for Oracle-related work. All OCI and Oracle-related specialists live under `skills/oci/<skill-name>/` and use skill IDs like `oci/zpr-security`. The [manifest](skills/oci/manifest.json) is validated in CI against skill metadata, the CLI, and the Bash installer.
 
+See the [OCI Skill Catalog and Use Cases](skills/oci/USE_CASES.md) for concrete example prompts, routing guidance, and multi-skill workflows.
+
 | Skill | What It Does | Key Feature |
 | ----- | ------------ | ----------- |
 | **[/oci](skills/oci/)** | OCI and Oracle skill-pack router | Canonical manifest for separation of duties |

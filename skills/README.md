@@ -49,6 +49,8 @@ These skills chain into a complete implementation workflow:
 
 The `oci` skill pack is the visible repository boundary for OCI and Oracle-related work. All OCI and Oracle-related specialists live under `skills/oci/<skill-name>/` with IDs such as `oci/zpr-security`. `skills/oci/manifest.json` records the canonical ownership set and CI checks it against metadata, CLI, installer, and docs.
 
+For concrete example prompts, routing guidance, and multi-skill workflows, see [`oci/USE_CASES.md`](oci/USE_CASES.md).
+
 | Skill | Description | Version |
 | ----- | ----------- | ------- |
 | **oci** | OCI and Oracle skill-pack router | v1.0.0 |

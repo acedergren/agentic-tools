@@ -4,6 +4,8 @@ This folder is the repository boundary for OCI and Oracle-related skill ownershi
 
 All OCI and Oracle-related specialist skills live under `skills/oci/<skill-name>/` and are installed with skill IDs such as `oci/zpr-security`. The canonical OCI inventory lives in [`manifest.json`](manifest.json), and [`SKILL.md`](SKILL.md) is the user-facing router.
 
+For a complete human-readable catalog with example prompts and multi-skill workflows, see [`USE_CASES.md`](USE_CASES.md).
+
 ## Core OCI Operations
 
 - `oci/best-practices`
