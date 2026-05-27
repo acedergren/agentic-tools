@@ -16,6 +16,9 @@ keywords:
   - "Terraform apply 403"
   - "Resource Manager"
   - "orm-family"
+  - "ZPR"
+  - "OCI Bastion"
+  - "security attribute"
 aliases:
   - "oci-iam"
   - "identity-domains"
@@ -134,6 +137,8 @@ Before changing HCL, identify the principal and scope:
 | Resource Manager stack/job gets 403 | `orm-*` permissions plus target service permissions in the target compartment |
 | Resource Manager dynamic group cannot create VCN | Whether the principal is actually a Resource Manager/user context, and whether `manage virtual-network-family` is granted where the VCN is created |
 | Identity-domain group can log in but cannot apply | Group mapping, exact group name, policy subject, compartment policy location |
+| ZPR policy or security attributes cannot be managed | ZPR IAM permissions plus policy location and compartment scope |
+| Bastion session creation is denied | Bastion/session permissions plus target resource/network permissions |
 
 ## Policy Syntax Gotchas
 
@@ -255,6 +260,10 @@ Load [`references/oci-iam-policies-reference.md`](references/oci-iam-policies-re
 Do NOT load for quick syntax examples, troubleshooting 403/404, or dynamic group rules — this file covers those.
 
 Load [`../infrastructure-as-code/references/oci-terraform-auth-matrix.md`](../infrastructure-as-code/references/oci-terraform-auth-matrix.md) when Terraform, OCI DevOps, Resource Manager, Compute instance principals, resource principals, OKE workload identity, Cloud Shell, or CI/CD federation affect the caller.
+
+Load [`../oci/zpr-security/references/zpr-reference.md`](../oci/zpr-security/references/zpr-reference.md) when the IAM task is specifically about who may configure ZPR, security attributes, or ZPR policies.
+
+Load [`../oci/managed-bastion-access/references/managed-bastion-reference.md`](../oci/managed-bastion-access/references/managed-bastion-reference.md) when the IAM task is specifically about who may create bastions, create sessions, update allowlists, or connect through OCI Bastion.
 
 ## Arguments
 

@@ -2,7 +2,7 @@
 
 This folder is the repository boundary for OCI and Oracle-related skill ownership.
 
-The specialist skills stay at `skills/<skill-name>/` for installer and external `npx skills add repo@skill-name` compatibility. The canonical OCI inventory lives in [`manifest.json`](manifest.json), and [`SKILL.md`](SKILL.md) is the user-facing router.
+Most specialist skills stay at `skills/<skill-name>/` for broad compatibility. OCI-only specialist skills can live at `skills/oci/<skill-name>/` and are installed with skill IDs such as `oci/zpr-security`. The canonical OCI inventory lives in [`manifest.json`](manifest.json), and [`SKILL.md`](SKILL.md) is the user-facing router.
 
 ## Core OCI Operations
 
@@ -17,7 +17,10 @@ The specialist skills stay at `skills/<skill-name>/` for installer and external 
 - `monitoring-operations`
 - `networking-management`
 - `oci-events`
-- `oci-resource-manager`
+- `oci/managed-bastion-access`
+- `oci/oci-resource-manager`
+- `oci/oci-security-control-plane`
+- `oci/zpr-security`
 - `oracle-dba`
 - `secrets-management`
 

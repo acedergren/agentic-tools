@@ -84,8 +84,8 @@ For users and groups operating Resource Manager, check `orm-family` or specific 
 ## Reference Files
 
 - Load [`references/resource-manager-reference.md`](references/resource-manager-reference.md) for current source links, stack/job lifecycle, private endpoints, provider support, source providers, IAM, state migration, and troubleshooting.
-- Load `../infrastructure-as-code/references/oci-terraform-auth-matrix.md` when the failure is actually provider auth or principal selection.
-- Load `../infrastructure-as-code/references/oci-terraform-secrets-state.md` when stack variables, state, logs, or outputs may contain secret values.
+- Load `../../infrastructure-as-code/references/oci-terraform-auth-matrix.md` when the failure is actually provider auth or principal selection.
+- Load `../../infrastructure-as-code/references/oci-terraform-secrets-state.md` when stack variables, state, logs, or outputs may contain secret values.
 
 ## Arguments
 

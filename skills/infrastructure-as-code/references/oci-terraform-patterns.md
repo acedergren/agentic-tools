@@ -25,3 +25,5 @@ Use the focused sibling references first:
 - `oci-terraform-import-drift.md` for brownfield adoption.
 - `oci-terraform-module-quality.md` for official-module review.
 - `oci-terraform-realms-regions.md` for government, FIPS, realm, and endpoint checks.
+- `oci-terraform-zpr.md` for ZPR security attributes, policy sequencing, provider support, imports, and rollout safety.
+- `oci-terraform-bastion.md` for Bastion resources, sessions, allowlists, IAM, key-state safety, and no-public-SSH guardrails.

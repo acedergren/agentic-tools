@@ -44,7 +44,10 @@ SKILLS=(
   "oci"
   "oci-events"
   "oci-pptx"
-  "oci-resource-manager"
+  "oci/managed-bastion-access"
+  "oci/oci-resource-manager"
+  "oci/oci-security-control-plane"
+  "oci/zpr-security"
   "oracle-dba"
   "oracle-idcs-better-auth-setup"
   "oracle-idcs-org-provisioning"
@@ -84,7 +87,10 @@ OCI_SKILLS=(
   "monitoring-operations"
   "networking-management"
   "oci-events"
-  "oci-resource-manager"
+  "oci/managed-bastion-access"
+  "oci/oci-resource-manager"
+  "oci/oci-security-control-plane"
+  "oci/zpr-security"
   "oracle-dba"
   "secrets-management"
   "fastify-better-auth-bridge"
@@ -96,7 +102,9 @@ OCI_SKILLS=(
 
 for skill in "${SKILLS[@]}"; do
   if [ -d "$SCRIPT_DIR/skills/$skill" ]; then
-    cp -r "$SCRIPT_DIR/skills/$skill" "$TARGET_DIR/.claude/skills/"
+    rm -rf "$TARGET_DIR/.claude/skills/$skill"
+    mkdir -p "$(dirname "$TARGET_DIR/.claude/skills/$skill")"
+    cp -r "$SCRIPT_DIR/skills/$skill" "$TARGET_DIR/.claude/skills/$skill"
     echo "  + $skill"
   fi
 done

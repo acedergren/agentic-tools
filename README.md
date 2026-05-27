@@ -11,7 +11,7 @@
 **Portable Agent Skills, workflows, and automation for AI-assisted development**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Skills](https://img.shields.io/badge/Skills-47-brightgreen)](#skills)
+[![Skills](https://img.shields.io/badge/Skills-50-brightgreen)](#skills)
 [![Agents](https://img.shields.io/badge/Agents-2-blue)](#agents)
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-SKILL.md-blue)](#agent-skills-standard)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Compatible-blueviolet)](https://claude.com/claude-code)
@@ -23,7 +23,7 @@
 
 ## What This Is
 
-`agentic-tools` is a curated library of 47 Agent Skills plus Claude Code agents, hooks, and workflow templates. It is built around the late-May 2026 Agent Skills model: each skill is a focused `skills/<name>/SKILL.md` package with trigger-oriented metadata, progressive disclosure, optional scripts or references, and validation gates that keep install surfaces in sync.
+`agentic-tools` is a curated library of 50 Agent Skills plus Claude Code agents, hooks, and workflow templates. It is built around the late-May 2026 Agent Skills model: each skill is a focused `SKILL.md` package with trigger-oriented metadata, progressive disclosure, optional scripts or references, and validation gates that keep install surfaces in sync.
 
 The library has two jobs:
 
@@ -42,8 +42,8 @@ As of late May 2026, Agent Skills are a lightweight open format built around a d
 
 This repo follows that model with a few local quality gates:
 
-- Every immediate child of `skills/` is installable and must contain `SKILL.md`.
-- `name` must match the folder name.
+- Every registered skill package under `skills/` is installable and must contain `SKILL.md`.
+- `name` must match the package folder name; nested OCI skills use IDs like `oci/zpr-security`.
 - Descriptions are trigger-oriented and include quoted user phrases for reliable discovery.
 - Skill bodies include load boundaries, anti-patterns, and an `## Arguments` section.
 - Large or high-drift material belongs in focused `references/` files, not in the always-loaded body.
@@ -177,14 +177,17 @@ These skills chain together into a full implementation workflow.
 
 ### OCI and Oracle Skill Pack
 
-The OCI skills stay individually installable at `skills/<skill-name>/` for compatibility, while [skills/oci](skills/oci/) provides the visible ownership boundary for Oracle-related work. Its [manifest](skills/oci/manifest.json) is validated in CI against skill metadata, the CLI, and the Bash installer.
+The OCI skills stay individually installable while [skills/oci](skills/oci/) provides the visible ownership boundary for Oracle-related work. OCI-only specialists live under `skills/oci/<skill-name>/` and use skill IDs like `oci/zpr-security`; broad or adjacent skills remain at `skills/<skill-name>/`. The [manifest](skills/oci/manifest.json) is validated in CI against skill metadata, the CLI, and the Bash installer.
 
 | Skill | What It Does | Key Feature |
 | ----- | ------------ | ----------- |
 | **[/oci](skills/oci/)** | OCI and Oracle skill-pack router | Canonical manifest for separation of duties |
 | **[/best-practices](skills/best-practices/)** | OCI architecture review router | Cross-domain triage into specialist skills |
 | **[/infrastructure-as-code](skills/infrastructure-as-code/)** | OCI Terraform hub | Native OCI backend, auth, import, drift, modules, and realm guardrails |
-| **[/oci-resource-manager](skills/oci-resource-manager/)** | OCI Resource Manager operations | Stacks, jobs, state, source providers, private endpoints, and IAM boundaries |
+| **[/oci/oci-resource-manager](skills/oci/oci-resource-manager/)** | OCI Resource Manager operations | Stacks, jobs, state, source providers, private endpoints, and IAM boundaries |
+| **[/oci/oci-security-control-plane](skills/oci/oci-security-control-plane/)** | OCI security control router | Routes Cloud Guard, Security Zones, ZPR, Bastion, IAM, Vault, Audit, and Terraform security work |
+| **[/oci/zpr-security](skills/oci/zpr-security/)** | Zero Trust Packet Routing | ZPR policy, security attributes, protected resources, and rollout safety |
+| **[/oci/managed-bastion-access](skills/oci/managed-bastion-access/)** | OCI Bastion access | Managed SSH, port forwarding, dynamic SOCKS5, allowlists, and plugin troubleshooting |
 | **[/oracle-dba](skills/oracle-dba/)** | Autonomous AI Database operations | ADB, SQLcl, wallet, ECPU, backup, and tuning guidance |
 | **[/secrets-management](skills/secrets-management/)** | OCI Vault and secret operations | Rotation, replication, instance principals, and retrieval guardrails |
 
@@ -192,7 +195,7 @@ The OCI skills stay individually installable at `skills/<skill-name>/` for compa
 
 ## Complete Skill Directory
 
-The install surfaces expose every immediate child under `skills/`. CI validates this table, `bin/cli.js`, `install.sh`, and each skill directory together.
+The install surfaces expose every registered skill package under `skills/`, including nested OCI skill IDs. CI validates this table, `bin/cli.js`, `install.sh`, and each skill directory together.
 
 | Skill | Trigger Summary |
 | ----- | --------------- |
@@ -211,7 +214,7 @@ The install surfaces expose every immediate child under `skills/`. CI validates 
 | **[/humanizer](skills/humanizer/)** | Use when making text sound human, removing AI tells, or fixing writing that sounds like ChatGPT. Detects and rewrites AI |
 | **[/iam-identity-management](skills/iam-identity-management/)** | "write OCI IAM policy", "debug OCI 403", "configure dynamic groups", "use identity domains", or "fix IDCS federation" |
 | **[/implement](skills/implement/)** | Use when implementing a feature, adding an endpoint, or making a non-trivial code change that requires pre-flight valida |
-| **[/infrastructure-as-code](skills/infrastructure-as-code/)** | "write Terraform for OCI", "debug terraform-provider-oci", "configure OCI Resource Manager", "fix OCI state", or "build OCI IaC" |
+| **[/infrastructure-as-code](skills/infrastructure-as-code/)** | "Terraform state on OCI", "native OCI backend", "Terraform import OCI", "Terraform apply 403", "Terraform ZPR", or "Terraform Bastion" |
 | **[/landing-zones](skills/landing-zones/)** | "design an OCI landing zone", "plan compartments", "enable Security Zones", "build hub-spoke OCI", or "meet CIS OCI Foundations" |
 | **[/migrate](skills/migrate/)** | Use when bulk-migrating import paths, renaming workspace packages, or reorganizing modules across many files in a monore |
 | **[/monitoring-operations](skills/monitoring-operations/)** | "create OCI alarms", "debug missing metrics", "write MQL", "configure Service Connector", or "monitor OCI resources" |
@@ -219,7 +222,10 @@ The install surfaces expose every immediate child under `skills/`. CI validates 
 | **[/oci](skills/oci/)** | "find OCI skills", "route Oracle Cloud work", "install the OCI skill pack", "review OCI skill ownership", or "separate Oracle skills" |
 | **[/oci-events](skills/oci-events/)** | "create OCI Events rule", "trigger Functions from events", "route events to Streaming", "debug Events delivery", or "filter CloudEvents" |
 | **[/oci-pptx](skills/oci-pptx/)** | "create Oracle slides", "edit an Oracle deck", "build a CloudWorld presentation", "review Oracle-branded PPTX", or "apply Oracle brand to slides" |
-| **[/oci-resource-manager](skills/oci-resource-manager/)** | "configure OCI Resource Manager", "debug Resource Manager job", "create ORM stack", "use Resource Manager private endpoint", or "fix Resource Manager dynamic group" |
+| **[/oci/managed-bastion-access](skills/oci/managed-bastion-access/)** | "use OCI Bastion", "create Managed SSH", "debug a port forwarding session", "configure dynamic port forwarding", or "update client CIDR allowlist" |
+| **[/oci/oci-resource-manager](skills/oci/oci-resource-manager/)** | "configure OCI Resource Manager", "debug Resource Manager job", "create ORM stack", "use Resource Manager private endpoint", or "fix Resource Manager dynamic group" |
+| **[/oci/oci-security-control-plane](skills/oci/oci-security-control-plane/)** | "choose OCI security control", "route OCI security issue", "compare Cloud Guard vs Security Zones", "decide ZPR vs NSG", or "use Bastion vs public SSH" |
+| **[/oci/zpr-security](skills/oci/zpr-security/)** | "configure ZPR", "debug Zero Trust Packet Routing", "write ZPL policy", "apply security attributes", or "protect OCI resources with ZPR" |
 | **[/oracle-dba](skills/oracle-dba/)** | "manage Autonomous AI Database", "debug ADB performance", "fix wallet connection", "optimize ECPU cost", or "use SQLcl with Oracle Database" |
 | **[/oracle-idcs-better-auth-setup](skills/oracle-idcs-better-auth-setup/)** | "connect Better Auth to OCI IAM", "configure identity domain OIDC", "fix IDCS callback URL", "set trusted origins", or "bootstrap Oracle auth provider" |
 | **[/oracle-idcs-org-provisioning](skills/oracle-idcs-org-provisioning/)** | "map IDCS groups to orgs", "provision org_members from identity domains", "fix Better Auth active org", or "bootstrap first admin" |
@@ -417,17 +423,21 @@ agentic-tools/
 │   ├── secret-scan.mjs
 │   └── run-all.mjs
 │
-├── skills/                           # 46 Agent Skills, one folder per skill
+├── skills/                           # 50 Agent Skills, registered from top-level and OCI nested packages
 │   ├── README.md                     # Skill catalog and standards
 │   ├── oci/                          # OCI/Oracle ownership boundary
 │   │   ├── SKILL.md                  # OCI skill-pack router
 │   │   ├── README.md
-│   │   └── manifest.json             # Canonical OCI skill inventory
+│   │   ├── manifest.json             # Canonical OCI skill inventory
+│   │   ├── oci-resource-manager/     # OCI Resource Manager operations
+│   │   ├── oci-security-control-plane/
+│   │   ├── managed-bastion-access/
+│   │   └── zpr-security/
 │   ├── implement/                    # Full TDD feature pipeline
 │   ├── review-all/                   # Parallel review pipeline
 │   ├── health-check/                 # Codebase diagnostics
 │   ├── oracle-dba/                   # Autonomous AI Database operations
-│   ├── infrastructure-as-code/       # OCI Terraform / Resource Manager
+│   ├── infrastructure-as-code/       # OCI Terraform, state, import, and security automation
 │   └── ...                           # Remaining skill packages
 │
 ├── claude/
@@ -455,7 +465,7 @@ agentic-tools/
 
 Found a missing pattern or have a battle-tested skill? PRs welcome.
 
-1. Put the skill at `skills/<skill-name>/SKILL.md`; keep the folder name and frontmatter `name` identical.
+1. Put the skill at `skills/<skill-name>/SKILL.md`, or under `skills/oci/<skill-name>/SKILL.md` for OCI-only specialists; keep the package folder name and frontmatter `name` identical.
 2. Write a trigger-oriented `description` with concrete quoted user phrases.
 3. Include `## When to Use`, `## Do NOT load this skill when`, anti-patterns, and `## Arguments`.
 4. Keep the always-loaded body lean; move detailed docs, volatile facts, examples, and API notes into `references/`.

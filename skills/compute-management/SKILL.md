@@ -16,6 +16,8 @@ keywords:
   - "Terraform"
   - "quota"
   - "service limits"
+  - "Managed SSH"
+  - "Bastion plugin"
 aliases:
   - "oci-compute"
   - "compute-shapes"
@@ -35,6 +37,8 @@ When the request is only asking to find or install skills, use `find-skills` ins
 Load this skill for: the user asks to "launch OCI compute", "choose an OCI shape", "debug compute capacity", "configure instance principals", or "optimize OCI instance cost".
 
 Prefer this skill only for its named domain. For broader OCI architecture triage, start with `best-practices` as the router.
+
+When the compute task involves private operator access, Managed SSH, or the Bastion plugin, also load `oci/managed-bastion-access`.
 
 ## NEVER Do This
 
@@ -171,6 +175,8 @@ Do NOT load for quick cost comparisons, capacity troubleshooting, or shape selec
 Load [`../infrastructure-as-code/references/oci-terraform-auth-matrix.md`](../infrastructure-as-code/references/oci-terraform-auth-matrix.md) when Terraform runs on OCI Compute and should use instance principals rather than local API keys.
 
 Load [`../infrastructure-as-code/references/oci-terraform-realms-regions.md`](../infrastructure-as-code/references/oci-terraform-realms-regions.md) when shape availability, government regions, FIPS, or realm-specific endpoints may affect Terraform.
+
+Load [`../oci/managed-bastion-access/references/managed-bastion-reference.md`](../oci/managed-bastion-access/references/managed-bastion-reference.md) when diagnosing Managed SSH, Oracle Cloud Agent, Bastion plugin, Ubuntu/Ampere plugin issues, or private instance access.
 
 ## Arguments
 

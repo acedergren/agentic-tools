@@ -50,20 +50,23 @@ These skills chain into a complete implementation workflow:
 
 ## OCI and Oracle Skills
 
-The `oci` skill pack is the visible repository boundary for OCI and Oracle-related work. Specialist skills remain top-level for compatibility, while `skills/oci/manifest.json` records the canonical ownership set and CI checks it against metadata, CLI, installer, and docs.
+The `oci` skill pack is the visible repository boundary for OCI and Oracle-related work. Broad and adjacent skills remain top-level, while OCI-only specialists can live under `skills/oci/<skill-name>/` with IDs such as `oci/zpr-security`. `skills/oci/manifest.json` records the canonical ownership set and CI checks it against metadata, CLI, installer, and docs.
 
 | Skill | Description | Version |
 | ----- | ----------- | ------- |
 | **oci** | OCI and Oracle skill-pack router | v1.0.0 |
 | **best-practices** | OCI architecture review router | v2.0.0 |
 | **infrastructure-as-code** | OCI Terraform hub | v2.0.0 |
-| **oci-resource-manager** | OCI Resource Manager operations | v2.0.0 |
+| **oci/oci-resource-manager** | OCI Resource Manager operations | v2.0.0 |
+| **oci/oci-security-control-plane** | OCI security control router | v2.0.0 |
+| **oci/zpr-security** | Zero Trust Packet Routing | v2.0.0 |
+| **oci/managed-bastion-access** | OCI Bastion access | v2.0.0 |
 | **oracle-dba** | Autonomous AI Database operations | v2.0.0 |
 | **secrets-management** | OCI Vault and secret operations | v2.0.0 |
 
 ## Full Library Coverage
 
-The install surfaces (`bin/cli.js`, `install.sh`, and `npx skills add`) are expected to expose every directory in `skills/`.
+The install surfaces (`bin/cli.js`, `install.sh`, and `npx skills add`) are expected to expose every registered skill package in `skills/`, including nested OCI skill IDs.
 CI validates that registry coverage stays in sync with the filesystem and docs.
 
 ## Complete Skill Directory
@@ -85,7 +88,7 @@ CI validates that registry coverage stays in sync with the filesystem and docs.
 | **humanizer** | Use when making text sound human, removing AI tells, or fixing writing that sounds like ChatGPT. Detects and rewrites AI |
 | **iam-identity-management** | "write OCI IAM policy", "debug OCI 403", "configure dynamic groups", "use identity domains", or "fix IDCS federation" |
 | **implement** | Use when implementing a feature, adding an endpoint, or making a non-trivial code change that requires pre-flight valida |
-| **infrastructure-as-code** | "write Terraform for OCI", "debug terraform-provider-oci", "configure OCI Resource Manager", "fix OCI state", or "build OCI IaC" |
+| **infrastructure-as-code** | "Terraform state on OCI", "native OCI backend", "Terraform import OCI", "Terraform apply 403", "Terraform ZPR", or "Terraform Bastion" |
 | **landing-zones** | "design an OCI landing zone", "plan compartments", "enable Security Zones", "build hub-spoke OCI", or "meet CIS OCI Foundations" |
 | **migrate** | Use when bulk-migrating import paths, renaming workspace packages, or reorganizing modules across many files in a monore |
 | **monitoring-operations** | "create OCI alarms", "debug missing metrics", "write MQL", "configure Service Connector", or "monitor OCI resources" |
@@ -93,7 +96,10 @@ CI validates that registry coverage stays in sync with the filesystem and docs.
 | **oci** | "find OCI skills", "route Oracle Cloud work", "install the OCI skill pack", "review OCI skill ownership", or "separate Oracle skills" |
 | **oci-events** | "create OCI Events rule", "trigger Functions from events", "route events to Streaming", "debug Events delivery", or "filter CloudEvents" |
 | **oci-pptx** | "create Oracle slides", "edit an Oracle deck", "build a CloudWorld presentation", "review Oracle-branded PPTX", or "apply Oracle brand to slides" |
-| **oci-resource-manager** | "configure OCI Resource Manager", "debug Resource Manager job", "create ORM stack", "use Resource Manager private endpoint", or "fix Resource Manager dynamic group" |
+| **oci/managed-bastion-access** | "use OCI Bastion", "create Managed SSH", "debug a port forwarding session", "configure dynamic port forwarding", or "update client CIDR allowlist" |
+| **oci/oci-resource-manager** | "configure OCI Resource Manager", "debug Resource Manager job", "create ORM stack", "use Resource Manager private endpoint", or "fix Resource Manager dynamic group" |
+| **oci/oci-security-control-plane** | "choose OCI security control", "route OCI security issue", "compare Cloud Guard vs Security Zones", "decide ZPR vs NSG", or "use Bastion vs public SSH" |
+| **oci/zpr-security** | "configure ZPR", "debug Zero Trust Packet Routing", "write ZPL policy", "apply security attributes", or "protect OCI resources with ZPR" |
 | **oracle-dba** | "manage Autonomous AI Database", "debug ADB performance", "fix wallet connection", "optimize ECPU cost", or "use SQLcl with Oracle Database" |
 | **oracle-idcs-better-auth-setup** | "connect Better Auth to OCI IAM", "configure identity domain OIDC", "fix IDCS callback URL", "set trusted origins", or "bootstrap Oracle auth provider" |
 | **oracle-idcs-org-provisioning** | "map IDCS groups to orgs", "provision org_members from identity domains", "fix Better Auth active org", or "bootstrap first admin" |

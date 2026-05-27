@@ -24,7 +24,7 @@ domains:
 ---
 # OCI Skill Pack
 
-Use this skill as the ownership and routing boundary for OCI and Oracle-related skills in this repository. It exists to make Oracle Cloud skills distinct from the general-purpose development skills while preserving the top-level skill folders required by current install tooling.
+Use this skill as the ownership and routing boundary for OCI and Oracle-related skills in this repository. The OCI pack can own nested specialist skills under `skills/oci/<skill-name>/` when installer, validation, and docs surfaces register them explicitly.
 
 ## When to Use
 
@@ -45,7 +45,10 @@ Do not load this skill for a narrow OCI task that already maps to one specialist
 | Autonomous AI Database, ADB wallet, SQLcl, ECPU | `oracle-dba` |
 | OCI DB Systems, PDB/CDB lifecycle, DB provisioning | `database-management` |
 | Terraform, native OCI backend, provider auth, import, drift | `infrastructure-as-code` |
-| Resource Manager stacks, jobs, source providers, private endpoints | `oci-resource-manager` |
+| Resource Manager stacks, jobs, source providers, private endpoints | `oci/oci-resource-manager` |
+| Broad OCI security control routing, Cloud Guard vs Security Zones, ZPR vs NSG | `oci/oci-security-control-plane` |
+| Zero Trust Packet Routing, ZPR security attributes, ZPL policy | `oci/zpr-security` |
+| OCI Bastion, Managed SSH, port forwarding, client CIDR allowlists | `oci/managed-bastion-access` |
 | Landing zones, compartments, Security Zones, Cloud Guard | `landing-zones` |
 | Monitoring, alarms, MQL, Service Connector | `monitoring-operations` |
 | Billing, budgets, egress, Resource Scheduler savings | `finops-cost-optimization` |
@@ -58,13 +61,13 @@ Do not load this skill for a narrow OCI task that already maps to one specialist
 
 Treat [`manifest.json`](manifest.json) as the canonical inventory of Oracle-related skills in this repo. It separates the set into:
 
-- Core OCI operations skills: skills that operate OCI services and should be reviewed for Oracle documentation drift.
+- Core OCI operations skills: skills that operate OCI services and should be reviewed for Oracle documentation drift, including nested OCI-only specialists under this folder.
 - Oracle-adjacent skills: skills that touch Oracle identity, database migration, branded presentations, or app integration but are not core OCI operations.
 - Router and compatibility skills: skills kept for discovery, migration, or backward-compatible naming.
 
 ## NEVER Do This
 
-- NEVER move OCI specialist skills under `skills/oci/<skill-name>/` unless the installer, external skill publishing flow, docs, and validation scripts support nested skills.
+- NEVER add a nested OCI specialist under `skills/oci/<skill-name>/` without registering the `oci/<skill-name>` skill ID in the manifest, CLI, installer, README tables, and validation coverage.
 - NEVER duplicate service-specific instructions in this pack. Route to the owning specialist skill so high-drift facts have one owner.
 - NEVER add an Oracle-related skill without updating `skills/oci/manifest.json`, `bin/cli.js`, `install.sh`, `README.md`, and `skills/README.md`.
 - NEVER treat this pack as current Oracle service documentation. Use the relevant specialist skill and verify drift-prone facts against official Oracle docs.

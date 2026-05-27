@@ -13,6 +13,8 @@ keywords:
   - "VCN"
   - "IAM"
   - "Cloud Guard"
+  - "Bastion"
+  - "ZPR"
 aliases:
   - "oci-architecture-review"
   - "oci-router"
@@ -47,6 +49,7 @@ Do not load this skill for a narrow, already-identified service task:
 | Vault secrets, KMS, rotation, secret replication | `secrets-management` |
 | OCI Generative AI, model choice, RAG, rate limits | `genai-services` |
 | Events rules, CloudEvents, Functions, Streaming, Notifications | `oci-events` |
+| ZPR, Bastion, Cloud Guard vs Security Zones, security-control routing | `oci/oci-security-control-plane` |
 
 When the request is only asking to find or install skills, use `find-skills` instead.
 
@@ -76,6 +79,7 @@ When the request is only asking to find or install skills, use `find-skills` ins
 | `OCI GenAI`, `Command A`, `Llama`, `Gemini`, `gpt-oss`, `RAG` | `genai-services` |
 | `Events`, `CloudEvents`, `Functions`, `Streaming`, `Notifications` | `oci-events` |
 | `Terraform`, `Resource Manager`, `state`, `import`, `drift` | `infrastructure-as-code` |
+| `ZPR`, `Zero Trust Packet Routing`, `Bastion`, `Managed SSH`, `security control` | `oci/oci-security-control-plane` |
 
 ## Reference Files
 

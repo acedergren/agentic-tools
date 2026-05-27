@@ -12,7 +12,25 @@ const shellProjectDir = join(tempRoot, 'shell-project');
 execFileSync('mkdir', ['-p', cliProjectDir, shellProjectDir]);
 
 function listInstalledSkills(projectDir) {
-  return readdirSync(join(projectDir, '.claude', 'skills')).sort();
+  const skillsRoot = join(projectDir, '.claude', 'skills');
+  const found = [];
+
+  function walk(dir, prefix = '') {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      if (!entry.isDirectory()) {
+        continue;
+      }
+      const relative = prefix ? `${prefix}/${entry.name}` : entry.name;
+      const child = join(dir, entry.name);
+      if (existsSync(join(child, 'SKILL.md'))) {
+        found.push(relative);
+      }
+      walk(child, relative);
+    }
+  }
+
+  walk(skillsRoot);
+  return found.sort();
 }
 
 execFileSync('node', ['bin/cli.js', 'list'], { cwd: repo, stdio: 'inherit' });

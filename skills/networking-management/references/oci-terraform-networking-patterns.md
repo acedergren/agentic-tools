@@ -35,7 +35,7 @@ Use this reference when Terraform manages OCI VCNs, subnets, route tables, gatew
 
 ## Resource Manager Private Endpoint Note
 
-Resource Manager private endpoints are Resource Manager resources, not generic VCN endpoints. Use them when Resource Manager jobs must reach private Git, private compute, or private services. Route Resource Manager-specific troubleshooting to `oci-resource-manager`.
+Resource Manager private endpoints are Resource Manager resources, not generic VCN endpoints. Use them when Resource Manager jobs must reach private Git, private compute, or private services. Route Resource Manager-specific troubleshooting to `oci/oci-resource-manager`.
 
 ## Cost and Limit Rules
 

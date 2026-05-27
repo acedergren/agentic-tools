@@ -6,9 +6,22 @@ import { join, resolve } from 'node:path';
 
 const root = resolve(process.cwd());
 const skillsDir = join(root, 'skills');
-const skillDirs = readdirSync(skillsDir, { withFileTypes: true })
+
+function hasSkillFile(skill) {
+  return existsSync(join(skillsDir, skill, 'SKILL.md'));
+}
+
+const topLevelSkillDirs = readdirSync(skillsDir, { withFileTypes: true })
   .filter((entry) => entry.isDirectory())
   .map((entry) => entry.name)
+  .filter((skill) => hasSkillFile(skill));
+
+const nestedOciSkillDirs = readdirSync(join(skillsDir, 'oci'), { withFileTypes: true })
+  .filter((entry) => entry.isDirectory())
+  .map((entry) => `oci/${entry.name}`)
+  .filter((skill) => hasSkillFile(skill));
+
+const skillDirs = [...new Set([...topLevelSkillDirs, ...nestedOciSkillDirs])]
   .sort();
 
 for (const skill of skillDirs) {

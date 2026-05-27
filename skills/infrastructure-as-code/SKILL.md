@@ -1,6 +1,6 @@
 ---
 name: infrastructure-as-code
-description: "Use when the user asks to \"Terraform state on OCI\", \"native OCI backend\", \"debug terraform-provider-oci\", \"Terraform import OCI\", or \"Terraform apply 403\"."
+description: "Use when the user asks to \"Terraform state on OCI\", \"native OCI backend\", \"Terraform import OCI\", \"Terraform apply 403\", \"Terraform ZPR\", or \"Terraform Bastion\"."
 version: 2.0.0
 keywords:
   - "OCI"
@@ -16,6 +16,8 @@ keywords:
   - "government cloud Terraform"
   - "OCI Terraform auth"
   - "OCI module quality"
+  - "Terraform ZPR"
+  - "Terraform Bastion"
 aliases:
   - "oci-terraform"
   - "oci-iac"
@@ -36,7 +38,9 @@ Also load it when Terraform touches an OCI sibling domain, then load the sibling
 
 | Terraform task | Also load |
 | --- | --- |
-| Resource Manager stack, job, source provider, or private endpoint | `oci-resource-manager` |
+| Resource Manager stack, job, source provider, or private endpoint | `oci/oci-resource-manager` |
+| ZPR policy, security attributes, or protected resources | `oci/zpr-security` |
+| Bastion, Managed SSH, port forwarding, or allowlists | `oci/managed-bastion-access` |
 | VCN, subnet, route table, DRG, Service Gateway, NAT Gateway | `networking-management` |
 | IAM policy, identity domain, dynamic group, 403/404 | `iam-identity-management` |
 | Vault secret, wallet, password, private key, sensitive output | `secrets-management` |
@@ -56,13 +60,16 @@ For Terraform v1.12 and later, prefer the native `backend "oci"` with Object Sto
 `sensitive = true` redacts CLI/UI output but does not remove values from state or plan files. Prefer passing secret OCIDs, letting workloads retrieve secrets at runtime, and using Terraform ephemeral or write-only features only when the Terraform version and OCI provider/resource support them.
 
 **NEVER treat Resource Manager as just "Terraform in the console."**
-Resource Manager owns stack state, job execution, variables, provider retrieval, source providers, private endpoints, and IAM behavior. Route those cases to `oci-resource-manager`.
+Resource Manager owns stack state, job execution, variables, provider retrieval, source providers, private endpoints, and IAM behavior. Route those cases to `oci/oci-resource-manager`.
 
 **NEVER diagnose `Terraform apply gets 403` before identifying the caller.**
 Decide whether the caller is a local API key user, session-token profile, CI principal, instance principal, resource principal, Resource Manager job/user, or OKE workload identity. Then check policy location, principal type, verb, resource family, and compartment scope.
 
 **NEVER trust an Oracle-branded Terraform module just because it is official.**
 Check release recency, provider constraints, issue activity, examples, supported resources, sensitive outputs, generated plan shape, and upgrade path before recommending any module.
+
+**NEVER automate ZPR or Bastion as a shortcut around rollout safety.**
+ZPR can block traffic when attributes are applied before policy, and Bastion Terraform can widen client allowlists or leak keys into state. Load the focused references before writing HCL.
 
 **NEVER hardcode tenancy-specific values unless the deployment contract requires it.**
 Avoid hardcoded availability-domain names, compartment OCIDs, subnet IDs, region domains, and provider endpoints. Query or inject them as variables/data sources and document the owning tenancy boundary.
@@ -108,6 +115,8 @@ Load only the narrow reference needed for the task:
 - [`references/oci-terraform-import-drift.md`](references/oci-terraform-import-drift.md) for imports, moved blocks, provider pinning, eventual consistency, and adoption of existing resources.
 - [`references/oci-terraform-module-quality.md`](references/oci-terraform-module-quality.md) for official-module review and stale-module detection.
 - [`references/oci-terraform-realms-regions.md`](references/oci-terraform-realms-regions.md) for government cloud, realms, FIPS, dedicated endpoints, and region availability.
+- [`references/oci-terraform-zpr.md`](references/oci-terraform-zpr.md) for ZPR policy, security attributes, provider support, imports, and lockout-safe sequencing.
+- [`references/oci-terraform-bastion.md`](references/oci-terraform-bastion.md) for Bastion resources, sessions, allowlists, IAM, key-state safety, and no-public-SSH guardrails.
 - [`references/oci-terraform-patterns.md`](references/oci-terraform-patterns.md) only for the official source map and compact cross-reference list.
 
 ## Arguments

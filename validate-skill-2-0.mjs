@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { existsSync, readFileSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { basename, join, resolve } from 'node:path';
 
 const root = resolve(process.cwd(), 'skills');
 const targets = process.argv.slice(2).length
@@ -24,7 +24,7 @@ for (const skill of targets) {
 	const description = frontmatter?.[1].match(/^description:\s*([\s\S]*)$/m)?.[1]?.trim() ?? '';
 
 	const checks = [
-		['name matches folder', name === skill],
+		['name matches folder', name === basename(skill)],
 		['trigger-oriented description', /Use when|Triggers when|Triggers on|when user mentions/i.test(description)],
 		['quoted trigger phrases', /"[^"]+"/.test(description)],
 		['has anti-patterns', /\bNEVER\b|Anti-Patterns/i.test(text)],

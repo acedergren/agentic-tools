@@ -18,6 +18,8 @@ keywords:
   - "private endpoint"
   - "DNS resolver"
   - "NAT Gateway"
+  - "ZPR"
+  - "OCI Bastion"
 aliases:
   - "oci-networking"
   - "vcn-management"
@@ -37,6 +39,8 @@ When the request is only asking to find or install skills, use `find-skills` ins
 Load this skill for: the user asks to "design OCI networking", "debug VCN connectivity", "configure Service Gateway", "choose NSG vs security list", or "plan FastConnect or VPN".
 
 Prefer this skill only for its named domain. For broader OCI architecture triage, start with `best-practices` as the router.
+
+When the network symptom includes ZPR security attributes or OCI Bastion sessions, load the specialist skill as well: `oci/zpr-security` for ZPR and `oci/managed-bastion-access` for Bastion.
 
 ## NEVER Do This
 
@@ -212,6 +216,10 @@ NSG db:   Allow 1521 from app NSG only
 - VCN CIDR add/modify docs or subnet CLI reference
 
 **Load** [`references/oci-terraform-networking-patterns.md`](references/oci-terraform-networking-patterns.md) when Terraform manages VCNs, subnets, route tables, NSGs, security lists, DRGs, Service Gateway, NAT Gateway, DNS resolver settings, or private endpoints.
+
+Load [`../oci/zpr-security/references/zpr-reference.md`](../oci/zpr-security/references/zpr-reference.md) when routes, NSGs, or security lists appear correct but ZPR security attributes or ZPL policy may be blocking traffic.
+
+Load [`../oci/managed-bastion-access/references/managed-bastion-reference.md`](../oci/managed-bastion-access/references/managed-bastion-reference.md) when a Bastion session depends on target-side NSGs, security lists, routes, DNS, or VCN placement.
 
 ## Arguments
 

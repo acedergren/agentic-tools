@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { existsSync, mkdirSync, cpSync, readdirSync, statSync } from "node:fs";
+import { existsSync, mkdirSync, cpSync, readdirSync, rmSync, statSync } from "node:fs";
 import { resolve, join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -31,7 +31,10 @@ const SKILLS = [
   "oci",
   "oci-events",
   "oci-pptx",
-  "oci-resource-manager",
+  "oci/managed-bastion-access",
+  "oci/oci-resource-manager",
+  "oci/oci-security-control-plane",
+  "oci/zpr-security",
   "oracle-dba",
   "oracle-idcs-better-auth-setup",
   "oracle-idcs-org-provisioning",
@@ -71,7 +74,10 @@ const OCI_SKILLS = [
   "monitoring-operations",
   "networking-management",
   "oci-events",
-  "oci-resource-manager",
+  "oci/managed-bastion-access",
+  "oci/oci-resource-manager",
+  "oci/oci-security-control-plane",
+  "oci/zpr-security",
   "oracle-dba",
   "secrets-management",
   "fastify-better-auth-bridge",
@@ -158,6 +164,8 @@ function init(targetDir) {
     const src = join(ROOT, "skills", skill);
     if (existsSync(src) && statSync(src).isDirectory()) {
       const dest = join(skillsDir, skill);
+      rmSync(dest, { recursive: true, force: true });
+      mkdirSync(dirname(dest), { recursive: true });
       cpSync(src, dest, { recursive: true });
       console.log(`    + /${skill}`);
       skillCount++;

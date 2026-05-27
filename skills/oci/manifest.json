@@ -18,7 +18,10 @@
         "monitoring-operations",
         "networking-management",
         "oci-events",
-        "oci-resource-manager",
+        "oci/managed-bastion-access",
+        "oci/oci-resource-manager",
+        "oci/oci-security-control-plane",
+        "oci/zpr-security",
         "oracle-dba",
         "secrets-management"
       ]
@@ -40,7 +43,8 @@
       "skills": [
         "oci",
         "best-practices",
-        "database-management"
+        "database-management",
+        "oci/oci-security-control-plane"
       ]
     }
   ],
