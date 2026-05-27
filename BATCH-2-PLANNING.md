@@ -10,7 +10,7 @@
 | Skill | Baseline | Final | Improvement | Grade |
 |-------|----------|-------|-------------|-------|
 | humanizer | 25/120 (F) | 110/120 (A) | +85 (+340%) | ✅ A |
-| shadcn-svelte-skill | 26/120 (F) | 111/120 (A) | +85 (+327%) | ✅ A |
+| shadcn-svelte | 26/120 (F) | 111/120 (A) | +85 (+327%) | ✅ A |
 | firecrawl | 88/120 (C) | 110/120 (A) | +22 (+25%) | ✅ A |
 | tanstack-query | 94/120 (C) | 112/120 (A) | +18 (+19%) | ✅ A |
 | turborepo | 97/120 (B) | 109/120 (A) | +12 (+12%) | ✅ A |

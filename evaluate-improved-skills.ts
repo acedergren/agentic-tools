@@ -19,7 +19,7 @@ interface SkillEvaluation {
 
 const SKILLS_TO_EVALUATE = [
   'humanizer',
-  'shadcn-svelte-skill',
+  'shadcn-svelte',
   'firecrawl',
   'tanstack-query',
   'turborepo',

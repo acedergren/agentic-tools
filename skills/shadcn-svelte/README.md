@@ -1,4 +1,4 @@
-# shadcn-svelte-skill - Expert Component Guidance
+# shadcn-svelte - Expert Component Guidance
 
 **Version**: 3.0.0
 **Grade**: F → C (26/120 → ~75/120)
@@ -139,8 +139,8 @@ Need UI components?
 ## Installation
 
 ```bash
-cp -r shadcn-svelte-skill ~/.agents/skills/  # Claude Code
-cp -r shadcn-svelte-skill ~/.cursor/skills/  # Cursor
+cp -r shadcn-svelte ~/.agents/skills/  # Claude Code
+cp -r shadcn-svelte ~/.cursor/skills/  # Cursor
 ```
 
 ## Resources
