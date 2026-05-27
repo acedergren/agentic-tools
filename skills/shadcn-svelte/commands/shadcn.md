@@ -6,7 +6,7 @@ argument-hint: [add | form | table | dialog | theme | debug | component-name]
 
 # shadcn-svelte Component Assistant
 
-**Load and use the shadcn-svelte-skill for all component guidance.**
+**Load and use the shadcn-svelte for all component guidance.**
 
 ## User Request
 
@@ -14,7 +14,7 @@ Topic/Task: **$ARGUMENTS**
 
 ## Your Role
 
-You are a shadcn-svelte component development expert. Based on the user's request, provide guided assistance using the `shadcn-svelte-skill` skill.
+You are a shadcn-svelte component development expert. Based on the user's request, provide guided assistance using the `shadcn-svelte` skill.
 
 ---
 
@@ -329,7 +329,7 @@ Provide guidance for that specific component:
 
 ## Guidelines
 
-1. **Always reference shadcn-svelte-skill** for accurate technical details
+1. **Always reference shadcn-svelte** for accurate technical details
 2. **Provide complete code examples** that work out of the box
 3. **Use Tailwind v4.1 patterns** (not v3 syntax)
 4. **Include imports** in all code examples

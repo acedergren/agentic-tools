@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { existsSync, mkdirSync, cpSync, readdirSync, statSync } from "node:fs";
+import { existsSync, mkdirSync, cpSync, readdirSync, rmSync, statSync } from "node:fs";
 import { resolve, join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -9,29 +9,82 @@ const ROOT = resolve(__dirname, "..");
 
 const SKILLS = [
   "api-audit",
+  "oci/best-practices",
   "bugfix",
+  "oci/compute-management",
+  "oci/database-management",
   "doc-sync",
-  "fastify-better-auth-bridge",
+  "oci/fastify-better-auth-bridge",
+  "find-skills",
+  "oci/finops-cost-optimization",
   "firecrawl",
+  "oci/genai-services",
   "health-check",
   "humanizer",
+  "oci/iam-identity-management",
   "implement",
+  "oci/infrastructure-as-code",
+  "oci/landing-zones",
   "migrate",
-  "oracle-idcs-better-auth-setup",
-  "oracle-idcs-org-provisioning",
+  "oci/monitoring-operations",
+  "oci/networking-management",
+  "oci",
+  "oci/oci-events",
+  "oci/oci-pptx",
+  "oci/managed-bastion-access",
+  "oci/oci-resource-manager",
+  "oci/oci-security-control-plane",
+  "oci/zpr-security",
+  "oci/oracle-dba",
+  "oci/oracle-idcs-better-auth-setup",
+  "oci/oracle-idcs-org-provisioning",
   "orchestrate",
   "phase-kickoff",
   "prd",
   "prod-readiness",
+  "publish-skill",
   "quality-commit",
   "refactor-module",
   "review-all",
-  "shadcn-svelte-skill",
+  "oci/secrets-management",
+  "semgrep-coderabbit",
+  "shadcn-svelte",
+  "oci/sqlite-to-oracle-planner",
+  "stitch-design-system",
+  "stitch-prompt-engineer",
+  "stitch-to-react",
   "tanstack-query",
   "tdd",
   "turborepo",
   "write-natural-swedish",
   "write-tests",
+];
+
+// OCI and Oracle-owned skills. Keep in sync with skills/oci/manifest.json.
+const OCI_SKILLS = [
+  "oci",
+  "oci/best-practices",
+  "oci/compute-management",
+  "oci/database-management",
+  "oci/finops-cost-optimization",
+  "oci/genai-services",
+  "oci/iam-identity-management",
+  "oci/infrastructure-as-code",
+  "oci/landing-zones",
+  "oci/monitoring-operations",
+  "oci/networking-management",
+  "oci/oci-events",
+  "oci/managed-bastion-access",
+  "oci/oci-resource-manager",
+  "oci/oci-security-control-plane",
+  "oci/zpr-security",
+  "oci/oracle-dba",
+  "oci/secrets-management",
+  "oci/fastify-better-auth-bridge",
+  "oci/oci-pptx",
+  "oci/oracle-idcs-better-auth-setup",
+  "oci/oracle-idcs-org-provisioning",
+  "oci/sqlite-to-oracle-planner",
 ];
 
 const AGENTS = ["mock-debugger.md", "security-reviewer.md"];
@@ -52,8 +105,17 @@ function usage() {
 }
 
 function list() {
-  console.log("\n  Skills:");
-  for (const skill of SKILLS) {
+  const ociSet = new Set(OCI_SKILLS);
+
+  console.log("\n  OCI Skills:");
+  for (const skill of OCI_SKILLS) {
+    const dir = join(ROOT, "skills", skill);
+    const exists = existsSync(dir);
+    console.log(`    ${exists ? "+" : "-"} /${skill}`);
+  }
+
+  console.log("\n  Other Skills:");
+  for (const skill of SKILLS.filter((skill) => !ociSet.has(skill))) {
     const dir = join(ROOT, "skills", skill);
     const exists = existsSync(dir);
     console.log(`    ${exists ? "+" : "-"} /${skill}`);
@@ -102,6 +164,8 @@ function init(targetDir) {
     const src = join(ROOT, "skills", skill);
     if (existsSync(src) && statSync(src).isDirectory()) {
       const dest = join(skillsDir, skill);
+      rmSync(dest, { recursive: true, force: true });
+      mkdirSync(dirname(dest), { recursive: true });
       cpSync(src, dest, { recursive: true });
       console.log(`    + /${skill}`);
       skillCount++;

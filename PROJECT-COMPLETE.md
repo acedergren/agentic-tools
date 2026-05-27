@@ -24,7 +24,7 @@
 | Skill | Baseline | Final | Improvement | Final Grade |
 |-------|----------|-------|-------------|-------------|
 | **humanizer** | 25/120 (F, 21%) | 110/120 (A, 92%) | +85 (+340%) | ✅ A |
-| **shadcn-svelte-skill** | 26/120 (F, 22%) | 111/120 (A, 93%) | +85 (+327%) | ✅ A |
+| **shadcn-svelte** | 26/120 (F, 22%) | 111/120 (A, 93%) | +85 (+327%) | ✅ A |
 | **firecrawl** | 88/120 (C, 73%) | 110/120 (A, 92%) | +22 (+25%) | ✅ A |
 | **tanstack-query** | 94/120 (C, 78%) | 112/120 (A, 93%) | +18 (+19%) | ✅ A |
 | **turborepo** | 97/120 (B, 81%) | 109/120 (A, 91%) | +12 (+12%) | ✅ A |
@@ -292,7 +292,7 @@ With explicit loading triggers:
 
 ### Improved Skills (All A-Grade)
 - ✅ `skills/humanizer/` - 110/120 (92%)
-- ✅ `skills/shadcn-svelte-skill/` - 111/120 (93%)
+- ✅ `skills/shadcn-svelte/` - 111/120 (93%)
 - ✅ `skills/firecrawl/` - 110/120 (92%)
 - ✅ `skills/tanstack-query/` - 112/120 (93%)
 - ✅ `skills/turborepo/` - 109/120 (91%)

@@ -1,9 +1,12 @@
 ---
 name: health-check
-description: "Use when running codebase quality gates (typecheck, lint, tests, security, dead code, circular deps, audits). Reports pass/fail across all checks without making edits or suggesting fixes. Keywords: health check, pre-PR validation, quality gates, repo diagnostics, CI gates."
+description: "Use when running codebase quality gates (typecheck, lint, tests, security, dead code, circular deps, audits). Reports pass/fail across all checks without making edits or suggesting fixes. Keywords: health check, pre-PR validation, quality gates, repo diagnostics, CI gates. Triggers on "run health check" or "validate quality gates"."
 ---
-
 # Health Check
+
+## When to Use
+
+Load this skill when the user request matches the frontmatter description for Health Check.
 
 Full codebase diagnostic: typecheck, tests, security scans, dead code, circular deps, package health. Reports a summary table.
 

@@ -1,11 +1,12 @@
 ---
 name: tanstack-query
-version: 3.0.0
-description: "Use when debugging TanStack Query / React Query issues: v4→v5 migration errors (gcTime, isPending, throwOnError), infinite refetch loops, SSR hydration mismatches, choosing between React Query vs SWR, or optimistic update patterns not working. NOT for basic useQuery setup."
-user-invocable: true
+description: "Use when debugging TanStack Query / React Query issues: v4→v5 migration errors (gcTime, isPending, throwOnError), infinite refetch loops, SSR hydration mismatches, choosing between React Query vs SWR, or optimistic update patterns not working. NOT for basic useQuery setup. Triggers on "debug TanStack Query" or "migrate React Query v5"."
 ---
-
 # TanStack Query v5 - Expert Troubleshooting
+
+## When to Use
+
+Load this skill when the user request matches the frontmatter description for TanStack Query v5 - Expert Troubleshooting.
 
 **Assumption**: You know `useQuery` basics. This covers what breaks in production.
 

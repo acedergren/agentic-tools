@@ -11,7 +11,7 @@
 | Rank | Skill | Score | Grade | Primary Issue | TDD Priority |
 |------|-------|-------|-------|---------------|--------------|
 | 10 | humanizer | 25/120 | F | Description score 0/25 - invisible skill | HIGH |
-| 9 | shadcn-svelte-skill | 26/120 | F | 1175 lines - massive token waste | HIGH |
+| 9 | shadcn-svelte | 26/120 | F | 1175 lines - massive token waste | HIGH |
 | 8 | firecrawl | 28/120 | F | Description score 0/25 - invisible skill | HIGH |
 | 7 | tanstack-query | 28/120 | F | Tutorial-heavy, explains basics | MEDIUM |
 | 6 | turborepo | 28/120 | F | Procedures over mindset | MEDIUM |
@@ -118,7 +118,7 @@ humanizer/
 
 ---
 
-## Skill #9: shadcn-svelte-skill (26/120) - Grade F
+## Skill #9: shadcn-svelte (26/120) - Grade F
 
 ### Dimension Scores
 

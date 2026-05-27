@@ -6,9 +6,22 @@ import { join, resolve } from 'node:path';
 
 const root = resolve(process.cwd());
 const skillsDir = join(root, 'skills');
-const skillDirs = readdirSync(skillsDir, { withFileTypes: true })
+
+function hasSkillFile(skill) {
+  return existsSync(join(skillsDir, skill, 'SKILL.md'));
+}
+
+const topLevelSkillDirs = readdirSync(skillsDir, { withFileTypes: true })
   .filter((entry) => entry.isDirectory())
   .map((entry) => entry.name)
+  .filter((skill) => hasSkillFile(skill));
+
+const nestedOciSkillDirs = readdirSync(join(skillsDir, 'oci'), { withFileTypes: true })
+  .filter((entry) => entry.isDirectory())
+  .map((entry) => `oci/${entry.name}`)
+  .filter((skill) => hasSkillFile(skill));
+
+const skillDirs = [...new Set([...topLevelSkillDirs, ...nestedOciSkillDirs])]
   .sort();
 
 for (const skill of skillDirs) {
@@ -40,7 +53,9 @@ function parseBashArrayLiteral(source, label) {
 }
 
 const cliSkills = parseJsArrayLiteral(readFileSync(join(root, 'bin', 'cli.js'), 'utf8'), 'SKILLS');
+const cliOciSkills = parseJsArrayLiteral(readFileSync(join(root, 'bin', 'cli.js'), 'utf8'), 'OCI_SKILLS');
 const installSkills = parseBashArrayLiteral(readFileSync(join(root, 'install.sh'), 'utf8'), 'SKILLS');
+const installOciSkills = parseBashArrayLiteral(readFileSync(join(root, 'install.sh'), 'utf8'), 'OCI_SKILLS');
 
 const missingInCli = skillDirs.filter((skill) => !cliSkills.includes(skill));
 const missingInInstall = skillDirs.filter((skill) => !installSkills.includes(skill));
@@ -50,6 +65,67 @@ if (missingInCli.length > 0) {
 if (missingInInstall.length > 0) {
   throw new Error(`Missing skills in install.sh: ${missingInInstall.join(', ')}`);
 }
+
+function assertSameSet(label, actual, expected) {
+  const actualSet = new Set(actual);
+  const expectedSet = new Set(expected);
+  const missing = expected.filter((entry) => !actualSet.has(entry));
+  const extra = actual.filter((entry) => !expectedSet.has(entry));
+  if (missing.length > 0 || extra.length > 0) {
+    throw new Error(`${label} mismatch. Missing: ${missing.join(', ') || '(none)'}. Extra: ${extra.join(', ') || '(none)'}`);
+  }
+}
+
+function parseFrontmatter(text) {
+  return text.match(/^---\n([\s\S]*?)\n---/)?.[1] ?? '';
+}
+
+function yamlList(frontmatter, label) {
+  const lines = frontmatter.split('\n');
+  const values = [];
+  let inList = false;
+  for (const line of lines) {
+    if (line.startsWith(`${label}:`)) {
+      inList = true;
+      continue;
+    }
+    if (inList && /^[A-Za-z0-9_-]+:/.test(line)) {
+      break;
+    }
+    if (inList) {
+      const match = line.match(/^\s*-\s+"?([^"\n]+)"?\s*$/);
+      if (match) {
+        values.push(match[1]);
+      }
+    }
+  }
+  return values;
+}
+
+const ociManifestPath = join(skillsDir, 'oci', 'manifest.json');
+if (!existsSync(ociManifestPath)) {
+  throw new Error('Missing skills/oci/manifest.json');
+}
+
+const ociManifest = JSON.parse(readFileSync(ociManifestPath, 'utf8'));
+const manifestOciSkills = [...new Set([
+  ociManifest.packSkill,
+  ...ociManifest.groups.flatMap((group) => group.skills),
+])].sort();
+const oracleTaggedSkills = skillDirs.filter((skill) => {
+  const frontmatter = parseFrontmatter(readFileSync(join(skillsDir, skill, 'SKILL.md'), 'utf8'));
+  const domains = yamlList(frontmatter, 'domains');
+  return domains.some((domain) => ['oci', 'oracle', 'oracle-adjacent'].includes(domain));
+}).sort();
+
+for (const skill of manifestOciSkills) {
+  if (!skillDirs.includes(skill)) {
+    throw new Error(`OCI manifest references missing skill: ${skill}`);
+  }
+}
+assertSameSet('skills/oci/manifest.json Oracle-tagged skill coverage', manifestOciSkills, oracleTaggedSkills);
+assertSameSet('bin/cli.js OCI_SKILLS', cliOciSkills, manifestOciSkills);
+assertSameSet('install.sh OCI_SKILLS', installOciSkills, manifestOciSkills);
 
 const readme = readFileSync(join(root, 'README.md'), 'utf8');
 const skillsReadme = readFileSync(join(root, 'skills', 'README.md'), 'utf8');

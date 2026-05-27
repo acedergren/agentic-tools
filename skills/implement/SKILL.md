@@ -1,9 +1,12 @@
 ---
 name: implement
-description: "Use when implementing a feature, adding an endpoint, or making a non-trivial code change that requires pre-flight validation, TDD cycle, scope enforcement, and a clean commit. Combines pre-flight + tdd + scope-check + quality-commit into one flow. Keywords: implement feature, add endpoint, TDD, new functionality, code change."
+description: "Use when implementing a feature, adding an endpoint, or making a non-trivial code change that requires pre-flight validation, TDD cycle, scope enforcement, and a clean commit. Combines pre-flight + tdd + scope-check + quality-commit into one flow. Keywords: implement feature, add endpoint, TDD, new functionality, code change. Triggers on "implement feature" or "add endpoint"."
 ---
-
 # Implement
+
+## When to Use
+
+Load this skill when the user request matches the frontmatter description for Implement.
 
 End-to-end feature implementation pipeline. Runs pre-flight validation, TDD cycle, scope enforcement, and quality commit as a single orchestrated flow.
 

@@ -1,9 +1,12 @@
 ---
 name: prod-readiness
-description: "Use when assessing release readiness or running a pre-launch review. Spawns 5 specialist agents in parallel (security, testing, performance, observability, code quality) and synthesizes a prioritized report with ship/don't-ship recommendation. Keywords: production readiness, release review, pre-launch, security audit, test coverage, ship checklist."
+description: "Use when assessing release readiness or running a pre-launch review. Spawns 5 specialist agents in parallel (security, testing, performance, observability, code quality) and synthesizes a prioritized report with ship/don't-ship recommendation. Keywords: production readiness, release review, pre-launch, security audit, test coverage, ship checklist. Triggers on "assess production readiness" or "run launch review"."
 ---
-
 # Prod-Readiness
+
+## When to Use
+
+Load this skill when the user request matches the frontmatter description for Prod-Readiness.
 
 Spawns 5 specialist review agents in parallel, each writing findings to a dedicated report file. Synthesizes into a prioritized production readiness report with executive summary, blockers, and remediation plan.
 

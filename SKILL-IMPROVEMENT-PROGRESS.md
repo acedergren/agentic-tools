@@ -12,7 +12,7 @@
    - Improvement: +85 points (+340%)
    - Key additions: Decision framework table, non-obvious AI tells, statistical density checks
 
-2. **shadcn-svelte-skill** - 111/120 (93%) ✅
+2. **shadcn-svelte** - 111/120 (93%) ✅
    - Baseline: F (26/120) → Final: A (111/120)
    - Improvement: +85 points (+327%)
    - Key additions: Debugging insights, error recovery procedures, MANDATORY loading triggers

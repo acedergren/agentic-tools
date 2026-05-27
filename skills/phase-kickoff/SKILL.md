@@ -1,9 +1,12 @@
 ---
 name: phase-kickoff
-description: "Use when starting a new development phase or sprint that needs branch creation, TDD test shell, and roadmap entry done together. Enforces phase scaffolding before implementation begins. Keywords: new phase, sprint start, feature branch, roadmap, test shell, scaffold."
+description: "Use when starting a new development phase or sprint that needs branch creation, TDD test shell, and roadmap entry done together. Enforces phase scaffolding before implementation begins. Keywords: new phase, sprint start, feature branch, roadmap, test shell, scaffold. Triggers on "start phase" or "scaffold sprint"."
 ---
-
 # Phase Kickoff
+
+## When to Use
+
+Load this skill when the user request matches the frontmatter description for Phase Kickoff.
 
 Scaffold a new development phase: branch, test shell, and roadmap entry as one atomic operation. Enforces the invariant that implementation never starts without a branch and verification shell.
 

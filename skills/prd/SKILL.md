@@ -1,9 +1,12 @@
 ---
 name: prd
-description: "Use when creating, updating, validating, or phasing a PRD. Drives interactive discovery, technical architecture, phasing DAG, TDD protocol, and dependency analysis. Keywords: PRD, product requirements, feature planning, acceptance criteria, MoSCoW, phasing, requirements document."
+description: "Use when creating, updating, validating, or phasing a PRD. Drives interactive discovery, technical architecture, phasing DAG, TDD protocol, and dependency analysis. Keywords: PRD, product requirements, feature planning, acceptance criteria, MoSCoW, phasing, requirements document. Triggers on "create PRD" or "update requirements"."
 ---
-
 # PRD Skill
+
+## When to Use
+
+Load this skill when the user request matches the frontmatter description for PRD Skill.
 
 Produce drift-proof Product Requirements Documents through iterative discovery.
 

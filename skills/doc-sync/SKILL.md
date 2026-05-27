@@ -1,9 +1,12 @@
 ---
 name: doc-sync
-description: "Use when auditing or fixing drift between project documentation and the actual codebase. Detects stale architecture diagrams, wrong file paths, outdated test counts, and undocumented structural changes. Pass 'fix' to apply repairs; default is report-only. Keywords: doc drift, stale docs, sync docs, documentation audit, update docs, architecture docs outdated."
+description: "Use when auditing or fixing drift between project documentation and the actual codebase. Detects stale architecture diagrams, wrong file paths, outdated test counts, and undocumented structural changes. Pass 'fix' to apply repairs; default is report-only. Keywords: doc drift, stale docs, sync docs, documentation audit, update docs, architecture docs outdated. Triggers on "audit doc drift" or "sync documentation"."
 ---
-
 # Documentation Sync Audit
+
+## When to Use
+
+Load this skill when the user request matches the frontmatter description for Documentation Sync Audit.
 
 Audit project docs against codebase reality. Report drift or fix it.
 
@@ -65,3 +68,7 @@ Severity: **Critical** (broken paths, missing security docs), **Warning** (stale
 ```
 docs: sync documentation with codebase [doc-sync]
 ```
+
+## Arguments
+
+$ARGUMENTS: Optional user-provided target, path, environment, symptom, or constraint. When empty, infer the narrowest safe scope from the current repository context and ask only if multiple high-impact choices remain.

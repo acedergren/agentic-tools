@@ -1,5 +1,5 @@
 {
-  "name": "shadcn-svelte-skill",
+  "name": "shadcn-svelte",
   "version": "1.0.0",
   "description": "Build accessible, customizable UI components for Svelte/SvelteKit projects using shadcn-svelte CLI, Tailwind CSS v4.1, and TypeScript",
   "author": {

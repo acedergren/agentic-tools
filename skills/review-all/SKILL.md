@@ -1,9 +1,12 @@
 ---
 name: review-all
-description: "Use when preparing a PR or completing a phase of work and needing a full-spectrum code review. Runs security, API audit, and scope reviewers in parallel and synthesizes findings into a single go/no-go report. Read-only — no file modifications. Keywords: pre-PR review, security audit, API audit, scope review, code review, merge check."
+description: "Use when preparing a PR or completing a phase of work and needing a full-spectrum code review. Runs security, API audit, and scope reviewers in parallel and synthesizes findings into a single go/no-go report. Read-only — no file modifications. Keywords: pre-PR review, security audit, API audit, scope review, code review, merge check. Triggers on "review all changes" or "run pre-PR review"."
 ---
-
 # Review All
+
+## When to Use
+
+Load this skill when the user request matches the frontmatter description for Review All.
 
 Comprehensive pre-PR review: run specialized reviewers in parallel, synthesize into a single report. **Read-only — no changes.**
 

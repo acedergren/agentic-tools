@@ -8,27 +8,48 @@
        |___/
 ```
 
-**Production-grade AI agent skills, workflows, and automation for Claude Code**
+**Portable Agent Skills, workflows, and automation for AI-assisted development**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Skills](https://img.shields.io/badge/Skills-24-brightgreen)](#skills)
+[![Skills](https://img.shields.io/badge/Skills-50-brightgreen)](#skills)
 [![Agents](https://img.shields.io/badge/Agents-2-blue)](#agents)
+[![Agent Skills](https://img.shields.io/badge/Agent%20Skills-SKILL.md-blue)](#agent-skills-standard)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Compatible-blueviolet)](https://claude.com/claude-code)
 [![Community Project](https://img.shields.io/badge/Community-Maintained-success)](https://github.com/acedergren/agentic-tools)
 
 </div>
 
-> **Independent Community Project** — No official affiliation with Anthropic or the Claude Code team. Skills are designed for Claude Code but are community-created.
+> **Independent Community Project** — No official affiliation with Anthropic, OpenAI, Oracle, or any other mentioned product team. Skills are community-created and use the portable `SKILL.md` Agent Skills format.
 
 ## What This Is
 
-A battle-tested collection of Claude Code skills, custom agents, hooks, and configuration templates that form a complete development workflow pipeline. Built from real production use across 276 sessions, 435 commits, and 1,700+ passing tests.
+`agentic-tools` is a curated library of 50 Agent Skills plus Claude Code agents, hooks, and workflow templates. It is built around the late-May 2026 Agent Skills model: each skill is a focused `SKILL.md` package with trigger-oriented metadata, progressive disclosure, optional scripts or references, and validation gates that keep install surfaces in sync.
 
-The core pipeline takes you from requirements to merged PR:
+The library has two jobs:
+
+- Provide a practical development pipeline from requirements to review.
+- Package repeatable domain expertise, including a distinct OCI and Oracle skill pack, in a portable format that can be reused by skills-compatible agents.
+
+The core development pipeline:
 
 ```
 /prd → /prd --to-plan → /orchestrate → agents use /implement → /review-all → /health-check → PR
 ```
+
+## Agent Skills Standard
+
+As of late May 2026, Agent Skills are a lightweight open format built around a directory containing a required `SKILL.md` file plus optional `scripts/`, `references/`, and `assets/`. Agents use progressive disclosure: they first see only the `name` and `description`, load the full `SKILL.md` when the task matches, and load bundled resources only when needed.
+
+This repo follows that model with a few local quality gates:
+
+- Every registered skill package under `skills/` is installable and must contain `SKILL.md`.
+- `name` must match the package folder name; nested OCI skills use IDs like `oci/zpr-security`.
+- Descriptions are trigger-oriented and include quoted user phrases for reliable discovery.
+- Skill bodies include load boundaries, anti-patterns, and an `## Arguments` section.
+- Large or high-drift material belongs in focused `references/` files, not in the always-loaded body.
+- `scripts/ci/validate-skill-library.mjs` checks skills, registries, READMEs, referenced scripts, and the OCI manifest together.
+
+References: [Agent Skills overview](https://agentskills.io/home), [Agent Skills specification](https://agentskills.io/specification), [Agent Skills best practices](https://agentskills.io/skill-creation/best-practices), [Claude custom Skills guide](https://support.claude.com/en/articles/12512198-how-to-create-custom-skills), and [OpenAI Academy: Skills](https://academy.openai.com/public/resources/skills).
 
 ## Packages
 
@@ -80,6 +101,16 @@ cp -r skills/implement /path/to/project/.claude/skills/
 ln -s $(pwd)/skills/implement /path/to/project/.claude/skills/
 ```
 
+### Validate the Library
+
+```bash
+# Validate all skills, installer coverage, docs coverage, scripts, and OCI manifest
+npm run skills:validate
+
+# Run the full local skill CI: validation, install smoke, and secret scan
+npm run skills:ci
+```
+
 ### Try It
 
 ```bash
@@ -91,6 +122,7 @@ ln -s $(pwd)/skills/implement /path/to/project/.claude/skills/
 /health-check
 /review-all
 /prod-readiness
+/oci route this OCI architecture review to the right specialist skills
 ```
 
 ---
@@ -134,16 +166,97 @@ These skills chain together into a full implementation workflow.
 | ------------------------------------------------- | --------------------------- | ----------------------------------------- |
 | **[/humanizer](skills/humanizer/)**               | Remove AI writing patterns  | Diagnostic framework + voice injection    |
 | **[/firecrawl](skills/firecrawl/)**               | Web scraping CLI            | Parallel scraping, clean markdown output  |
-| **[/shadcn-svelte](skills/shadcn-svelte-skill/)** | shadcn-svelte architecture  | Tailwind v4.1 patterns, library selection |
+| **[/shadcn-svelte](skills/shadcn-svelte/)** | shadcn-svelte architecture  | Tailwind v4.1 patterns, library selection |
 | **[/tanstack-query](skills/tanstack-query/)**     | TanStack Query v5 patterns  | Migration gotchas, performance pitfalls   |
 | **[/turborepo](skills/turborepo/)**               | Monorepo architecture       | Build optimization, workspace patterns    |
 | **[/refactor-module](skills/refactor-module/)**   | Terraform module extraction | Decision framework for when to extract    |
 | **[/write-natural-swedish](skills/write-natural-swedish/)** | Natural Swedish writing | Contemporary Swedish + tech-company presets |
-| **[/oracle-idcs-better-auth-setup](skills/oracle-idcs-better-auth-setup/)** | Oracle + IDCS auth setup | Routes setup work across shared Better Auth foundations |
-| **[/fastify-better-auth-bridge](skills/fastify-better-auth-bridge/)** | Fastify Better Auth bridge | Web Request forwarding, decorators, and org-context patching |
-| **[/oracle-idcs-org-provisioning](skills/oracle-idcs-org-provisioning/)** | IDCS org provisioning | Group gating, tenant-org resolution, MERGE INTO upserts |
+
+### OCI and Oracle Skill Pack
+
+The OCI skills stay individually installable while [skills/oci](skills/oci/) provides the visible ownership boundary for Oracle-related work. All OCI and Oracle-related specialists live under `skills/oci/<skill-name>/` and use skill IDs like `oci/zpr-security`. The [manifest](skills/oci/manifest.json) is validated in CI against skill metadata, the CLI, and the Bash installer.
+
+See the [OCI Skill Catalog and Use Cases](skills/oci/USE_CASES.md) for concrete example prompts, routing guidance, and multi-skill workflows.
+
+| Skill | What It Does | Key Feature |
+| ----- | ------------ | ----------- |
+| **[/oci](skills/oci/)** | OCI and Oracle skill-pack router | Canonical manifest for separation of duties |
+| **[/oci/best-practices](skills/oci/best-practices/)** | OCI architecture review router | Cross-domain triage into specialist skills |
+| **[/oci/compute-management](skills/oci/compute-management/)** | OCI Compute operations | Shapes, capacity, instance principals, boot volumes, and access posture |
+| **[/oci/networking-management](skills/oci/networking-management/)** | OCI Networking operations | VCN, DRG, FastConnect, VPN, NSG, security lists, and private connectivity |
+| **[/oci/iam-identity-management](skills/oci/iam-identity-management/)** | OCI IAM and identity | IAM policies, identity domains, IDCS compatibility, dynamic groups, and 403s |
+| **[/oci/infrastructure-as-code](skills/oci/infrastructure-as-code/)** | OCI Terraform hub | Native OCI backend, auth, import, drift, modules, and realm guardrails |
+| **[/oci/oci-resource-manager](skills/oci/oci-resource-manager/)** | OCI Resource Manager operations | Stacks, jobs, state, source providers, private endpoints, and IAM boundaries |
+| **[/oci/oci-security-control-plane](skills/oci/oci-security-control-plane/)** | OCI security control router | Routes Cloud Guard, Security Zones, ZPR, Bastion, IAM, Vault, Audit, and Terraform security work |
+| **[/oci/zpr-security](skills/oci/zpr-security/)** | Zero Trust Packet Routing | ZPR policy, security attributes, protected resources, and rollout safety |
+| **[/oci/managed-bastion-access](skills/oci/managed-bastion-access/)** | OCI Bastion access | Managed SSH, port forwarding, dynamic SOCKS5, allowlists, and plugin troubleshooting |
+| **[/oci/database-management](skills/oci/database-management/)** | Oracle database router | DB Systems/PDB work and ADB handoff to oracle-dba |
+| **[/oci/oracle-dba](skills/oci/oracle-dba/)** | Autonomous AI Database operations | ADB, SQLcl, wallet, ECPU, backup, and tuning guidance |
+| **[/oci/secrets-management](skills/oci/secrets-management/)** | OCI Vault and secret operations | Rotation, replication, instance principals, and retrieval guardrails |
+| **[/oci/fastify-better-auth-bridge](skills/oci/fastify-better-auth-bridge/)** | Fastify Better Auth bridge | Web Request forwarding, decorators, and org-context patching |
+| **[/oci/oracle-idcs-better-auth-setup](skills/oci/oracle-idcs-better-auth-setup/)** | Oracle + IDCS auth setup | Routes setup work across shared Better Auth foundations |
+| **[/oci/oracle-idcs-org-provisioning](skills/oci/oracle-idcs-org-provisioning/)** | IDCS org provisioning | Group gating, tenant-org resolution, MERGE INTO upserts |
+| **[/oci/sqlite-to-oracle-planner](skills/oci/sqlite-to-oracle-planner/)** | SQLite to Oracle migration | Schema, driver, and touch-point planning for Oracle moves |
 
 ---
+
+## Complete Skill Directory
+
+The install surfaces expose every registered skill package under `skills/`, including nested OCI skill IDs. CI validates this table, `bin/cli.js`, `install.sh`, and each skill directory together.
+
+| Skill | Trigger Summary |
+| ----- | --------------- |
+| **[/api-audit](skills/api-audit/)** | Use when auditing API routes for schema drift, missing auth, or validation gaps. Scans routes against shared TypeScript  |
+| **[/oci/best-practices](skills/oci/best-practices/)** | "review OCI architecture", "avoid OCI anti-patterns", "plan an Oracle Cloud migration", "evaluate OCI Well-Architected risks", or "choose which OCI skill applies" |
+| **[/bugfix](skills/bugfix/)** | Use when given a bug report, failing test, stack trace, or CI failure that needs diagnosis and repair. Autonomously diag |
+| **[/oci/compute-management](skills/oci/compute-management/)** | "launch OCI compute", "choose an OCI shape", "debug compute capacity", "configure instance principals", or "optimize OCI instance cost" |
+| **[/oci/database-management](skills/oci/database-management/)** | "create an OCI database", "choose DB System vs ADB", "manage PDB lifecycle", "route ADB work", or "plan Oracle database provisioning" |
+| **[/doc-sync](skills/doc-sync/)** | Use when auditing or fixing drift between project documentation and the actual codebase. Detects stale architecture diag |
+| **[/oci/fastify-better-auth-bridge](skills/oci/fastify-better-auth-bridge/)** | "bridge Better Auth into Fastify", "fix Fastify session resolution", "forward auth cookies", "patch IDCS org context", or "decorate Fastify request auth" |
+| **[/find-skills](skills/find-skills/)** | Use when user asks to find, install, or search for agent skills. Also use when user asks 'can you do X' or 'is there a s |
+| **[/oci/finops-cost-optimization](skills/oci/finops-cost-optimization/)** | "optimize OCI cost", "investigate an OCI bill", "estimate egress cost", "right-size OCI resources", or "plan Resource Scheduler savings" |
+| **[/firecrawl](skills/firecrawl/)** | Use when scraping web pages, extracting content from JS-rendered sites or SPAs, running search-plus-scrape workflows, or |
+| **[/oci/genai-services](skills/oci/genai-services/)** | "call OCI Generative AI", "choose an OCI GenAI model", "debug GenAI 429", "plan OCI RAG", or "compare Command A, Llama, Gemini, or gpt-oss" |
+| **[/health-check](skills/health-check/)** | Use when running codebase quality gates (typecheck, lint, tests, security, dead code, circular deps, audits). Reports pa |
+| **[/humanizer](skills/humanizer/)** | Use when making text sound human, removing AI tells, or fixing writing that sounds like ChatGPT. Detects and rewrites AI |
+| **[/oci/iam-identity-management](skills/oci/iam-identity-management/)** | "write OCI IAM policy", "debug OCI 403", "configure dynamic groups", "use identity domains", or "fix IDCS federation" |
+| **[/implement](skills/implement/)** | Use when implementing a feature, adding an endpoint, or making a non-trivial code change that requires pre-flight valida |
+| **[/oci/infrastructure-as-code](skills/oci/infrastructure-as-code/)** | "Terraform state on OCI", "native OCI backend", "Terraform import OCI", "Terraform apply 403", "Terraform ZPR", or "Terraform Bastion" |
+| **[/oci/landing-zones](skills/oci/landing-zones/)** | "design an OCI landing zone", "plan compartments", "enable Security Zones", "build hub-spoke OCI", or "meet CIS OCI Foundations" |
+| **[/migrate](skills/migrate/)** | Use when bulk-migrating import paths, renaming workspace packages, or reorganizing modules across many files in a monore |
+| **[/oci/monitoring-operations](skills/oci/monitoring-operations/)** | "create OCI alarms", "debug missing metrics", "write MQL", "configure Service Connector", or "monitor OCI resources" |
+| **[/oci/networking-management](skills/oci/networking-management/)** | "design OCI networking", "debug VCN connectivity", "configure Service Gateway", "choose NSG vs security list", or "plan FastConnect or VPN" |
+| **[/oci](skills/oci/)** | "find OCI skills", "route Oracle Cloud work", "install the OCI skill pack", "review OCI skill ownership", or "separate Oracle skills" |
+| **[/oci/oci-events](skills/oci/oci-events/)** | "create OCI Events rule", "trigger Functions from events", "route events to Streaming", "debug Events delivery", or "filter CloudEvents" |
+| **[/oci/oci-pptx](skills/oci/oci-pptx/)** | "create Oracle slides", "edit an Oracle deck", "build a CloudWorld presentation", "review Oracle-branded PPTX", or "apply Oracle brand to slides" |
+| **[/oci/managed-bastion-access](skills/oci/managed-bastion-access/)** | "use OCI Bastion", "create Managed SSH", "debug a port forwarding session", "configure dynamic port forwarding", or "update client CIDR allowlist" |
+| **[/oci/oci-resource-manager](skills/oci/oci-resource-manager/)** | "configure OCI Resource Manager", "debug Resource Manager job", "create ORM stack", "use Resource Manager private endpoint", or "fix Resource Manager dynamic group" |
+| **[/oci/oci-security-control-plane](skills/oci/oci-security-control-plane/)** | "choose OCI security control", "route OCI security issue", "compare Cloud Guard vs Security Zones", "decide ZPR vs NSG", or "use Bastion vs public SSH" |
+| **[/oci/zpr-security](skills/oci/zpr-security/)** | "configure ZPR", "debug Zero Trust Packet Routing", "write ZPL policy", "apply security attributes", or "protect OCI resources with ZPR" |
+| **[/oci/oracle-dba](skills/oci/oracle-dba/)** | "manage Autonomous AI Database", "debug ADB performance", "fix wallet connection", "optimize ECPU cost", or "use SQLcl with Oracle Database" |
+| **[/oci/oracle-idcs-better-auth-setup](skills/oci/oracle-idcs-better-auth-setup/)** | "connect Better Auth to OCI IAM", "configure identity domain OIDC", "fix IDCS callback URL", "set trusted origins", or "bootstrap Oracle auth provider" |
+| **[/oci/oracle-idcs-org-provisioning](skills/oci/oracle-idcs-org-provisioning/)** | "map IDCS groups to orgs", "provision org_members from identity domains", "fix Better Auth active org", or "bootstrap first admin" |
+| **[/orchestrate](skills/orchestrate/)** | Use when executing a multi-task implementation plan with parallel agents. Coordinates task assignment, wave sequencing,  |
+| **[/phase-kickoff](skills/phase-kickoff/)** | Use when starting a new development phase or sprint that needs branch creation, TDD test shell, and roadmap entry done t |
+| **[/prd](skills/prd/)** | Use when creating, updating, validating, or phasing a PRD. Drives interactive discovery, technical architecture, phasing |
+| **[/prod-readiness](skills/prod-readiness/)** | Use when assessing release readiness or running a pre-launch review. Spawns 5 specialist agents in parallel (security, t |
+| **[/publish-skill](skills/publish-skill/)** | Use when creating a new skill and publishing it to a GitHub repo for installation via npx skills add. Covers scaffold, s |
+| **[/quality-commit](skills/quality-commit/)** | Use when committing code changes. Runs lint, typecheck, Semgrep security scan, optional CodeRabbit review, and related t |
+| **[/refactor-module](skills/refactor-module/)** | Use when deciding whether to extract Terraform code into a reusable module, determining module boundaries, or migrating  |
+| **[/review-all](skills/review-all/)** | Use when preparing a PR or completing a phase of work and needing a full-spectrum code review. Runs security, API audit, |
+| **[/oci/secrets-management](skills/oci/secrets-management/)** | "store OCI secrets", "rotate Vault secrets", "debug secret retrieval 403", "use instance principals for Vault", or "replicate secrets" |
+| **[/semgrep-coderabbit](skills/semgrep-coderabbit/)** | Use when reviewing code changes before commit or PR merge. Covers tool sequencing, finding severity priorities, fix orde |
+| **[/shadcn-svelte](skills/shadcn-svelte/)** | Use when working with shadcn-svelte components, TanStack Table in Svelte 5, or Tailwind v4.1. Covers non-obvious reactiv |
+| **[/oci/sqlite-to-oracle-planner](skills/oci/sqlite-to-oracle-planner/)** | "migrate SQLite to Oracle", "replace better-sqlite3", "plan Oracle migration", "convert SQLite schema", or "find SQLite touch points" |
+| **[/stitch-design-system](skills/stitch-design-system/)** | Use when extracting a design system from a Stitch project to create a DESIGN.md source-of-truth for consistent multi-scr |
+| **[/stitch-prompt-engineer](skills/stitch-prompt-engineer/)** | Use when enhancing, polishing, or fixing Stitch UI generation prompts. Adds UI/UX keywords, injects design system tokens |
+| **[/stitch-to-react](skills/stitch-to-react/)** | Use when converting Stitch designs into production React components. Enforces modular architecture: logic in hooks, data |
+| **[/tanstack-query](skills/tanstack-query/)** | Use when debugging TanStack Query / React Query issues: v4→v5 migration errors (gcTime, isPending, throwOnError), infini |
+| **[/tdd](skills/tdd/)** | Use when implementing features, fixing bugs, or adding deliberate test coverage. Enforces test-first (red-green-refactor |
+| **[/turborepo](skills/turborepo/)** | Use when making Turborepo monorepo architecture decisions: choosing between monorepo vs polyrepo, deciding when to split |
+| **[/write-natural-swedish](skills/write-natural-swedish/)** | Use when improving Swedish writing, Swedish translations, or Swedish product copy with natural contemporary phrasing |
+| **[/write-tests](skills/write-tests/)** | Use when adding or improving test coverage for existing source code without changing production behavior. Selects mock s |
+
 
 ## Agents
 
@@ -304,41 +417,37 @@ npx spectral lint openapi.json --ruleset .spectral.yaml
 ```
 agentic-tools/
 ├── README.md
-├── install.sh                        # One-command installer
+├── package.json                      # npm package + skill CI scripts
+├── install.sh                        # Shell installer
 ├── LICENSE
 │
-├── skills/                           # Claude Code skills
-│   ├── implement/SKILL.md            # Full TDD pipeline
-│   ├── tdd/SKILL.md                  # Test-driven development
-│   ├── write-tests/SKILL.md          # Test generation
-│   ├── bugfix/SKILL.md               # Autonomous bug fix pipeline
-│   ├── migrate/SKILL.md              # Bulk import/module migration
-│   ├── review-all/SKILL.md           # Parallel review pipeline
-│   ├── health-check/SKILL.md         # Codebase diagnostics
-│   ├── prod-readiness/SKILL.md       # 5-agent pre-release review
-│   ├── api-audit/SKILL.md            # Route-type contract audit
-│   ├── doc-sync/SKILL.md             # Documentation drift
-│   ├── phase-kickoff/SKILL.md        # Phase scaffolding
-│   ├── prd/                          # PRD management
-│   │   ├── SKILL.md
-│   │   ├── template.md
-│   │   ├── validation.md
-│   │   └── drift-prevention.md
-│   ├── orchestrate/                  # Multi-agent coordination
-│   │   ├── SKILL.md
-│   │   ├── wave-template.md
-│   │   ├── agent-roles.md
-│   │   └── headless-runner.md
-│   ├── quality-commit/SKILL.md       # Quality gates + commit
-│   ├── humanizer/                    # AI pattern removal
-│   ├── firecrawl/                    # Web scraping
-│   ├── shadcn-svelte-skill/          # shadcn-svelte patterns
-│   ├── tanstack-query/               # TanStack Query v5
-│   ├── turborepo/                    # Monorepo patterns
-│   └── refactor-module/              # Terraform extraction
-│   ├── oracle-idcs-better-auth-setup/   # Oracle + IDCS + Better Auth router
-│   ├── fastify-better-auth-bridge/      # Fastify session bridge patterns
-│   └── oracle-idcs-org-provisioning/    # IDCS org membership provisioning
+├── bin/
+│   └── cli.js                        # npx agentic-tools init/list/help
+│
+├── scripts/ci/                       # Skill library validation gates
+│   ├── validate-skill-library.mjs
+│   ├── install-smoke.mjs
+│   ├── secret-scan.mjs
+│   └── run-all.mjs
+│
+├── skills/                           # 50 Agent Skills, registered from top-level and OCI nested packages
+│   ├── README.md                     # Skill catalog and standards
+│   ├── oci/                          # OCI/Oracle ownership boundary
+│   │   ├── SKILL.md                  # OCI skill-pack router
+│   │   ├── README.md
+│   │   ├── manifest.json             # Canonical OCI skill inventory
+│   │   ├── best-practices/           # OCI architecture router
+│   │   ├── infrastructure-as-code/    # OCI Terraform, state, import, and security automation
+│   │   ├── oracle-dba/               # Autonomous AI Database operations
+│   │   ├── oci-resource-manager/     # OCI Resource Manager operations
+│   │   ├── oci-security-control-plane/
+│   │   ├── managed-bastion-access/
+│   │   ├── zpr-security/
+│   │   └── ...                       # Remaining OCI and Oracle-related packages
+│   ├── implement/                    # Full TDD feature pipeline
+│   ├── review-all/                   # Parallel review pipeline
+│   ├── health-check/                 # Codebase diagnostics
+│   └── ...                           # Remaining skill packages
 │
 ├── claude/
 │   ├── agents/                       # Custom agent definitions
@@ -365,10 +474,13 @@ agentic-tools/
 
 Found a missing pattern or have a battle-tested skill? PRs welcome.
 
-1. Follow the existing skill format (YAML frontmatter + markdown body)
-2. Include anti-patterns with WHY explanations
-3. Keep core content under 300 lines (use progressive disclosure with reference files)
-4. Test the skill in a real project before submitting
+1. Put general skills at `skills/<skill-name>/SKILL.md`; put all OCI or Oracle-related skills under `skills/oci/<skill-name>/SKILL.md`. Keep the package folder name and frontmatter `name` identical.
+2. Write a trigger-oriented `description` with concrete quoted user phrases.
+3. Include `## When to Use`, `## Do NOT load this skill when`, anti-patterns, and `## Arguments`.
+4. Keep the always-loaded body lean; move detailed docs, volatile facts, examples, and API notes into `references/`.
+5. Add scripts only when they provide deterministic value, and make sure every referenced script exists.
+6. Update `bin/cli.js`, `install.sh`, `README.md`, and `skills/README.md`; every Oracle-related skill also belongs in `skills/oci/manifest.json`.
+7. Run `npm run skills:ci` before opening a PR.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for full guidelines.
 
@@ -382,5 +494,6 @@ MIT License — see [LICENSE](LICENSE) for details.
 
 ---
 
-**Last Updated**: February 2026
-**Claude Code Version**: Compatible with latest CLI
+**Last Reviewed**: May 27, 2026
+
+**Compatibility**: Agent Skills `SKILL.md` format; local installers target Claude Code `.claude/skills/` by default.

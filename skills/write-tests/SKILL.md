@@ -1,9 +1,12 @@
 ---
 name: write-tests
-description: "Use when adding or improving test coverage for existing source code without changing production behavior. Selects mock strategy by module type (route handler, repository, plugin, utility, service), handles mockReset:true environments, and prevents common vitest/jest mock wiring failures. Triggers on: write tests, add tests, test coverage, regression coverage, untested module, *.test.ts."
+description: "Use when adding or improving test coverage for existing source code without changing production behavior. Selects mock strategy by module type (route handler, repository, plugin, utility, service), handles mockReset:true environments, and prevents common vitest/jest mock wiring failures. Triggers on: write tests, add tests, test coverage, regression coverage, untested module, *.test.ts. Triggers on "write tests" or "add test coverage"."
 ---
-
 # Write Tests for Existing Code
+
+## When to Use
+
+Load this skill when the user request matches the frontmatter description for Write Tests for Existing Code.
 
 ## NEVER
 

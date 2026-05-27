@@ -1,9 +1,12 @@
 ---
 name: orchestrate
-description: "Use when executing a multi-task implementation plan with parallel agents. Coordinates task assignment, wave sequencing, heartbeat monitoring, git safety, and quality gates. Supports interactive (TeamCreate/Task) and headless (claude -p) modes. Keywords: parallel agents, wave execution, orchestrate, headless, phase execution, task plan."
+description: "Use when executing a multi-task implementation plan with parallel agents. Coordinates task assignment, wave sequencing, heartbeat monitoring, git safety, and quality gates. Supports interactive (TeamCreate/Task) and headless (claude -p) modes. Keywords: parallel agents, wave execution, orchestrate, headless, phase execution, task plan. Triggers on "orchestrate agents" or "execute multi-task plan"."
 ---
-
 # Orchestrate
+
+## When to Use
+
+Load this skill when the user request matches the frontmatter description for Orchestrate.
 
 Coordinate a team of parallel agents to execute a phase from a task plan. Manages task assignment, monitoring, scope enforcement, and wave-transition quality gates.
 

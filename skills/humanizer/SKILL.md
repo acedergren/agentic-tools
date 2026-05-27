@@ -1,9 +1,12 @@
 ---
 name: humanizer
-description: "Use when making text sound human, removing AI tells, or fixing writing that sounds like ChatGPT. Detects and rewrites AI patterns: overused phrases (testament to, pivotal, landscape, delve), structural tells (rule of three, em dash overuse, negative parallelisms, copula avoidance), promotional language, and vague attributions. Keywords: AI-generated, humanize, writing style, natural writing, human voice, remove AI patterns, conversational tone."
+description: "Use when making text sound human, removing AI tells, or fixing writing that sounds like ChatGPT. Detects and rewrites AI patterns: overused phrases (testament to, pivotal, landscape, delve), structural tells (rule of three, em dash overuse, negative parallelisms, copula avoidance), promotional language, and vague attributions. Keywords: AI-generated, humanize, writing style, natural writing, human voice, remove AI patterns, conversational tone. Triggers on "humanize writing" or "remove AI tells"."
 ---
-
 # Humanizer: AI Pattern Detection & Voice Injection
+
+## When to Use
+
+Load this skill when the user request matches the frontmatter description for Humanizer: AI Pattern Detection & Voice Injection.
 
 Transform AI-generated text into human writing by detecting patterns and injecting authentic voice.
 

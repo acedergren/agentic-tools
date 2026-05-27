@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "packSkill": "oci",
+  "purpose": "Canonical ownership boundary for OCI and Oracle-related skills in agentic-tools.",
+  "groups": [
+    {
+      "name": "core-oci-operations",
+      "description": "OCI service operation, architecture, governance, automation, observability, cost, AI, events, secrets, and database skills.",
+      "skills": [
+        "oci/best-practices",
+        "oci/compute-management",
+        "oci/database-management",
+        "oci/finops-cost-optimization",
+        "oci/genai-services",
+        "oci/iam-identity-management",
+        "oci/infrastructure-as-code",
+        "oci/landing-zones",
+        "oci/monitoring-operations",
+        "oci/networking-management",
+        "oci/oci-events",
+        "oci/managed-bastion-access",
+        "oci/oci-resource-manager",
+        "oci/oci-security-control-plane",
+        "oci/zpr-security",
+        "oci/oracle-dba",
+        "oci/secrets-management"
+      ]
+    },
+    {
+      "name": "oracle-adjacent",
+      "description": "Oracle identity, migration, app integration, and branded artifact skills that should remain distinct from core OCI operations.",
+      "skills": [
+        "oci/fastify-better-auth-bridge",
+        "oci/oci-pptx",
+        "oci/oracle-idcs-better-auth-setup",
+        "oci/oracle-idcs-org-provisioning",
+        "oci/sqlite-to-oracle-planner"
+      ]
+    },
+    {
+      "name": "pack-and-routing",
+      "description": "Compatibility and routing entry points for OCI skill discovery and ownership.",
+      "skills": [
+        "oci",
+        "oci/best-practices",
+        "oci/database-management",
+        "oci/oci-security-control-plane"
+      ]
+    }
+  ],
+  "reviewTriggers": [
+    "Oracle documentation drift",
+    "OCI pricing, limits, quotas, model catalogs, or service availability changes",
+    "Identity Domains or IDCS terminology changes",
+    "New OCI specialist skill added to skills/",
+    "Installer, marketplace, or external skill publishing changes"
+  ]
+}

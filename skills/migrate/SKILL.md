@@ -1,9 +1,12 @@
 ---
 name: migrate
-description: "Use when bulk-migrating import paths, renaming workspace packages, or reorganizing modules across many files in a monorepo. Uses scripted bulk operations with verification gates and atomic commits. Keywords: migrate imports, rename package, bulk import path change, module reorganization, monorepo refactor."
+description: "Use when bulk-migrating import paths, renaming workspace packages, or reorganizing modules across many files in a monorepo. Uses scripted bulk operations with verification gates and atomic commits. Keywords: migrate imports, rename package, bulk import path change, module reorganization, monorepo refactor. Triggers on "migrate imports" or "rename package"."
 ---
-
 # Migrate
+
+## When to Use
+
+Load this skill when the user request matches the frontmatter description for Migrate.
 
 Orchestrates monorepo migrations: import path changes, package renames, module moves. Uses scripted bulk operations (never file-by-file edits), deduplicates against existing work, verifies types at each step, and commits atomically.
 

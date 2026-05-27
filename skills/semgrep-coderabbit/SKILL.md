@@ -1,8 +1,7 @@
 ---
 name: semgrep-coderabbit
-description: "Use when reviewing code changes before commit or PR merge. Covers tool sequencing, finding severity priorities, fix ordering strategy, and conflict resolution between tools. Keywords: code review, semgrep, coderabbit, security scan, pre-commit review, PR review, hardcoded secrets, SQL injection, XSS."
+description: "Use when reviewing code changes before commit or PR merge. Covers tool sequencing, finding severity priorities, fix ordering strategy, and conflict resolution between tools. Keywords: code review, semgrep, coderabbit, security scan, pre-commit review, PR review, hardcoded secrets, SQL injection, XSS. Triggers on "review with Semgrep" or "run CodeRabbit review"."
 ---
-
 # Semgrep + CodeRabbit Review
 
 Two-stage code review: fast deterministic pattern detection first, then semantic AI analysis. Order is non-negotiable.
@@ -87,3 +86,7 @@ When Semgrep and CodeRabbit give conflicting feedback on the same line: trust Se
 | Review specific recent commits | `--since HEAD~3` |
 | Only staged files (partial work) | `--staged` |
 | CodeRabbit not installed/available | `--semgrep-only` + manual checklist |
+
+## Arguments
+
+$ARGUMENTS: Optional user-provided target, path, environment, symptom, or constraint. When empty, infer the narrowest safe scope from the current repository context and ask only if multiple high-impact choices remain.

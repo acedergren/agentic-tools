@@ -1,9 +1,12 @@
 ---
 name: api-audit
-description: "Use when auditing API routes for schema drift, missing auth, or validation gaps. Scans routes against shared TypeScript types to find mismatches, missing middleware, and undocumented endpoints. Read-only — produces a severity-grouped report. Keywords: audit routes, schema drift, auth gaps, missing validation, type mismatch, orphaned schemas."
+description: "Use when auditing API routes for schema drift, missing auth, or validation gaps. Scans routes against shared TypeScript types to find mismatches, missing middleware, and undocumented endpoints. Read-only — produces a severity-grouped report. Keywords: audit routes, schema drift, auth gaps, missing validation, type mismatch, orphaned schemas. Triggers on "audit API routes" or "find schema drift"."
 ---
-
 # API Route & Type Audit Skill
+
+## When to Use
+
+Load this skill when the user request matches the frontmatter description for API Route & Type Audit Skill.
 
 Read-only cross-reference of API routes against shared type definitions. Do NOT modify any files.
 
@@ -64,3 +67,7 @@ Include summary counts: total routes, full validation coverage, partial, none, m
 ## Scope Filter
 
 `$ARGUMENTS` — optional path prefix (e.g., `admin` → only audit `/admin/*` routes). Empty = audit all.
+
+## Arguments
+
+$ARGUMENTS: Optional user-provided target, path, environment, symptom, or constraint. When empty, infer the narrowest safe scope from the current repository context and ask only if multiple high-impact choices remain.

@@ -1,9 +1,12 @@
 ---
 name: publish-skill
-description: "Use when creating a new skill and publishing it to a GitHub repo for installation via npx skills add. Covers scaffold, spec compliance, skill-judge evaluation, commit, push, and install verification. Keywords: publish skill, add skill to repo, npx skills init, share skill, agentic-tools, skills.sh."
+description: "Use when creating a new skill and publishing it to a GitHub repo for installation via npx skills add. Covers scaffold, spec compliance, skill-judge evaluation, commit, push, and install verification. Keywords: publish skill, add skill to repo, npx skills init, share skill, agentic-tools, skills.sh. Triggers on "publish skill" or "share skill"."
 ---
-
 # Publish Skill
+
+## When to Use
+
+Load this skill when the user request matches the frontmatter description for Publish Skill.
 
 Add a new skill to `acedergren/agentic-tools` and make it installable via `npx skills add`.
 
@@ -74,3 +77,7 @@ npx skills add acedergren/agentic-tools -l
 - **Never use extra frontmatter fields** — only `name` and `description` are valid; `license`, `metadata`, `version` cause parse errors in some agents
 - **Never put "When to use" only in the body** — the agent only reads the description to decide whether to load; body content is invisible at trigger time
 - **Never name a skill with spaces or special chars** — `my skill!` breaks install; use `my-skill`
+
+## Arguments
+
+$ARGUMENTS: Optional user-provided target, path, environment, symptom, or constraint. When empty, infer the narrowest safe scope from the current repository context and ask only if multiple high-impact choices remain.
