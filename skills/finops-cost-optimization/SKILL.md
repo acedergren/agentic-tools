@@ -39,7 +39,7 @@ Prefer this skill only for its named domain. For broader OCI architecture triage
 ```bash
 # DEFAULT OCI behavior: boot volume PRESERVED after instance termination
 oci compute instance terminate --instance-id <ocid> --force
-# Instance gone, but boot volume keeps charging at $0.025/GB/month FOREVER
+# Instance gone, but the boot volume can keep charging until deleted
 
 # RIGHT: explicitly delete boot volume
 oci compute instance terminate \
@@ -50,33 +50,33 @@ oci compute instance terminate \
 resource "oci_core_instance" "dev" {
   preserve_boot_volume = false
 }
-# 20 forgotten boot volumes at 50GB = $25/month = $300/year
+# Estimate waste with live pricing:
+# orphaned_boot_volume_cost = count * gb_per_volume * live_boot_volume_rate
 ```
 
 **NEVER leave reserved public IPs unattached**
 ```
-Reserved IP: $0.01/hour = $7.30/month (charged whether attached or not)
-Ephemeral IP: $0 (auto-deleted when instance terminated)
+Reserved public IPs can keep charging while reserved, whether attached or not.
+Ephemeral public IPs are released with the instance lifecycle.
 
 Use RESERVED only when you need a static IP that survives instance termination.
 Use EPHEMERAL for everything else.
 
-5 forgotten reserved IPs = $36.50/month = $438/year
 Detection: oci network public-ip list --scope REGION --lifetime RESERVED
 ```
 
 **NEVER assume stopped resources = zero cost**
 ```
 Stopped Compute Instance:
-  Compute: $0 (stopped)
-  Boot volume: $0.025/GB/month CONTINUES
-  Block volumes: $0.025/GB/month CONTINUES
-  Reserved IP (if attached): $7.30/month CONTINUES
+  Compute billing may pause while stopped
+  Boot volumes can continue charging
+  Block volumes can continue charging
+  Reserved public IPs can continue charging
 
 Stopped Autonomous Database:
-  Compute: $0 (stopped)
-  Storage: $0.025/GB/month CONTINUES
-  Backups: Retention charges CONTINUE
+  CPU/ECPU billing may stop while stopped
+  Storage can continue charging
+  Backups or retention can continue charging
 
 Rule: Stopped = compute paused, storage still charged.
 For long-term idle (>30 days): terminate + backup, restore when needed.
@@ -84,16 +84,14 @@ For long-term idle (>30 days): terminate + backup, restore when needed.
 
 **NEVER send large data via internet egress without calculating cost first**
 ```
-OCI egress pricing:
-  First 10 TB/month: FREE
-  10-50 TB: $0.0085/GB
-  50+ TB: contact sales
-
-15 TB bulk export = 5 TB chargeable × 1024 GB/TB × $0.0085/GB = $43.52
+Look up current OCI data transfer tiers before giving an egress estimate.
+Calculate with live tiers:
+  chargeable_gb = max(0, transferred_gb - included_allowance_gb)
+  egress_cost = sum(tier_gb * live_tier_rate)
 
 Cheaper alternatives:
 1. OCI FastConnect: useful for private connectivity and predictable throughput; calculate port/provider costs before claiming egress savings
-2. Intra-region transfer between OCI services: FREE
+2. Intra-region transfer between OCI services: verify current service-specific pricing before calling it free
 3. Cross-region transfer: verify current Oracle price list and source/destination services before calling it free
 ```
 
@@ -104,8 +102,8 @@ Credits are NON-TRANSFERABLE between service categories:
   Database credits → database only
   Cannot move surplus to another category
 
-Commit $10k/month compute, use $6k → $4k/month waste ($48k/year).
-Monthly credits EXPIRE end of month (no rollover = use-it-or-lose-it).
+Monthly credits can expire without rollover depending on the contract.
+Unused committed spend in one service category may not offset another category.
 
 RIGHT: Analyze 6 months historical usage per category.
        Commit to 70-80% of baseline, not peak.
@@ -113,8 +111,8 @@ RIGHT: Analyze 6 months historical usage per category.
 
 **NEVER rely on FORECAST budget alerts as your primary alert**
 ```
-OCI FORECAST uses simple linear projection (30-40% error rate).
-Week 1 includes one-time data migration → forecast projects 4× that for month.
+Forecast alerts can be skewed by one-time migrations, month-start spikes, and seasonal usage.
+Week 1 includes one-time data migration → forecast can overstate the monthly run rate.
 
 RIGHT: Set ACTUAL spend alerts at 50%, 75%, 90%, 100%.
 Use FORECAST for trend awareness only, not budget enforcement.
@@ -123,14 +121,15 @@ Budgets are ALERTING only — cannot block spending.
 
 **NEVER use NAT Gateway for high-traffic applications**
 ```
-NAT Gateway cost: $0.01/hr ($7.30/month) + $0.01/GB processed
-5 TB/month outbound: $7.30 + (5000 × $0.01) = $57.30/month
+NAT Gateway can include both hourly and per-GB processing charges.
+Estimate with live pricing:
+  nat_gateway_cost = (hours * live_hourly_rate) + (processed_gb * live_processing_rate)
 
 Alternative: Ephemeral public IP on instance
-Cost for <10 TB egress: $0/month
+Cost depends on current public IP and data-transfer pricing.
 
 NAT Gateway makes sense for:
-  - Private subnets with <100 GB/month egress
+  - Private subnets with low outbound traffic
   - Security requirement (no public IPs on instances)
 ```
 
@@ -140,20 +139,20 @@ NAT Gateway makes sense for:
 
 **Fixed → Flex (right-size RAM separately from OCPU):**
 ```
-VM.Standard2.4: 4 OCPU, 60 GB RAM (fixed 1:15 ratio)
-Cost: $0.24/hr = $175/month
+Current fixed shape:
+  monthly_cost = hours * live_fixed_shape_rate
 
-VM.Standard.E4.Flex: 4 OCPU, 16 GB RAM (custom ratio)
-Cost: ($0.02/OCPU × 4) + ($0.0015/GB × 16) = $0.104/hr = $76/month
+Candidate flexible shape:
+  monthly_cost = hours * ((ocpus * live_ocpu_rate) + (gb_memory * live_memory_rate))
 
-Savings: $99/month per instance (56% reduction)
+Savings:
+  current_monthly_cost - candidate_monthly_cost
 ```
 
-**AMD → Arm (50% compute cost reduction):**
+**AMD/Intel → Arm:**
 ```
-VM.Standard.E4.Flex: 4 OCPU, 16 GB RAM → $58.40/month
-VM.Standard.A1.Flex: 4 OCPU, 16 GB RAM → $29.20/month
-Savings: $29.20/month (50% reduction)
+Compare current x86 shape pricing against current Arm shape pricing for the target region and subscription.
+Do not promise a fixed percentage reduction without a live price lookup.
 
 Gotcha: ARM64 architecture — verify Docker images, compiled binaries, and language runtimes support arm64 before migrating.
 ```
@@ -162,23 +161,15 @@ Gotcha: ARM64 architecture — verify Docker images, compiled binaries, and lang
 
 ## Free Tier Maximization
 
-Always-Free tier if fully utilized saves ~$727/month ($8,730/year):
+Use the current Oracle Always Free docs before quoting limits or savings:
 ```
-Compute:
-  2× AMD Micro VMs:     $14/month
-  4 Arm OCPU (24 GB):   $29.20/month
-
-Database:
-  2× Autonomous Databases: $584/month (2 ECPU each, 20 GB storage)
-
-Storage:
-  200 GB block + 10 GB object + 10 GB archive: $5.28/month
-
-Networking:
-  1 load balancer + 10 TB egress: $95/month
+1. Inventory current Always Free resources already consumed in the tenancy.
+2. Confirm regional availability and service-specific eligibility.
+3. Calculate avoided spend with the current Oracle price list.
+4. Document the lookup date and source with every savings estimate.
 ```
 
-**Critical gotcha**: 2 ADB limit is TENANCY-wide (not per region, not per compartment). Counted across all regions.
+**Critical gotcha**: verify whether each Always Free limit is tenancy-wide, region-scoped, or service-specific before counting savings.
 
 ---
 
@@ -188,15 +179,15 @@ Networking:
 10 TB compliance data, accessed quarterly:
 
 Without tiering (Standard all year):
-  10,000 GB × $0.0255/GB/month × 12 = $3,060/year
+  gb * live_standard_rate * 12
 
 With lifecycle rule (Archive after 30 days):
-  Month 1 (Standard):    $255
-  Months 2-12 (Archive): 10,000 GB × $0.0024 × 11 = $264
-  Total: $519/year
+  (gb * live_standard_rate * 1) + (gb * live_archive_rate * 11)
 
-Savings: $2,541/year (83% reduction)
-Retrieval cost: $0.01/GB — acceptable for quarterly access
+Savings:
+  standard_all_year_cost - lifecycle_policy_cost
+
+Also check current retrieval, minimum-retention, operation, and replication charges before recommending Archive.
 ```
 
 Lifecycle policy: Day 0-30 Standard → Day 31+ Archive.
@@ -207,12 +198,14 @@ Lifecycle policy: Day 0-30 Standard → Day 31+ Archive.
 
 ```
 10 dev instances, 2 OCPU each:
-24/7: 10 × 2 × $0.02/hr × 730 = $292/month
+24/7 compute:
+  instance_count * ocpus * live_ocpu_rate * 730
 
 Weekdays 9am-6pm only (195 hours/month):
-10 × 2 × $0.02 × 195 = $78/month
+  instance_count * ocpus * live_ocpu_rate * 195
 
-Savings: $214/month (73% reduction)
+Savings:
+  always_on_cost - scheduled_cost
 
 Implementation:
   Tag instances: Environment=Development
@@ -240,8 +233,9 @@ oci network public-ip list --scope REGION --lifetime RESERVED \
 oci compute instance list --lifecycle-state STOPPED
 
 # 5. Old backups (filter by date)
+# export CUTOFF_DATE=2026-01-01
 oci bv backup list --all \
-  | jq '.data[] | select(.["time-created"] < "2025-01-01")'
+  | jq --arg cutoff "$CUTOFF_DATE" '.data[] | select(.["time-created"] < $cutoff)'
 
 # 6. Load balancers with no backends
 oci lb load-balancer list --all

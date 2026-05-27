@@ -35,15 +35,14 @@ Prefer this skill only for its named domain. For broader OCI architecture triage
 
 ## NEVER Do This
 
-❌ **NEVER route Oracle service traffic via Internet Gateway — Service Gateway is FREE**
+**NEVER route Oracle service traffic via Internet Gateway when Service Gateway is the right path**
 ```
 Without Service Gateway (via Internet Gateway):
-- 20 TB/month database backups to Object Storage
-- Egress: 20,000 GB × $0.0085/GB = $170/month
+- Oracle service traffic can take public internet paths and may create avoidable data-transfer cost or exposure.
 
 With Service Gateway:
-- Same traffic = $0/month
-- Annual savings: $2,040
+- Keep supported Oracle service traffic on the Oracle Services Network path.
+- Verify current service-specific pricing before calling any transfer path free.
 
 Service Gateway covers: Object Storage (all tiers), ADB private endpoints, Oracle Services Network
 ```

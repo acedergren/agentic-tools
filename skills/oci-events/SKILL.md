@@ -103,7 +103,7 @@ oci events rule create \
 // Fires only for critical lifecycle events
 ```
 
-**Cost impact**: 10,000 unnecessary function invocations/day × $0.0000002/GB-second × 256MB × 5s = $2.56/day = $77/month wasted.
+**Cost impact**: broad rules can trigger unnecessary Function, Notification, or Streaming usage. Estimate with current service pricing before calling the waste negligible.
 
 **NEVER send sensitive data in event notification (security risk)**
 ```json

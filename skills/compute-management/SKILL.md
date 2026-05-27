@@ -43,7 +43,7 @@ oci limits resource-availability get \
   --compartment-id <ocid> \
   --availability-domain <ad>
 ```
-87% of "out of capacity" errors are actually quota limits, not infrastructure capacity. Check limits BEFORE launching to get accurate error messages.
+Many "out of capacity" launch failures are quota or service-limit problems rather than host-capacity problems. Check limits BEFORE launching to get accurate error messages.
 
 **NEVER use console serial connection as primary access**
 - Creates security audit findings (bypasses SSH key controls)
@@ -58,11 +58,11 @@ oci limits resource-availability get \
 ```bash
 oci compute instance terminate --instance-id <id> --preserve-boot-volume false
 ```
-Without `--preserve-boot-volume false`: $50+/month per deleted instance (orphaned boot volumes accumulate silently)
+Without `--preserve-boot-volume false`: orphaned boot volumes can keep charging after the instance is gone.
 
 **NEVER enable public IP on production instances**
 - Use bastion service or private endpoints for access
-- Cost impact: $500–5000+ per security incident from exposed instances
+- Treat public exposure as a security and incident-response cost driver, not only as a network setting.
 
 **NEVER use fixed shapes when Flex covers the same specs**
 - Fixed shapes (e.g., VM.Standard2.1) are often MORE expensive than Flex equivalents
@@ -73,13 +73,13 @@ Without `--preserve-boot-volume false`: $50+/month per deleted instance (orphane
 ```
 "Out of host capacity for shape X"?
 │
-├─ Check service limits FIRST (87% of cases)
+├─ Check service limits FIRST
 │  └─ oci limits resource-availability get
 │     ├─ available = 0 → Request limit increase (NOT a capacity issue)
 │     └─ available > 0 → True capacity issue, continue below
 │
 ├─ Same shape, different AD?
-│  └─ Try each AD in region (PHX/IAD each have 3, all independent)
+│  └─ Query the tenancy's ADs and try each viable AD in the region
 │
 ├─ Different shape, same series?
 │  └─ E4 failed → try E5 (newer gen, often more available)
@@ -94,31 +94,28 @@ Without `--preserve-boot-volume false`: $50+/month per deleted instance (orphane
 
 ## Shape Selection: Cost vs Performance
 
-**Budget-critical** (save ~66%):
-- VM.Standard.A1.Flex (ARM): $0.01/OCPU/hr vs $0.03 AMD
-- Caveat: test ARM compatibility — not all software runs on ARM
+**Budget-critical**:
+- Compare Arm flexible shapes against current AMD/Intel alternatives in the Oracle price list.
+- Test ARM64 compatibility first; not all Docker images, compiled binaries, agents, or vendor packages support Arm.
 
-**General purpose** (balanced):
-- VM.Standard.E4.Flex: 2:16 CPU:RAM ratio, $0.03/OCPU/hr
-- Start with 2 OCPUs, scale based on metrics — not guesses
+**General purpose**:
+- Prefer flexible shapes when they meet the workload requirement so CPU and memory can be right-sized separately.
+- Start from measured CPU, memory, network, and storage I/O needs; scale based on metrics, not guesses.
 
-**Memory-intensive** (databases, caches):
-- VM.Standard.E4.Flex with custom ratio: up to 1:64 CPU:RAM
-- Cost: $0.03/OCPU + $0.0015/GB RAM
+**Memory-intensive**:
+- Compare flexible shape memory ratios against the workload's actual resident set, cache, and JVM/DB memory needs.
+- Verify the current memory-per-OCPU limits in Oracle shape documentation before promising a target ratio.
 
-## Quick Cost Reference
+## Live Cost Check
 
-| Shape Family      | $/OCPU/hr | $/GB RAM/hr | Best For                        |
-|-------------------|-----------|-------------|---------------------------------|
-| A1.Flex (ARM)     | $0.01     | $0.0015     | Cost-critical, ARM-compatible   |
-| E4.Flex (AMD)     | $0.03     | $0.0015     | General purpose                 |
-| E5.Flex (AMD)     | $0.035    | $0.0015     | Latest gen, premium performance |
-| Optimized3.Flex   | $0.025    | $0.0015     | Network-intensive               |
+Do not quote static shape prices from this skill. Before estimating cost:
 
-**Free Tier**: 2x AMD VM (1/8 OCPU, 1GB) + 4 ARM cores (24GB total) — always free
-
-**Formula**: (OCPUs × $/OCPU + GB × $0.0015) × 730 hrs/month
-Example: 2 OCPU, 16GB E4 = (2×$0.03 + 16×$0.0015) × 730 = **$61.32/month**
+1. Open the current Oracle Cloud price list for the target region, currency, and subscription model.
+2. Confirm the shape family, architecture, OCPU/ECPU terms, memory billing unit, and any Free Tier eligibility in current Oracle docs.
+3. Calculate with live unit rates:
+   `monthly_compute = hours * ((ocpus * live_ocpu_rate) + (gb_memory * live_memory_rate))`
+4. Add non-compute resources separately: boot volume, block volumes, public IPs, load balancers, backups, images, network transfer, and support commitments.
+5. State the date and source of the price lookup whenever giving numbers.
 
 ## Instance Principal Authentication (Production)
 
