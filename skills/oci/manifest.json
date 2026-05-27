@@ -7,34 +7,34 @@
       "name": "core-oci-operations",
       "description": "OCI service operation, architecture, governance, automation, observability, cost, AI, events, secrets, and database skills.",
       "skills": [
-        "best-practices",
-        "compute-management",
-        "database-management",
-        "finops-cost-optimization",
-        "genai-services",
-        "iam-identity-management",
-        "infrastructure-as-code",
-        "landing-zones",
-        "monitoring-operations",
-        "networking-management",
-        "oci-events",
+        "oci/best-practices",
+        "oci/compute-management",
+        "oci/database-management",
+        "oci/finops-cost-optimization",
+        "oci/genai-services",
+        "oci/iam-identity-management",
+        "oci/infrastructure-as-code",
+        "oci/landing-zones",
+        "oci/monitoring-operations",
+        "oci/networking-management",
+        "oci/oci-events",
         "oci/managed-bastion-access",
         "oci/oci-resource-manager",
         "oci/oci-security-control-plane",
         "oci/zpr-security",
-        "oracle-dba",
-        "secrets-management"
+        "oci/oracle-dba",
+        "oci/secrets-management"
       ]
     },
     {
       "name": "oracle-adjacent",
       "description": "Oracle identity, migration, app integration, and branded artifact skills that should remain distinct from core OCI operations.",
       "skills": [
-        "fastify-better-auth-bridge",
-        "oci-pptx",
-        "oracle-idcs-better-auth-setup",
-        "oracle-idcs-org-provisioning",
-        "sqlite-to-oracle-planner"
+        "oci/fastify-better-auth-bridge",
+        "oci/oci-pptx",
+        "oci/oracle-idcs-better-auth-setup",
+        "oci/oracle-idcs-org-provisioning",
+        "oci/sqlite-to-oracle-planner"
       ]
     },
     {
@@ -42,8 +42,8 @@
       "description": "Compatibility and routing entry points for OCI skill discovery and ownership.",
       "skills": [
         "oci",
-        "best-practices",
-        "database-management",
+        "oci/best-practices",
+        "oci/database-management",
         "oci/oci-security-control-plane"
       ]
     }

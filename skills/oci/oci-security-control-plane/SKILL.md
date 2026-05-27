@@ -59,24 +59,24 @@ Route private operator access to `oci/managed-bastion-access`, VPN/FastConnect, 
 | --- | --- |
 | Zero Trust Packet Routing, ZPR, security attributes, ZPL policy, protected resources | `oci/zpr-security` |
 | OCI Bastion, Managed SSH, port forwarding, dynamic SOCKS5, client CIDR allowlist | `oci/managed-bastion-access` |
-| IAM policy, identity domains, IDCS, dynamic groups, 403/404, principal type | `iam-identity-management` |
-| Vault, KMS, secret rotation, replication, secret retrieval 403 | `secrets-management` |
-| Cloud Guard, detector/responder recipes, Security Zones, landing-zone guardrails | `landing-zones` |
-| NSGs, security lists, route tables, DRG, Service Gateway, DNS, private endpoints | `networking-management` |
-| Audit, Logging, Service Connector, alarms, evidence collection | `monitoring-operations` |
-| Terraform security automation, Resource Manager, state, imports, drift | `infrastructure-as-code` |
-| Compute access posture, public IPs, instance principals, plugin state | `compute-management` |
+| IAM policy, identity domains, IDCS, dynamic groups, 403/404, principal type | `oci/iam-identity-management` |
+| Vault, KMS, secret rotation, replication, secret retrieval 403 | `oci/secrets-management` |
+| Cloud Guard, detector/responder recipes, Security Zones, landing-zone guardrails | `oci/landing-zones` |
+| NSGs, security lists, route tables, DRG, Service Gateway, DNS, private endpoints | `oci/networking-management` |
+| Audit, Logging, Service Connector, alarms, evidence collection | `oci/monitoring-operations` |
+| Terraform security automation, Resource Manager, state, imports, drift | `oci/infrastructure-as-code` |
+| Compute access posture, public IPs, instance principals, plugin state | `oci/compute-management` |
 
 ## Decision Rules
 
-1. API denied or ambiguous 404: start with `iam-identity-management`.
-2. Packet path blocked without ZPR: start with `networking-management`.
+1. API denied or ambiguous 404: start with `oci/iam-identity-management`.
+2. Packet path blocked without ZPR: start with `oci/networking-management`.
 3. Packet path blocked after security attributes or ZPL change: start with `oci/zpr-security`.
 4. Human/operator access to private targets: start with `oci/managed-bastion-access`.
-5. Secret lifecycle or retrieval: start with `secrets-management`.
-6. Preventive tenancy guardrails: start with `landing-zones`.
-7. Detection, response, audit, and evidence: start with `monitoring-operations`.
-8. Any of the above encoded in Terraform: also load `infrastructure-as-code`.
+5. Secret lifecycle or retrieval: start with `oci/secrets-management`.
+6. Preventive tenancy guardrails: start with `oci/landing-zones`.
+7. Detection, response, audit, and evidence: start with `oci/monitoring-operations`.
+8. Any of the above encoded in Terraform: also load `oci/infrastructure-as-code`.
 
 ## Reference Files
 

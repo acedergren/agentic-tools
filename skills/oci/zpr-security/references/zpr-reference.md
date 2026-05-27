@@ -16,10 +16,10 @@ ZPR is an additional network-layer authorization control, not a substitute for O
 
 | Layer | Must allow traffic? | Owner skill |
 | --- | --- | --- |
-| Route table | Yes | `networking-management` |
-| Security list or NSG | Yes | `networking-management` |
+| Route table | Yes | `oci/networking-management` |
+| Security list or NSG | Yes | `oci/networking-management` |
 | ZPR policy for attributed resources | Yes | `oci/zpr-security` |
-| IAM policy for API calls | Only for management/API access | `iam-identity-management` |
+| IAM policy for API calls | Only for management/API access | `oci/iam-identity-management` |
 
 Oracle's current docs state that ZPR is built on existing NSG, security list, and route table rules. For a packet to arrive, all relevant layers must allow it.
 

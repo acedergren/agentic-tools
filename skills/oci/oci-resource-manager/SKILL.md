@@ -30,11 +30,11 @@ Use this skill for OCI Resource Manager stacks, jobs, state, variables, source p
 
 Load this skill for: the user asks to "configure OCI Resource Manager", "debug Resource Manager job", "create ORM stack", "use Resource Manager private endpoint", "fix Resource Manager dynamic group", "detect Resource Manager drift", "import Terraform state into Resource Manager", or "connect Resource Manager to Git".
 
-For Terraform language, module, backend, import, or provider questions that are not Resource Manager-specific, also load `infrastructure-as-code`.
+For Terraform language, module, backend, import, or provider questions that are not Resource Manager-specific, also load `oci/infrastructure-as-code`.
 
 ## Do NOT load this skill when
 
-Do not load this skill for local Terraform only, OCI service operations that do not involve Resource Manager, or generic CI/CD pipeline work. Use `infrastructure-as-code` for local Terraform and use service-specific OCI skills for networking, IAM, compute, databases, secrets, monitoring, or FinOps.
+Do not load this skill for local Terraform only, OCI service operations that do not involve Resource Manager, or generic CI/CD pipeline work. Use `oci/infrastructure-as-code` for local Terraform and use the relevant `oci/<skill-name>` service specialist for networking, IAM, compute, databases, secrets, monitoring, or FinOps.
 
 ## NEVER Do This
 
@@ -84,8 +84,8 @@ For users and groups operating Resource Manager, check `orm-family` or specific 
 ## Reference Files
 
 - Load [`references/resource-manager-reference.md`](references/resource-manager-reference.md) for current source links, stack/job lifecycle, private endpoints, provider support, source providers, IAM, state migration, and troubleshooting.
-- Load `../../infrastructure-as-code/references/oci-terraform-auth-matrix.md` when the failure is actually provider auth or principal selection.
-- Load `../../infrastructure-as-code/references/oci-terraform-secrets-state.md` when stack variables, state, logs, or outputs may contain secret values.
+- Load `../infrastructure-as-code/references/oci-terraform-auth-matrix.md` when the failure is actually provider auth or principal selection.
+- Load `../infrastructure-as-code/references/oci-terraform-secrets-state.md` when stack variables, state, logs, or outputs may contain secret values.
 
 ## Arguments
 

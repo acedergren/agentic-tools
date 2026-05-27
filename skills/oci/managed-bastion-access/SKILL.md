@@ -30,11 +30,11 @@ Use this skill for OCI Bastion access to private targets, Managed SSH, port forw
 
 Load this skill for: the user asks to "use OCI Bastion", "create Managed SSH", "debug a port forwarding session", "configure dynamic port forwarding", "update client CIDR allowlist", "enable Bastion plugin", or "access a private OCI instance".
 
-For broad security-control selection, start with `oci/oci-security-control-plane`. For Terraform-created bastions or sessions, also load `infrastructure-as-code`.
+For broad security-control selection, start with `oci/oci-security-control-plane`. For Terraform-created bastions or sessions, also load `oci/infrastructure-as-code`.
 
 ## Do NOT load this skill when
 
-Do not load this skill for generic SSH, public bastion hosts outside OCI Bastion, IAM-only problems, or network connectivity that does not use the OCI Bastion service. Use `compute-management` for instance lifecycle and `networking-management` for target-side route, NSG, and security-list rules.
+Do not load this skill for generic SSH, public bastion hosts outside OCI Bastion, IAM-only problems, or network connectivity that does not use the OCI Bastion service. Use `oci/compute-management` for instance lifecycle and `oci/networking-management` for target-side route, NSG, and security-list rules.
 
 ## NEVER Do This
 
@@ -75,8 +75,8 @@ Read the current bastion and ETag immediately before update, retry on ETag misma
 ## Reference Files
 
 - Load [`references/managed-bastion-reference.md`](references/managed-bastion-reference.md) for official docs, session choices, TTLs, plugin gotchas, allowlist updates, CLI/session quirks, and troubleshooting.
-- Load [`../../infrastructure-as-code/references/oci-terraform-bastion.md`](../../infrastructure-as-code/references/oci-terraform-bastion.md) when Terraform manages bastions, sessions, IAM, allowlists, or guardrails against public SSH.
-- Load `../../networking-management/references/oci-networking-reference.md` only when target-side routes, NSGs, security lists, DNS, or private connectivity are part of the failure.
+- Load [`../infrastructure-as-code/references/oci-terraform-bastion.md`](../infrastructure-as-code/references/oci-terraform-bastion.md) when Terraform manages bastions, sessions, IAM, allowlists, or guardrails against public SSH.
+- Load `../networking-management/references/oci-networking-reference.md` only when target-side routes, NSGs, security lists, DNS, or private connectivity are part of the failure.
 
 ## Arguments
 

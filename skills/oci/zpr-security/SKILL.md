@@ -29,11 +29,11 @@ Use this skill for Zero Trust Packet Routing design, rollout, troubleshooting, Z
 
 Load this skill for: the user asks to "configure ZPR", "debug Zero Trust Packet Routing", "write ZPL policy", "apply security attributes", "protect OCI resources with ZPR", "use security attributes", or "fix blocked traffic after enabling ZPR".
 
-For broad security-control selection, start with `oci/oci-security-control-plane`. For Terraform automation of ZPR attributes or policies, also load `infrastructure-as-code`.
+For broad security-control selection, start with `oci/oci-security-control-plane`. For Terraform automation of ZPR attributes or policies, also load `oci/infrastructure-as-code`.
 
 ## Do NOT load this skill when
 
-Do not load this skill for general IAM policy, Vault/KMS, Cloud Guard, Security Zones, or Bastion access tasks unless ZPR is part of the symptom. Use `networking-management` for route tables, NSGs, security lists, gateways, and DNS when ZPR is not involved.
+Do not load this skill for general IAM policy, Vault/KMS, Cloud Guard, Security Zones, or Bastion access tasks unless ZPR is part of the symptom. Use `oci/networking-management` for route tables, NSGs, security lists, gateways, and DNS when ZPR is not involved.
 
 ## NEVER Do This
 
@@ -77,8 +77,8 @@ Treat all resource metadata as non-secret operational metadata.
 ## Reference Files
 
 - Load [`references/zpr-reference.md`](references/zpr-reference.md) for official docs, rollout order, policy/attribute decision trees, troubleshooting, limits, and pressure scenarios.
-- Load [`../../infrastructure-as-code/references/oci-terraform-zpr.md`](../../infrastructure-as-code/references/oci-terraform-zpr.md) when Terraform manages ZPR configuration, attributes, policies, imports, or production rollout sequencing.
-- Load `../../networking-management/references/oci-networking-reference.md` only when the ZPR task also requires route, NSG, security list, DRG, or private connectivity details.
+- Load [`../infrastructure-as-code/references/oci-terraform-zpr.md`](../infrastructure-as-code/references/oci-terraform-zpr.md) when Terraform manages ZPR configuration, attributes, policies, imports, or production rollout sequencing.
+- Load `../networking-management/references/oci-networking-reference.md` only when the ZPR task also requires route, NSG, security list, DRG, or private connectivity details.
 
 ## Arguments
 
