@@ -1,15 +1,12 @@
 ---
 name: stitch-to-react
-description: "Use when converting Stitch designs into production React components. Enforces modular architecture: logic in hooks, data in mockData.ts, Readonly TypeScript interfaces, theme-mapped Tailwind classes. Triggers on: Stitch to React, design to code, stitch export, stitch MCP, stitch:get_screen."
-allowed-tools:
-  - "stitch*:*"
-  - "Bash"
-  - "Read"
-  - "Write"
-  - "web_fetch"
+description: "Use when converting Stitch designs into production React components. Enforces modular architecture: logic in hooks, data in mockData.ts, Readonly TypeScript interfaces, theme-mapped Tailwind classes. Triggers on: Stitch to React, design to code, stitch export, stitch MCP, stitch:get_screen. Triggers on "convert Stitch to React" or "implement design export"."
 ---
-
 # Stitch to React Components
+
+## When to Use
+
+Load this skill when the user request matches the frontmatter description for Stitch to React Components.
 
 ## NEVER
 
@@ -95,3 +92,7 @@ A component is not done until it passes the checklist AND the dev server shows n
 | TypeScript prop errors | Add `Readonly` interface following template in `resources/component-template.tsx` |
 | Theme class not recognized | Verify `tailwind.config` extracted and synced to `style-guide.json` |
 | Cached screenshot stale | Check file timestamps; ask user to confirm refresh |
+
+## Arguments
+
+$ARGUMENTS: Optional user-provided target, path, environment, symptom, or constraint. When empty, infer the narrowest safe scope from the current repository context and ask only if multiple high-impact choices remain.

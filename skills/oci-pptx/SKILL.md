@@ -1,9 +1,36 @@
 ---
 name: oci-pptx
-description: "Use when creating or editing Oracle-branded PowerPoint presentations, pitch decks, or technical slides. Applies Oracle design standards with cognitive science rules for audience retention. Triggers on: 'deck,' 'slides,' 'presentation,' .pptx filenames, 'Oracle presentation,' 'CloudWorld deck,' 'pitch deck.' Keywords: pptx, PowerPoint, Oracle brand, CloudWorld, slides, deck."
+description: "Use when the user asks to \"create Oracle slides\", \"edit an Oracle deck\", \"build a CloudWorld presentation\", \"review Oracle-branded PPTX\", or \"apply Oracle brand to slides\"."
+version: 2.0.0
+keywords:
+  - "Oracle"
+  - "PPTX"
+  - "PowerPoint"
+  - "CloudWorld"
+  - "Oracle brand"
+  - "Oracle Sans"
+  - "slides"
+  - "deck"
+  - "presentation"
+aliases:
+  - "oracle-pptx"
+  - "oracle-slides"
+domains:
+  - "oracle"
+  - "presentation"
 ---
-
 # OCI PPTX Skill
+
+## Do NOT load this skill when
+
+Do not load this skill for unrelated general programming, non-Oracle cloud work, or questions covered by a narrower sibling skill.
+When the request is only asking to find or install skills, use `find-skills` instead.
+
+## When to Use
+
+Load this skill for: the user asks to "create Oracle slides", "edit an Oracle deck", "build a CloudWorld presentation", "review Oracle-branded PPTX", or "apply Oracle brand to slides".
+
+Prefer this skill only for its named domain. For broader OCI architecture triage, start with `best-practices` as the router.
 ## Oracle-Branded Presentations with Cognitive Science
 
 ---
@@ -13,10 +40,10 @@ description: "Use when creating or editing Oracle-branded PowerPoint presentatio
 | Task | Tool | Loading Requirements |
 |------|------|----------------------|
 | Read/analyze content | `python -m markitdown file.pptx` | No additional files |
-| Edit existing Oracle template | [editing.md](editing.md) | **MANDATORY - read complete file, no range limits** |
-| Create from scratch | [pptxgenjs.md](pptxgenjs.md) | **MANDATORY - read complete file, no range limits** |
-| Select pillar colors | See Quick Colors below | Also read [references/color-palettes.md](references/color-palettes.md) for full palette |
-| Implementation code examples | PptxGenJS | Read [references/implementation-examples.md](references/implementation-examples.md) |
+| Edit existing Oracle template | Existing deck + `python-pptx` | Load `references/implementation-examples.md` only for code patterns |
+| Create from scratch | PptxGenJS or `python-pptx` | Load `references/implementation-examples.md` only when implementing |
+| Select pillar colors | See Quick Colors below | Load `references/color-palettes.md` only for full palette |
+| Implementation code examples | PptxGenJS / Python | Search `references/implementation-examples.md` for the needed pattern |
 
 Do NOT load multiple references simultaneously.
 
@@ -82,7 +109,7 @@ For full palette details, read [references/color-palettes.md](references/color-p
 **Backgrounds**: Dark `#0B2540` / `#1a1a1a` | Light `#FFFFFF` / `#F5F5F5`
 
 ### Oracle Footer (Mandatory on All Slides)
-- Left: `Copyright © 2026, Oracle and/or its affiliates`
+- Left: `Copyright © <current year>, Oracle and/or its affiliates`
 - Right (optional): omit for public events | `| Confidential: Internal` | `| Confidential: Restricted` | `| Confidential: Highly Restricted`
 
 ---
@@ -217,3 +244,7 @@ python -m markitdown presentation.pptx        # Text extraction
 python scripts/thumbnail.py presentation.pptx  # Visual thumbnail grid
 python scripts/office/unpack.py file.pptx dir/ # Raw XML inspection
 ```
+
+## Arguments
+
+$ARGUMENTS: Optional user-provided target, path, environment, symptom, or constraint. When empty, infer the narrowest safe scope from the current repository context and ask only if multiple high-impact choices remain.

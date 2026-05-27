@@ -1,9 +1,12 @@
 ---
 name: shadcn-svelte
-description: "Use when working with shadcn-svelte components, TanStack Table in Svelte 5, or Tailwind v4.1. Covers non-obvious reactivity bugs, library selection trade-offs, and migration pitfalls not in the official docs. Keywords: shadcn-svelte, TanStack Table, Tailwind v4.1, Svelte 5 runes, bits-ui, superforms, data table, svelte-check."
+description: "Use when working with shadcn-svelte components, TanStack Table in Svelte 5, or Tailwind v4.1. Covers non-obvious reactivity bugs, library selection trade-offs, and migration pitfalls not in the official docs. Keywords: shadcn-svelte, TanStack Table, Tailwind v4.1, Svelte 5 runes, bits-ui, superforms, data table, svelte-check. Triggers on "use shadcn-svelte" or "build Svelte data table"."
 ---
-
 # shadcn-svelte Expert Guidance
+
+## When to Use
+
+Load this skill when the user request matches the frontmatter description for shadcn-svelte Expert Guidance.
 
 **Assumption**: You know how to run `npx shadcn-svelte@latest add`. This skill covers what the docs won't tell you.
 
@@ -185,3 +188,7 @@ Space-separated HSL format (not `hsl(H,S,L)`) is required for the `/alpha` Tailw
 - Zod + superforms backend integration
 
 Do NOT load references for library choice, anti-pattern debugging, or Tailwind migration — handle with this file.
+
+## Arguments
+
+$ARGUMENTS: Optional user-provided target, path, environment, symptom, or constraint. When empty, infer the narrowest safe scope from the current repository context and ask only if multiple high-impact choices remain.

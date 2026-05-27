@@ -1,9 +1,12 @@
 ---
 name: refactor-module
-description: "Use when deciding whether to extract Terraform code into a reusable module, determining module boundaries, or migrating state after modularization. Covers the refactoring decision (modularize vs inline), anti-patterns causing module sprawl, and state migration risk. Keywords: terraform module, refactor terraform, module boundaries, terraform abstraction, module sprawl, state migration, terraform state mv."
+description: "Use when deciding whether to extract Terraform code into a reusable module, determining module boundaries, or migrating state after modularization. Covers the refactoring decision (modularize vs inline), anti-patterns causing module sprawl, and state migration risk. Keywords: terraform module, refactor terraform, module boundaries, terraform abstraction, module sprawl, state migration, terraform state mv. Triggers on "refactor Terraform module" or "decide module boundary"."
 ---
-
 # Terraform Module Refactoring - Decision Expert
+
+## When to Use
+
+Load this skill when the user request matches the frontmatter description for Terraform Module Refactoring - Decision Expert.
 
 **Assumption**: You know Terraform syntax. This covers when to modularize vs keep inline.
 
@@ -119,3 +122,7 @@ Prefer **composition** (small focused modules wired together) over **monolithic*
 - Basic modularization decisions (use Core Decision tree above)
 - Single resource state moves (use Refactoring Checklist above)
 - Terraform syntax help (see official docs)
+
+## Arguments
+
+$ARGUMENTS: Optional user-provided target, path, environment, symptom, or constraint. When empty, infer the narrowest safe scope from the current repository context and ask only if multiple high-impact choices remain.

@@ -1,9 +1,36 @@
 ---
 name: infrastructure-as-code
-description: "Use when writing Terraform for OCI, troubleshooting provider errors, managing state files, or implementing Resource Manager stacks. Covers terraform-provider-oci gotchas, resource lifecycle anti-patterns, state drift/corruption recovery, authentication precedence, and OCI Landing Zones. KEYWORDS: Terraform, OCI provider, state, Resource Manager, lifecycle, drift, import, 409, availability domain, boot volume, flex shape."
+description: "Use when the user asks to \"write Terraform for OCI\", \"debug terraform-provider-oci\", \"configure OCI Resource Manager\", \"fix OCI state\", or \"build OCI IaC\"."
+version: 2.0.0
+keywords:
+  - "OCI"
+  - "Terraform"
+  - "terraform-provider-oci"
+  - "Resource Manager"
+  - "Object Storage backend"
+  - "state"
+  - "drift"
+  - "import"
+  - "landing zone"
+aliases:
+  - "oci-terraform"
+  - "oci-iac"
+domains:
+  - "oci"
+  - "iac"
 ---
-
 # OCI Infrastructure as Code - Expert Knowledge
+
+## Do NOT load this skill when
+
+Do not load this skill for unrelated general programming, non-Oracle cloud work, or questions covered by a narrower sibling skill.
+When the request is only asking to find or install skills, use `find-skills` instead.
+
+## When to Use
+
+Load this skill for: the user asks to "write Terraform for OCI", "debug terraform-provider-oci", "configure OCI Resource Manager", "fix OCI state", or "build OCI IaC".
+
+Prefer this skill only for its named domain. For broader OCI architecture triage, start with `best-practices` as the router.
 
 ## NEVER Do This
 
@@ -83,20 +110,17 @@ resource "oci_core_instance" "web" {
 # WRONG - no locking, no collaboration
 terraform { backend "local" {} }
 
-# RIGHT - OCI Object Storage with S3-compatible backend
+# RIGHT - Terraform v1.12+ native OCI Object Storage backend
 terraform {
-  backend "s3" {
-    bucket                      = "terraform-state"
-    key                         = "prod/terraform.tfstate"
-    region                      = "us-phoenix-1"
-    endpoint                    = "https://<namespace>.compat.objectstorage.us-phoenix-1.oraclecloud.com"
-    skip_region_validation      = true
-    skip_credentials_validation = true
-    skip_metadata_api_check     = true
-    use_path_style              = true
+  backend "oci" {
+    bucket    = "terraform-state"
+    namespace = "<object-storage-namespace>"
+    key       = "prod/terraform.tfstate"
+    region    = "us-phoenix-1"
   }
 }
 ```
+Use the S3-compatible Object Storage backend only as a legacy fallback. Oracle marks that path deprecated for Terraform versions that support the native OCI backend.
 
 ## OCI Provider Authentication Gotchas
 
@@ -223,3 +247,7 @@ Load [`references/oci-terraform-patterns.md`](references/oci-terraform-patterns.
 - Landing Zone module usage examples
 
 Do NOT load for NEVER-list gotchas, lifecycle management, or state troubleshooting — this file covers those.
+
+## Arguments
+
+$ARGUMENTS: Optional user-provided target, path, environment, symptom, or constraint. When empty, infer the narrowest safe scope from the current repository context and ask only if multiple high-impact choices remain.

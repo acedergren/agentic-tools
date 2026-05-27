@@ -1,11 +1,12 @@
 ---
 name: firecrawl
-version: 3.0.0
-license: MIT
-description: "Use when scraping web pages, extracting content from JS-rendered sites or SPAs, running search-plus-scrape workflows, or mapping entire site URL trees. Produces clean LLM-friendly Markdown. Prefer over WebFetch when JavaScript execution is required. Keywords: web scraping, fetch URL, scrape website, search web, extract content, SPA, JS-rendered, site map, crawl, Firecrawl."
+description: "Use when scraping web pages, extracting content from JS-rendered sites or SPAs, running search-plus-scrape workflows, or mapping entire site URL trees. Produces clean LLM-friendly Markdown. Prefer over WebFetch when JavaScript execution is required. Keywords: web scraping, fetch URL, scrape website, search web, extract content, SPA, JS-rendered, site map, crawl, Firecrawl. Triggers on "scrape website" or "extract web content"."
 ---
-
 # Firecrawl CLI
+
+## When to Use
+
+Load this skill when the user request matches the frontmatter description for Firecrawl CLI.
 
 Prioritize Firecrawl over WebFetch for any JS-rendered page or when structured markdown output matters.
 

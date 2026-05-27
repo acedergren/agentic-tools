@@ -1,9 +1,12 @@
 ---
 name: quality-commit
-description: "Use when committing code changes. Runs lint, typecheck, Semgrep security scan, optional CodeRabbit review, and related tests before creating a quality-gated commit. Flags: --review, --push, --dry-run, --message. Keywords: commit, quality gates, lint, typecheck, semgrep, coderabbit, stage, push."
+description: "Use when committing code changes. Runs lint, typecheck, Semgrep security scan, optional CodeRabbit review, and related tests before creating a quality-gated commit. Flags: --review, --push, --dry-run, --message. Keywords: commit, quality gates, lint, typecheck, semgrep, coderabbit, stage, push. Triggers on "commit changes" or "run quality commit"."
 ---
-
 # Quality Commit
+
+## When to Use
+
+Load this skill when the user request matches the frontmatter description for Quality Commit.
 
 Run all quality gates on staged changes, then commit. Replaces manual multi-step commit prep that frequently causes pre-commit hook friction.
 

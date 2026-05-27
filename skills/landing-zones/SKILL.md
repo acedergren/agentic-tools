@@ -1,9 +1,37 @@
 ---
 name: landing-zones
-description: "Use when designing multi-tenant OCI environments, standing up landing zone Terraform stacks, enforcing Security Zones, or planning hub-spoke network topology. Covers OCI-specific compartment hierarchies, multi-tenant IAM decision trees, Security Zone automation, CIS Foundations compliance, and DRG routing. Keywords: landing zone, compartments, Security Zone, hub-spoke, DRG, CIS, multi-tenant, tenancy, IAM policy."
+description: "Use when the user asks to \"design an OCI landing zone\", \"plan compartments\", \"enable Security Zones\", \"build hub-spoke OCI\", or \"meet CIS OCI Foundations\"."
+version: 2.0.0
+keywords:
+  - "OCI"
+  - "landing zone"
+  - "compartment"
+  - "Security Zone"
+  - "Cloud Guard"
+  - "CIS"
+  - "hub-spoke"
+  - "DRG"
+  - "tenancy"
+  - "tag defaults"
+aliases:
+  - "oci-landing-zone"
+  - "oci-governance"
+domains:
+  - "oci"
+  - "governance"
 ---
-
 # OCI Landing Zones - Expert Architecture
+
+## Do NOT load this skill when
+
+Do not load this skill for unrelated general programming, non-Oracle cloud work, or questions covered by a narrower sibling skill.
+When the request is only asking to find or install skills, use `find-skills` instead.
+
+## When to Use
+
+Load this skill for: the user asks to "design an OCI landing zone", "plan compartments", "enable Security Zones", "build hub-spoke OCI", or "meet CIS OCI Foundations".
+
+Prefer this skill only for its named domain. For broader OCI architecture triage, start with `best-practices` as the router.
 
 ## NEVER Do This
 
@@ -37,7 +65,7 @@ Dev VCN:  10.0.0.0/16
 Test VCN: 10.0.0.0/16   # Cannot peer with Dev
 Prod VCN: 10.0.0.0/16   # Cannot peer with either
 
-VCN CIDR is IMMUTABLE. Wrong CIDR = complete rebuild + downtime.
+VCN CIDRs can be added or modified with restrictions, but overlapping address plans still block peering and can force disruptive migration. Plan non-overlapping ranges before provisioning.
 
 GOOD - non-overlapping allocation:
 Hub VCN:  10.0.0.0/16
@@ -200,3 +228,7 @@ Full scripts in `references/security-zone-automation.md`. Treat as MANDATORY for
 - Preparing architectural review or compliance audit
 - Comparing Core Landing Zone vs Operating Entities Landing Zone
 - Need official Oracle guidance on all five pillars (Security, Reliability, Performance, Cost, Operations)
+
+## Arguments
+
+$ARGUMENTS: Optional user-provided target, path, environment, symptom, or constraint. When empty, infer the narrowest safe scope from the current repository context and ask only if multiple high-impact choices remain.

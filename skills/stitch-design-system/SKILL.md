@@ -1,9 +1,12 @@
 ---
 name: stitch-design-system
-description: "Use when extracting a design system from a Stitch project to create a DESIGN.md source-of-truth for consistent multi-screen generation. Covers semantic translation of technical design assets into descriptive language Stitch interprets for visual consistency. Keywords: stitch, DESIGN.md, design system, design tokens, color palette, typography, component styling, design governance, multi-screen consistency."
+description: "Use when extracting a design system from a Stitch project to create a DESIGN.md source-of-truth for consistent multi-screen generation. Covers semantic translation of technical design assets into descriptive language Stitch interprets for visual consistency. Keywords: stitch, DESIGN.md, design system, design tokens, color palette, typography, component styling, design governance, multi-screen consistency. Triggers on "extract Stitch design system" or "create DESIGN.md"."
 ---
-
 # Stitch Design System
+
+## When to Use
+
+Load this skill when the user request matches the frontmatter description for Stitch Design System.
 
 Extract Stitch designs into semantic `DESIGN.md` files that serve as authoritative references for generating new screens with consistent visual language.
 
@@ -110,3 +113,7 @@ Before writing atmosphere, ask:
 - What is the visual weight? (lightweight/substantial)
 
 These answers should generate 2–3 specific sentences — not adjective lists.
+
+## Arguments
+
+$ARGUMENTS: Optional user-provided target, path, environment, symptom, or constraint. When empty, infer the narrowest safe scope from the current repository context and ask only if multiple high-impact choices remain.

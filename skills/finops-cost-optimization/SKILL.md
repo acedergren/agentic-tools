@@ -1,9 +1,37 @@
 ---
 name: finops-cost-optimization
-description: "Use when optimizing OCI costs, investigating unexpected bills, right-sizing resources, or planning Universal Credits commitments. Covers OCI-specific hidden cost traps (orphaned boot volumes, reserved IPs, stopped resources), Universal Credits non-transferability gotcha, shape migration savings, free tier maximization, and egress cost surprises. Keywords: cost, billing, budget, ECPU, boot volume, reserved IP, Universal Credits, free tier, egress, shape, FinOps."
+description: "Use when the user asks to \"optimize OCI cost\", \"investigate an OCI bill\", \"estimate egress cost\", \"right-size OCI resources\", or \"plan Resource Scheduler savings\"."
+version: 2.0.0
+keywords:
+  - "OCI"
+  - "Oracle Cloud"
+  - "FinOps"
+  - "billing"
+  - "budget"
+  - "egress"
+  - "FastConnect"
+  - "Resource Scheduler"
+  - "ECPU"
+  - "boot volume"
+aliases:
+  - "oci-finops"
+  - "oci-cost"
+domains:
+  - "oci"
+  - "finops"
 ---
-
 # OCI FinOps - Expert Knowledge
+
+## Do NOT load this skill when
+
+Do not load this skill for unrelated general programming, non-Oracle cloud work, or questions covered by a narrower sibling skill.
+When the request is only asking to find or install skills, use `find-skills` instead.
+
+## When to Use
+
+Load this skill for: the user asks to "optimize OCI cost", "investigate an OCI bill", "estimate egress cost", "right-size OCI resources", or "plan Resource Scheduler savings".
+
+Prefer this skill only for its named domain. For broader OCI architecture triage, start with `best-practices` as the router.
 
 ## NEVER Do This
 
@@ -61,12 +89,12 @@ OCI egress pricing:
   10-50 TB: $0.0085/GB
   50+ TB: contact sales
 
-15 TB bulk export = 5 TB chargeable × $0.0085/GB × 1024 = $43,520
+15 TB bulk export = 5 TB chargeable × 1024 GB/TB × $0.0085/GB = $43.52
 
 Cheaper alternatives:
-1. OCI FastConnect (1 Gbps): $1,100/month flat, breakeven at 130 GB/month
+1. OCI FastConnect: useful for private connectivity and predictable throughput; calculate port/provider costs before claiming egress savings
 2. Intra-region transfer between OCI services: FREE
-3. Cross-region transfer (OCI to OCI): FREE (intra-Oracle network)
+3. Cross-region transfer: verify current Oracle price list and source/destination services before calling it free
 ```
 
 **NEVER over-commit Universal Credits without understanding non-transferability**
@@ -188,8 +216,8 @@ Savings: $214/month (73% reduction)
 
 Implementation:
   Tag instances: Environment=Development
-  OCI Functions for start/stop
-  OCI Scheduler: Start weekdays 9am, Stop weekdays 6pm
+  OCI Resource Scheduler for supported start/stop resources
+  Custom Functions only when Resource Scheduler cannot express the policy
 ```
 
 ---
@@ -231,3 +259,7 @@ oci os bucket list --all --fields approximateCount,approximateSize
 - Querying usage reports via CLI (`oci usage-api`)
 - Managing service limits and quotas
 - Downloading detailed cost and usage reports
+
+## Arguments
+
+$ARGUMENTS: Optional user-provided target, path, environment, symptom, or constraint. When empty, infer the narrowest safe scope from the current repository context and ask only if multiple high-impact choices remain.

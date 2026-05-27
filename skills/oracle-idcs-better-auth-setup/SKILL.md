@@ -1,9 +1,37 @@
 ---
 name: oracle-idcs-better-auth-setup
-description: "Use when setting up Better Auth with Oracle IDCS/OCI IAM, configuring OIDC callback URLs, trusted origins, provider bootstrap order, or sharing an auth model between Fastify and Next.js. Entry point for the full auth foundation — routes to bridge or provisioning skills when narrowed. Keywords: Oracle IDCS, OCI IAM, Better Auth, OIDC, Fastify auth, Next.js auth, callback URL, trusted origins, provider bootstrap."
+description: "Use when the user asks to \"connect Better Auth to OCI IAM\", \"configure identity domain OIDC\", \"fix IDCS callback URL\", \"set trusted origins\", or \"bootstrap Oracle auth provider\"."
+version: 2.0.0
+keywords:
+  - "OCI IAM Identity Domains"
+  - "identity domain"
+  - "IDCS"
+  - "OIDC"
+  - "Better Auth"
+  - "Fastify"
+  - "Next.js"
+  - "callback URL"
+  - "trusted origins"
+aliases:
+  - "oci-identity-better-auth-setup"
+  - "idcs-better-auth"
+domains:
+  - "oracle"
+  - "identity"
+  - "auth"
 ---
-
 # Oracle IDCS + Better Auth Setup
+
+## Do NOT load this skill when
+
+Do not load this skill for unrelated general programming, non-Oracle cloud work, or questions covered by a narrower sibling skill.
+When the request is only asking to find or install skills, use `find-skills` instead.
+
+## When to Use
+
+Load this skill for: the user asks to "connect Better Auth to OCI IAM", "configure identity domain OIDC", "fix IDCS callback URL", "set trusted origins", or "bootstrap Oracle auth provider".
+
+Prefer this skill only for its named domain. For broader OCI architecture triage, start with `best-practices` as the router.
 
 Entry skill for the full auth foundation: Oracle adapter, OIDC config, trusted origins, callback URLs, provider bootstrap, and cross-app consistency.
 

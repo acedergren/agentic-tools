@@ -1,9 +1,12 @@
 ---
 name: tdd
-description: "Use when implementing features, fixing bugs, or adding deliberate test coverage. Enforces test-first (red-green-refactor) cycle, handles mock bootstrap for projects with mockReset:true, prevents code-before-tests violations. NOT for reviewing existing code or running test suites."
+description: "Use when implementing features, fixing bugs, or adding deliberate test coverage. Enforces test-first (red-green-refactor) cycle, handles mock bootstrap for projects with mockReset:true, prevents code-before-tests violations. NOT for reviewing existing code or running test suites. Triggers on "write test first" or "use TDD"."
 ---
-
 # TDD Implementation Skill
+
+## When to Use
+
+Load this skill when the user request matches the frontmatter description for TDD Implementation Skill.
 
 Enforce a strict test-driven development cycle: Red → Green → Refactor → Commit.
 

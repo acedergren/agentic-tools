@@ -1,9 +1,37 @@
 ---
 name: genai-services
-description: "Use when implementing OCI GenAI inference APIs, debugging rate limit (429) or token limit (400) errors, selecting between command-r vs command-r-plus, handling PHI/PII in prompts, or optimizing GenAI costs. Covers model cost trade-offs, token management, rate limit backoff, PHI redaction patterns, and response validation for healthcare."
+description: "Use when the user asks to \"call OCI Generative AI\", \"choose an OCI GenAI model\", \"debug GenAI 429\", \"plan OCI RAG\", or \"compare Command A, Llama, Gemini, or gpt-oss\"."
+version: 2.0.0
+keywords:
+  - "OCI Generative AI"
+  - "GenAI"
+  - "model catalog"
+  - "Command A"
+  - "Command R"
+  - "Llama"
+  - "Gemini"
+  - "gpt-oss"
+  - "RAG"
+  - "rate limit"
+aliases:
+  - "oci-genai"
+  - "generative-ai"
+domains:
+  - "oci"
+  - "ai"
 ---
-
 # OCI Generative AI Services
+
+## Do NOT load this skill when
+
+Do not load this skill for unrelated general programming, non-Oracle cloud work, or questions covered by a narrower sibling skill.
+When the request is only asking to find or install skills, use `find-skills` instead.
+
+## When to Use
+
+Load this skill for: the user asks to "call OCI Generative AI", "choose an OCI GenAI model", "debug GenAI 429", "plan OCI RAG", or "compare Command A, Llama, Gemini, or gpt-oss".
+
+Prefer this skill only for its named domain. For broader OCI architecture triage, start with `best-practices` as the router.
 
 ## NEVER Do This
 
@@ -22,10 +50,11 @@ GenAI service logs may retain data. Sending PHI violates HIPAA/GDPR regardless o
 - Hallucination rate: 5-15% for factual queries, higher for medical/legal
 - Always route AI-suggested content to human review queue before acting on it
 
-❌ **NEVER exceed token limits silently**
-- `command-r-plus`: 128k context (input + output combined)
-- `command-r`: 4k context
-- Exceeding limit: request truncated silently OR fails with 400 error
+❌ **NEVER hardcode stale model context windows, pricing, or quotas in app logic**
+- Oracle's OCI Generative AI catalog changes frequently.
+- Current hot words include Command A, Command R/R+, Llama, Gemini, Grok, Mistral, gpt-oss, embeddings, rerank, and model catalog.
+- Check the live model catalog, service limits, and price list before quoting exact numbers.
+- Exceeding model limits can truncate input, fail with 400, or degrade output quality depending on the API path.
 
 ❌ **NEVER call GenAI without rate limit handling** — 429s are common and predictable; see backoff pattern below
 
@@ -36,24 +65,15 @@ GenAI service logs may retain data. Sending PHI violates HIPAA/GDPR regardless o
 
 ## Model Selection
 
-| Model | Context | Input Cost/1M | Output Cost/1M | Use For |
-|-------|---------|---------------|----------------|---------|
-| command-r-plus | 128k | ~$15 | ~$75 | Complex reasoning, long docs, RAG |
-| command-r | 4k | ~$1.50 | ~$7.50 | Chat, short prompts, high volume |
-| embed-english-v3 | 512 | ~$0.10 | N/A | Semantic search (1000x cheaper than generation) |
-| llama-2-70b | 4k | ~$2 | ~$10 | Cost-effective, open weights |
+1. Check whether the workload is chat, summarization, tool use, RAG, embedding, reranking, multimodal, or agent orchestration.
+2. Open the current Oracle model catalog before selecting a model family. Do not assume Command R/R+ or Llama 2 are the only viable choices.
+3. Prefer embeddings/reranking for retrieval and classification-like search before using a generation model.
+4. Validate output quality on representative examples before changing model family, context size, or decoding parameters.
+5. Record the model OCID/name, region, date checked, and service-limit assumptions in the implementation notes.
 
-**Decision rule**: Start with command-r for everything. Upgrade to command-r-plus only when reasoning quality is demonstrably insufficient.
+## OCI GenAI Limits
 
-**Cost optimization**: Use embeddings for retrieval/search before invoking generation — same semantic result at 1000x lower cost.
-
-## OCI GenAI Rate Limits (Per Compartment)
-
-| Model | Requests/Min | Requests/Day |
-|-------|-------------|--------------|
-| command-r-plus | 20 | 1,000 |
-| command-r | 60 | 3,000 |
-| Embeddings | 100 | 10,000 |
+Treat rate limits, quotas, context windows, and prices as live service data. Check OCI service limits and the current model catalog for the target compartment and region before sizing retries, queues, or budgets.
 
 ## Rate Limit Backoff Pattern
 
@@ -81,9 +101,8 @@ def generate_with_backoff(genai_client, request, max_retries=5):
 ## Token Truncation
 
 ```python
-def truncate_for_model(text: str, model: str = "command-r-plus", max_output: int = 2000) -> str:
-    limits = {"command-r-plus": 128000, "command-r": 4000}
-    max_input_tokens = limits.get(model, 2000) - max_output
+def truncate_for_model(text: str, model_context_tokens: int, max_output: int = 2000) -> str:
+    max_input_tokens = model_context_tokens - max_output
     max_chars = max_input_tokens * 4  # ~4 chars per token
 
     if len(text) <= max_chars:
@@ -91,7 +110,7 @@ def truncate_for_model(text: str, model: str = "command-r-plus", max_output: int
     return "...[earlier content truncated]...\n" + text[-max_chars:]
 ```
 
-**Prompt token savings**: Verbose system prompts waste tokens at scale. "Summarize: diagnoses, meds, allergies, treatment plan." vs a 50-word instruction saves 50 tokens × 1000 req/day = $68/month at command-r-plus rates.
+**Prompt token savings**: Verbose system prompts waste tokens at scale. Measure current token usage and model pricing before claiming a dollar savings number.
 
 ## PHI Redaction Pattern
 
@@ -157,8 +176,8 @@ Before going live with PHI-adjacent GenAI:
 
 ## Reference Files
 
-**Load** [`references/oci-genai-reference.md`](references/oci-genai-reference.md) when you need:
-- Comprehensive GenAI API and SDK documentation
-- RAG implementation with OCI
-- GenAI Agents setup
-- Fine-tuning and custom model deployment
+**Load** [`references/oci-genai-reference.md`](references/oci-genai-reference.md) when you need current Oracle documentation anchors for the model catalog, SDK/API usage, RAG, GenAI Agents, embeddings, reranking, or custom model workflows. Use search inside the reference instead of loading it end to end.
+
+## Arguments
+
+$ARGUMENTS: Optional user-provided target, path, environment, symptom, or constraint. When empty, infer the narrowest safe scope from the current repository context and ask only if multiple high-impact choices remain.

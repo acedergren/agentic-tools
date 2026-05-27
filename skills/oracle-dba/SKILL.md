@@ -1,9 +1,40 @@
 ---
 name: oracle-dba
-description: "Use when managing Oracle Autonomous Database on OCI, troubleshooting performance, optimizing costs, or implementing HA/DR. ADB-specific gotchas, cost traps, SQL_ID debugging workflows, auto-scaling behavior, and version differences (19c/21c/23ai/26ai). Keywords: ADB, Autonomous Database, ECPU, auto-scaling, SQL_ID, wait events, ORA- errors, wallet, BYOL."
+description: "Use when the user asks to \"manage Autonomous AI Database\", \"debug ADB performance\", \"fix wallet connection\", \"optimize ECPU cost\", or \"use SQLcl with Oracle Database\"."
+version: 2.0.0
+keywords:
+  - "Oracle Database"
+  - "Autonomous AI Database"
+  - "ADB"
+  - "ECPU"
+  - "OCPU"
+  - "wallet"
+  - "SQLcl"
+  - "SQL_ID"
+  - "wait events"
+  - "Data Guard"
+aliases:
+  - "autonomous-database"
+  - "oracle-autonomous-database"
+  - "adb"
+domains:
+  - "oracle"
+  - "database"
 ---
+# Oracle Autonomous AI Database - Expert Knowledge
 
-# Oracle Autonomous Database - Expert Knowledge
+Use Autonomous AI Database and ADB as current/common terminology. Prefer ECPU wording for new guidance; keep OCPU only when quoting legacy configurations, API fields, or older docs that still use it.
+
+## Do NOT load this skill when
+
+Do not load this skill for unrelated general programming, non-Oracle cloud work, or questions covered by a narrower sibling skill.
+When the request is only asking to find or install skills, use `find-skills` instead.
+
+## When to Use
+
+Load this skill for: the user asks to "manage Autonomous AI Database", "debug ADB performance", "fix wallet connection", "optimize ECPU cost", or "use SQLcl with Oracle Database".
+
+Prefer this skill only for its named domain. For broader OCI architecture triage, start with `best-practices` as the router.
 
 ## NEVER Do This
 
@@ -18,7 +49,7 @@ GRANT CREATE SESSION, SELECT ON schema.table TO app_user;
 
 **NEVER scale ECPUs without checking wait events first**
 
-Scaling 2→4 ECPU costs $526/month extra. If root cause is bad SQL, that is wasted money.
+Scaling ECPUs without proof can waste budget. If root cause is bad SQL, more compute only hides the defect.
 ```
 Decision path:
 1. Check v$system_event for top wait events
@@ -31,16 +62,16 @@ Decision path:
 **NEVER assume stopped ADB = zero cost**
 ```
 Stopped ADB charges:
-  Compute: $0 (stopped)
-  Storage: $0.025/GB/month CONTINUES
-  Backups: Retention charges CONTINUE
+  CPU/ECPU billing: stopped
+  Storage: continues
+  Backups and retained resources: can continue
 
 For long-term idle (>60 days): Export via Data Pump, delete ADB, restore from backup.
 ```
 
 **NEVER create manual backups without retention (kept forever)**
 ```bash
-# WRONG - charged $0.025/GB/month FOREVER
+# WRONG - retained until explicitly removed, with ongoing storage impact
 oci db autonomous-database-backup create \
   --autonomous-database-id $ADB_ID \
   --display-name "pre-upgrade-backup"
@@ -50,16 +81,15 @@ oci db autonomous-database-backup create \
   --autonomous-database-id $ADB_ID \
   --display-name "pre-upgrade-backup" \
   --retention-days 30
-# 1TB × $0.025 × 12 months = $300/year if forgotten
 ```
 
 **NEVER enable auto-scaling without setting a max ECPU limit**
 ```
-Auto-scaling bills for PEAK usage each hour.
+Auto-scaling can bill for elevated usage during the hour.
 Base 2 ECPU → can scale to 6 ECPU (3× hard limit).
-Without max cap: $526/month → $1,578/month surprise.
+Without max cap: surprise spend is easy.
 
-RIGHT: Set Max ECPU = 4 in console (2× base) to cap at $1,052/month.
+RIGHT: Set a Max ECPU cap that matches the budget and workload SLO.
 ```
 
 **NEVER use ROWNUM with ORDER BY (wrong results)**
@@ -164,19 +194,19 @@ CANNOT: Use SYSDBA privileges (not available in ADB)
 
 **Service name performance impact:**
 
-| Service | CPU Allocation | Concurrency | Use For |
-|---------|---------------|-------------|---------|
-| HIGH | Dedicated OCPU | 1× ECPU | Interactive queries, OLTP |
-| MEDIUM | Shared OCPU | 2× ECPU | Reporting, batch |
-| LOW | Most sharing | 3× ECPU | Background tasks, ETL |
+| Service | Relative priority | Use For |
+|---------|-------------------|---------|
+| HIGH | Highest priority, least sharing | Interactive queries, OLTP |
+| MEDIUM | Balanced sharing | Reporting, batch |
+| LOW | Most sharing | Background tasks, ETL |
 
 Gotcha: Using HIGH for background jobs starves interactive users with no extra cost benefit.
 
 **Backup retention (automatic vs manual):**
 ```
 Automatic: Daily incremental + weekly full, 60-day default, INCLUDED in storage cost
-Manual: On-demand, FOREVER retention until manually deleted, $0.025/GB/month
-Cost trap: 10 manual backups × 1TB × $0.025 = $250/month ongoing
+Manual: On-demand, retained until policy or manual deletion
+Cost trap: forgotten manual backups keep consuming storage budget
 ```
 
 ---
@@ -234,3 +264,7 @@ Cost trap: 10 manual backups × 1TB × $0.025 = $250/month ongoing
 **See [`references/adb-security.md`](references/adb-security.md) for:** mTLS wallet configuration, private endpoints, VCN Service Gateway setup.
 
 **Pricing reference:** See [`references/cost-reference.md`](references/cost-reference.md) for ECPU/storage pricing tables and auto-scaling cost calculations.
+
+## Arguments
+
+$ARGUMENTS: Optional user-provided target, path, environment, symptom, or constraint. When empty, infer the narrowest safe scope from the current repository context and ask only if multiple high-impact choices remain.

@@ -1,9 +1,37 @@
 ---
 name: networking-management
-description: "Use when designing OCI VCN topology, troubleshooting connectivity failures, configuring Service Gateway to eliminate egress costs, choosing between Security Lists and NSGs, debugging transitive routing failures, or sizing Load Balancer subnets. Covers Service Gateway free egress, VCN CIDR immutability, peering non-transitivity, Security List hard limits, and stateful rule behavior."
+description: "Use when the user asks to \"design OCI networking\", \"debug VCN connectivity\", \"configure Service Gateway\", \"choose NSG vs security list\", or \"plan FastConnect or VPN\"."
+version: 2.0.0
+keywords:
+  - "OCI"
+  - "Oracle Cloud"
+  - "VCN"
+  - "subnet"
+  - "NSG"
+  - "security list"
+  - "Service Gateway"
+  - "DRG"
+  - "FastConnect"
+  - "VPN"
+aliases:
+  - "oci-networking"
+  - "vcn-management"
+domains:
+  - "oci"
+  - "networking"
 ---
-
 # OCI Networking
+
+## Do NOT load this skill when
+
+Do not load this skill for unrelated general programming, non-Oracle cloud work, or questions covered by a narrower sibling skill.
+When the request is only asking to find or install skills, use `find-skills` instead.
+
+## When to Use
+
+Load this skill for: the user asks to "design OCI networking", "debug VCN connectivity", "configure Service Gateway", "choose NSG vs security list", or "plan FastConnect or VPN".
+
+Prefer this skill only for its named domain. For broader OCI architecture triage, start with `best-practices` as the router.
 
 ## NEVER Do This
 
@@ -25,15 +53,15 @@ Service Gateway covers: Object Storage (all tiers), ADB private endpoints, Oracl
 # Target: Service Gateway OCID
 ```
 
-❌ **NEVER create a VCN with /24 CIDR — it cannot be resized**
+❌ **NEVER rely on VCN CIDR edits as an address-planning strategy**
 ```bash
-# WRONG - 256 IPs, exhausted quickly, immutable
+# WRONG - 256 IPs, exhausted quickly, hard to expand safely later
 oci network vcn create --cidr-block "10.0.0.0/24"
 
 # RIGHT - /16 gives 65,536 IPs, room for 256 /24 subnets
 oci network vcn create --cidr-block "10.0.0.0/16"
-# Migration requires: new VCN + resource migration + DNS + security rules = hours of downtime
 ```
+Oracle supports adding and modifying VCN CIDR ranges with restrictions. Treat edits as a controlled change: check subnet fit, route-table overlap, peer overlap, and DNS/security-rule blast radius before changing an existing VCN.
 
 ❌ **NEVER use /27 or smaller for Load Balancer subnets**
 ```bash
@@ -177,4 +205,8 @@ NSG db:   Allow 1521 from app NSG only
 - DRG, FastConnect, or VPN detailed configuration
 - Complex routing troubleshooting
 - Network Firewall setup
-- Comprehensive VCN and subnet CLI reference
+- VCN CIDR add/modify docs or subnet CLI reference
+
+## Arguments
+
+$ARGUMENTS: Optional user-provided target, path, environment, symptom, or constraint. When empty, infer the narrowest safe scope from the current repository context and ask only if multiple high-impact choices remain.

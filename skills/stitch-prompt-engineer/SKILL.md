@@ -1,12 +1,12 @@
 ---
 name: stitch-prompt-engineer
-description: "Use when enhancing, polishing, or fixing Stitch UI generation prompts. Adds UI/UX keywords, injects design system tokens, structures page hierarchy, and enforces hex color formatting. Triggers on: Stitch prompt, improve prompt, better output, redesign, multi-screen consistency, design system, DESIGN.md."
-allowed-tools:
-  - "Read"
-  - "Write"
+description: "Use when enhancing, polishing, or fixing Stitch UI generation prompts. Adds UI/UX keywords, injects design system tokens, structures page hierarchy, and enforces hex color formatting. Triggers on: Stitch prompt, improve prompt, better output, redesign, multi-screen consistency, design system, DESIGN.md. Triggers on "improve Stitch prompt" or "polish UI prompt"."
 ---
-
 # Enhance Prompt for Stitch
+
+## When to Use
+
+Load this skill when the user request matches the frontmatter description for Enhance Prompt for Stitch.
 
 ## NEVER
 
@@ -93,3 +93,7 @@ For targeted edits (not full-page prompts), include:
 
 Return enhanced prompt as text by default.
 If user requests file output: write `next-prompt.md` (for use with `stitch-loop` skill).
+
+## Arguments
+
+$ARGUMENTS: Optional user-provided target, path, environment, symptom, or constraint. When empty, infer the narrowest safe scope from the current repository context and ask only if multiple high-impact choices remain.

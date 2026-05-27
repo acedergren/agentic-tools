@@ -1,10 +1,12 @@
 ---
 name: turborepo
-version: 3.0.0
-description: "Use when making Turborepo monorepo architecture decisions: choosing between monorepo vs polyrepo, deciding when to split packages, debugging cache misses, setting package boundaries, or avoiding circular dependencies. NOT for basic CLI syntax. Triggers on: turborepo, turbo cache miss, package boundaries, monorepo architecture."
+description: "Use when making Turborepo monorepo architecture decisions: choosing between monorepo vs polyrepo, deciding when to split packages, debugging cache misses, setting package boundaries, or avoiding circular dependencies. NOT for basic CLI syntax. Triggers on: turborepo, turbo cache miss, package boundaries, monorepo architecture. Triggers on "debug turbo cache" or "design monorepo boundaries"."
 ---
-
 # Turborepo - Monorepo Architecture Expert
+
+## When to Use
+
+Load this skill when the user request matches the frontmatter description for Turborepo - Monorepo Architecture Expert.
 
 **Assumption**: You know `turbo run build`. This covers architectural decisions.
 

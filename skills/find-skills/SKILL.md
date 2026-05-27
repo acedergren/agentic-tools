@@ -1,9 +1,12 @@
 ---
 name: find-skills
-description: "Use when user asks to find, install, or search for agent skills. Also use when user asks 'can you do X' or 'is there a skill for X' where X is a specialized capability. Keywords: install skill, find skill, npx skills, skills.sh, extend agent, add capability."
+description: "Use when user asks to find, install, or search for agent skills. Also use when user asks 'can you do X' or 'is there a skill for X' where X is a specialized capability. Keywords: install skill, find skill, npx skills, skills.sh, extend agent, add capability. Triggers on "find skill" or "install skill"."
 ---
-
 # Find Skills
+
+## When to Use
+
+Load this skill when the user request matches the frontmatter description for Find Skills.
 
 Discover and install skills from the open agent skills ecosystem via the Skills CLI.
 
@@ -68,3 +71,7 @@ Options:
 - **Never install without `-g` unless user explicitly wants project-local** — project-local install puts skills in `./node_modules/.claude/` which most users don't want
 - **Never skip showing the skills.sh link** — users may want to inspect before installing
 - **Never assume `npx skills find` exhausts all options** — check known sources table above for OCI/workflow skills that may not be indexed yet
+
+## Arguments
+
+$ARGUMENTS: Optional user-provided target, path, environment, symptom, or constraint. When empty, infer the narrowest safe scope from the current repository context and ask only if multiple high-impact choices remain.

@@ -1,9 +1,37 @@
 ---
 name: oci-events
-description: Use when implementing event-driven automation, setting up CloudEvents rules, troubleshooting event delivery failures, or integrating OCI services via Functions/Streaming/Notifications. Covers event rule patterns, filter syntax, action types, dead letter queue configuration, and event-driven architecture anti-patterns. Keywords: events, CloudEvents, event rules, event filters, ONS, FAAS, OSS actions, DLQ, event-driven, reactive, serverless triggers.
+description: "Use when the user asks to \"create OCI Events rule\", \"trigger Functions from events\", \"route events to Streaming\", \"debug Events delivery\", or \"filter CloudEvents\"."
+version: 2.0.0
+keywords:
+  - "OCI Events"
+  - "CloudEvents"
+  - "Functions"
+  - "Streaming"
+  - "Notifications"
+  - "event rule"
+  - "event filter"
+  - "FAAS"
+  - "ONS"
+  - "serverless"
+aliases:
+  - "oracle-cloud-events"
+  - "events-service"
+domains:
+  - "oci"
+  - "events"
 ---
-
 # OCI Events Service - Event-Driven Architecture
+
+## Do NOT load this skill when
+
+Do not load this skill for unrelated general programming, non-Oracle cloud work, or questions covered by a narrower sibling skill.
+When the request is only asking to find or install skills, use `find-skills` instead.
+
+## When to Use
+
+Load this skill for: the user asks to "create OCI Events rule", "trigger Functions from events", "route events to Streaming", "debug Events delivery", or "filter CloudEvents".
+
+Prefer this skill only for its named domain. For broader OCI architecture triage, start with `best-practices` as the router.
 
 ## Events vs Alarms — First Decision
 
@@ -41,18 +69,17 @@ oci monitoring alarm create \
 | Resource lifecycle | Events | VCN created, policy updated, user added |
 | Performance | Alarms | Query latency > 2s, error rate > 5% |
 
-**NEVER forget to configure Dead Letter Queue (lost events)**
+**NEVER assume Events has built-in failed-delivery DLQ behavior**
 ```bash
-# BAD - no DLQ, failed events disappear silently
+# RISKY - no durable copy of matching events before function delivery
 oci events rule create \
   --display-name "Invoke-Function" \
   --condition '{"eventType": "com.oraclecloud.objectstorage.createobject"}' \
   --actions '{"actions": [{"actionType": "FAAS","isEnabled": true,"functionId": "ocid1.fnfunc.oc1..xxx"}]}'
-# If function fails, event is LOST — no retry, no error
+# If downstream processing fails, you need your own replay/compensation path
 
-# GOOD - pair rule with a Streaming DLQ action
-# Events that fail delivery go to stream for retry/analysis
-# Load events-cli.md for full DLQ setup pattern
+# GOOD - add a Streaming action when the architecture needs durable capture/replay
+# Treat Streaming as event capture, not as proof of built-in failed-delivery DLQ semantics
 ```
 
 **Cost impact**: Lost events = lost business transactions. E-commerce: 1 lost order event = $50-500 revenue loss. Healthcare: 1 lost patient record event = compliance violation.
@@ -152,7 +179,7 @@ Create this policy in the compartment where the event rule lives, or events sile
 
 ### Event Architecture Patterns and Filter Syntax
 
-**MANDATORY — READ ENTIRE FILE** [`events-patterns.md`](references/events-patterns.md) when:
+Load [`events-patterns.md`](references/events-patterns.md) only when:
 - Designing event-driven architecture (Object Storage → Function, Instance Lifecycle → Notification)
 - Writing complex event filter syntax (compartment, tags, resource attributes)
 - Looking up common event types by OCI service
@@ -166,7 +193,7 @@ Create this policy in the compartment where the event rule lives, or events sile
 
 ### OCI CLI for Events
 
-**MANDATORY — READ ENTIRE FILE** [`events-cli.md`](references/events-cli.md) when:
+Load [`events-cli.md`](references/events-cli.md) only when:
 - Creating event rules with filters
 - Configuring actions (Functions, Notifications, Streaming)
 - Troubleshooting event delivery failures
@@ -198,8 +225,8 @@ oci events rule create \
 
 ### OCI Events Reference (Official Oracle Documentation)
 
-**MANDATORY — READ ENTIRE FILE** [`oci-events-reference.md`](references/oci-events-reference.md) when:
-- Need comprehensive list of all OCI service event types
+Load [`oci-events-reference.md`](references/oci-events-reference.md) only when:
+- Need official links for OCI service event types
 - Understanding CloudEvents 1.0 specification in OCI
 - Implementing complex event patterns and filtering
 - Need official Oracle guidance on Events service architecture
@@ -209,3 +236,7 @@ oci events rule create \
 - Quick event rule creation (CLI examples above)
 - Common event patterns (architecture patterns in this skill)
 - Events vs Alarms decision (decision table above)
+
+## Arguments
+
+$ARGUMENTS: Optional user-provided target, path, environment, symptom, or constraint. When empty, infer the narrowest safe scope from the current repository context and ask only if multiple high-impact choices remain.

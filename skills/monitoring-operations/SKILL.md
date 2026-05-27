@@ -1,9 +1,37 @@
 ---
 name: monitoring-operations
-description: "Use when setting up OCI metrics, alarms, or log collection, or troubleshooting missing data and silent alarms. Covers metric namespace naming, MQL dimension requirements, alarm missing-data handling, Service Connector IAM gaps, and Cloud Guard integration. KEYWORDS: monitoring, alarm, metric, MQL, namespace, log, Service Connector, Log Analytics, Cloud Guard, missing data, oci_computeagent."
+description: "Use when the user asks to \"create OCI alarms\", \"debug missing metrics\", \"write MQL\", \"configure Service Connector\", or \"monitor OCI resources\"."
+version: 2.0.0
+keywords:
+  - "OCI"
+  - "Monitoring"
+  - "MQL"
+  - "alarm"
+  - "metric namespace"
+  - "Logging"
+  - "Service Connector"
+  - "Log Analytics"
+  - "Cloud Guard"
+  - "oci_computeagent"
+aliases:
+  - "oci-monitoring"
+  - "oci-observability"
+domains:
+  - "oci"
+  - "observability"
 ---
-
 # OCI Monitoring and Observability - Expert Knowledge
+
+## Do NOT load this skill when
+
+Do not load this skill for unrelated general programming, non-Oracle cloud work, or questions covered by a narrower sibling skill.
+When the request is only asking to find or install skills, use `find-skills` instead.
+
+## When to Use
+
+Load this skill for: the user asks to "create OCI alarms", "debug missing metrics", "write MQL", "configure Service Connector", or "monitor OCI resources".
+
+Prefer this skill only for its named domain. For broader OCI architecture triage, start with `best-practices` as the router.
 
 ## NEVER Do This
 
@@ -123,3 +151,7 @@ Load [`references/oci-monitoring-reference.md`](references/oci-monitoring-refere
 - Setting up Log Analytics workspace, APM, or Service Connector Hub in detail
 
 Do NOT load for alarm threshold patterns, namespace gotchas, or log troubleshooting — this file covers those.
+
+## Arguments
+
+$ARGUMENTS: Optional user-provided target, path, environment, symptom, or constraint. When empty, infer the narrowest safe scope from the current repository context and ask only if multiple high-impact choices remain.

@@ -1,9 +1,37 @@
 ---
 name: iam-identity-management
-description: "Use when writing IAM policies, troubleshooting 403/404 permission errors, setting up dynamic groups, or debugging IDCS federation. Covers OCI-specific policy syntax gotchas, principal type confusion, compartment hierarchy rules, verb hierarchy, and common authorization failures. KEYWORDS: IAM, policy, permission denied, dynamic group, compartment, IDCS, federation, 403, 404."
+description: "Use when the user asks to \"write OCI IAM policy\", \"debug OCI 403\", \"configure dynamic groups\", \"use identity domains\", or \"fix IDCS federation\"."
+version: 2.0.0
+keywords:
+  - "OCI IAM"
+  - "OCI IAM Identity Domains"
+  - "identity domain"
+  - "IDCS"
+  - "policy"
+  - "dynamic group"
+  - "compartment"
+  - "tenancy"
+  - "federation"
+  - "OIDC"
+aliases:
+  - "oci-iam"
+  - "identity-domains"
+domains:
+  - "oci"
+  - "identity"
 ---
-
 # OCI IAM and Identity Management - Expert Knowledge
+
+## Do NOT load this skill when
+
+Do not load this skill for unrelated general programming, non-Oracle cloud work, or questions covered by a narrower sibling skill.
+When the request is only asking to find or install skills, use `find-skills` instead.
+
+## When to Use
+
+Load this skill for: the user asks to "write OCI IAM policy", "debug OCI 403", "configure dynamic groups", "use identity domains", or "fix IDCS federation".
+
+Prefer this skill only for its named domain. For broader OCI architecture triage, start with `best-practices` as the router.
 
 ## NEVER Do This
 
@@ -210,3 +238,7 @@ Load [`references/oci-iam-policies-reference.md`](references/oci-iam-policies-re
 - Implementing least-privilege access for a specific service
 
 Do NOT load for quick syntax examples, troubleshooting 403/404, or dynamic group rules — this file covers those.
+
+## Arguments
+
+$ARGUMENTS: Optional user-provided target, path, environment, symptom, or constraint. When empty, infer the narrowest safe scope from the current repository context and ask only if multiple high-impact choices remain.

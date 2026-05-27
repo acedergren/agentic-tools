@@ -1,9 +1,36 @@
 ---
 name: sqlite-to-oracle-planner
-description: "Use when starting a SQLite-to-Oracle migration on a Node.js/TypeScript codebase. Scans for all SQLite touch points (imports, file extensions, connection strings, schema syntax, fallback branches) and produces a structured [SQLITE_REPLACE] migration manifest for implementation agents. KEYWORDS: SQLite, Oracle, migration, better-sqlite3, oracledb, drizzle-orm, typeorm, AUTOINCREMENT, connection string, manifest."
+description: "Use when the user asks to \"migrate SQLite to Oracle\", \"replace better-sqlite3\", \"plan Oracle migration\", \"convert SQLite schema\", or \"find SQLite touch points\"."
+version: 2.0.0
+keywords:
+  - "SQLite"
+  - "Oracle"
+  - "migration"
+  - "better-sqlite3"
+  - "oracledb"
+  - "Drizzle"
+  - "TypeORM"
+  - "AUTOINCREMENT"
+  - "connection string"
+aliases:
+  - "sqlite-oracle-migration"
+  - "oracle-migration-planner"
+domains:
+  - "oracle"
+  - "migration"
 ---
-
 # SQLite-to-Oracle Planner
+
+## Do NOT load this skill when
+
+Do not load this skill for unrelated general programming, non-Oracle cloud work, or questions covered by a narrower sibling skill.
+When the request is only asking to find or install skills, use `find-skills` instead.
+
+## When to Use
+
+Load this skill for: the user asks to "migrate SQLite to Oracle", "replace better-sqlite3", "plan Oracle migration", "convert SQLite schema", or "find SQLite touch points".
+
+Prefer this skill only for its named domain. For broader OCI architecture triage, start with `best-practices` as the router.
 
 ## Role
 
@@ -117,3 +144,7 @@ Each `[SQLITE_REPLACE]` marker = one atomic implementation unit for Agent 2+.
 | Ignoring `.db` data files | Flag them — they require data migration planning, not just code changes. |
 | Missing `drizzle-orm/sqlite-core` schema files | Drizzle's Oracle support differs; all schema files need flagging. |
 | Flagging Oracle-side code as SQLite | Filter false positives — `sqlite` may appear in migration docs or comments. |
+
+## Arguments
+
+$ARGUMENTS: Optional user-provided target, path, environment, symptom, or constraint. When empty, infer the narrowest safe scope from the current repository context and ask only if multiple high-impact choices remain.

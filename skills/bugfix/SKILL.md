@@ -1,9 +1,12 @@
 ---
 name: bugfix
-description: "Use when given a bug report, failing test, stack trace, or CI failure that needs diagnosis and repair. Autonomously diagnoses root cause, implements minimal fix, verifies correctness, and commits. Keywords: fix bug, failing test, stack trace, CI failure, debug error, broken test."
+description: "Use when given a bug report, failing test, stack trace, or CI failure that needs diagnosis and repair. Autonomously diagnoses root cause, implements minimal fix, verifies correctness, and commits. Keywords: fix bug, failing test, stack trace, CI failure, debug error, broken test. Triggers on "fix bug" or "debug failing test"."
 ---
-
 # Bugfix
+
+## When to Use
+
+Load this skill when the user request matches the frontmatter description for Bugfix.
 
 Autonomous end-to-end bug fix: diagnose from evidence, find root cause, minimal fix, verify, commit.
 

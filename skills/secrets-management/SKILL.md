@@ -1,9 +1,37 @@
 ---
 name: secrets-management
-description: "Use when storing secrets in OCI Vault, debugging 401/403 secret retrieval errors, implementing secret rotation, configuring instance principal auth, or caching Vault API calls. Covers IAM dual-permission gotcha, vault hierarchy confusion, temp file security window, BASE64 encoding requirement, and cost optimization."
+description: "Use when the user asks to \"store OCI secrets\", \"rotate Vault secrets\", \"debug secret retrieval 403\", \"use instance principals for Vault\", or \"replicate secrets\"."
+version: 2.0.0
+keywords:
+  - "OCI"
+  - "Vault"
+  - "Secret Management"
+  - "KMS"
+  - "BASE64"
+  - "secret rotation"
+  - "automatic generation"
+  - "replication"
+  - "dynamic group"
+  - "instance principal"
+aliases:
+  - "oci-secrets"
+  - "oci-vault"
+domains:
+  - "oci"
+  - "security"
 ---
-
 # OCI Vault and Secrets Management
+
+## Do NOT load this skill when
+
+Do not load this skill for unrelated general programming, non-Oracle cloud work, or questions covered by a narrower sibling skill.
+When the request is only asking to find or install skills, use `find-skills` instead.
+
+## When to Use
+
+Load this skill for: the user asks to "store OCI secrets", "rotate Vault secrets", "debug secret retrieval 403", "use instance principals for Vault", or "replicate secrets".
+
+Prefer this skill only for its named domain. For broader OCI architecture triage, start with `best-practices` as the router.
 
 ## NEVER Do This
 
@@ -28,12 +56,12 @@ GOOD: "Allow dynamic-group app-prod to read secret-family in compartment AppSecr
        where target.secret.name = 'db-*'"
 ```
 
-❌ **NEVER retrieve secrets without caching**
-- Cost: $0.03 per 10,000 requests (first 10k/month free)
-- Without cache: 1000 req/hr × 24 × 30 = 720k/month = **$2.16/month**
-- With 60-min cache: 24 calls/day = 720/month = **FREE** (98% cost reduction)
+❌ **NEVER retrieve secrets without a cache or refresh strategy**
+- OCI Secret Management is listed as free, so cache for latency, resilience, throttling, and blast-radius control rather than request-cost savings.
+- Keep TTL shorter than the rotation detection window.
+- Force refresh on authentication failures that may indicate rotated downstream credentials.
 
-❌ **NEVER use PLAIN content type** — always use BASE64 encoding; PLAIN is deprecated and may fail in future API versions
+❌ **NEVER confuse Console plaintext with API payload encoding** — Console plaintext entry is encoded before submission; API/SDK automation should send BASE64 secret content explicitly.
 
 ❌ **NEVER hardcode Vault OCIDs in code** — store in environment variables; OCIDs leak to repos and aren't portable across tenancies
 
@@ -136,7 +164,12 @@ encoded = secret_bundle.data.secret_bundle_content.content
 decoded = base64.b64decode(encoded).decode('utf-8')  # Both steps required
 ```
 
-**Not all OCI regions have Vault service** — check availability before designing architecture. Cross-region secret access adds 10-50ms latency.
+**Secret Management is available in OCI commercial regions** — still verify special realms, sovereign regions, and cross-region replication requirements before designing architecture.
+
+**Use managed lifecycle features where possible:**
+- Automatic secret generation can reduce password-handling code.
+- Automatic rotation supports service-managed rotation for supported targets.
+- Cross-region replication can copy a secret to up to three destination regions for DR and locality.
 
 ## Instance Principal Auth (Production Pattern)
 
@@ -157,8 +190,8 @@ secrets_client = oci.secrets.SecretsClient(config={}, signer=signer)
 
 ## Reference Files
 
-**Load** [`references/oci-vault-reference.md`](references/oci-vault-reference.md) when you need:
-- Comprehensive Vault/KMS API documentation
-- HSM-backed key protection setup
-- Cross-region secret replication
-- Official Oracle guidance on Vault architecture
+**Load** [`references/oci-vault-reference.md`](references/oci-vault-reference.md) only when you need current Oracle documentation anchors for Vault/KMS, BASE64 secret content, automatic generation, rotation, promotion, or cross-region replication. Use the links in the reference instead of loading broad external docs.
+
+## Arguments
+
+$ARGUMENTS: Optional user-provided target, path, environment, symptom, or constraint. When empty, infer the narrowest safe scope from the current repository context and ask only if multiple high-impact choices remain.

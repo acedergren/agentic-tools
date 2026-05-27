@@ -1,9 +1,37 @@
 ---
 name: compute-management
-description: "Use when launching OCI compute instances, troubleshooting out-of-capacity or boot failures, optimizing compute costs, or handling instance lifecycle. Covers shape selection, capacity planning, service limits, instance principal auth, and production gotchas. KEYWORDS: compute, instance, shape, capacity, OCPU, boot volume, launch, flex."
+description: "Use when the user asks to \"launch OCI compute\", \"choose an OCI shape\", \"debug compute capacity\", \"configure instance principals\", or \"optimize OCI instance cost\"."
+version: 2.0.0
+keywords:
+  - "OCI"
+  - "Oracle Cloud"
+  - "Compute"
+  - "instance"
+  - "shape"
+  - "OCPU"
+  - "ECPU"
+  - "boot volume"
+  - "capacity"
+  - "instance principal"
+aliases:
+  - "oci-compute"
+  - "compute-shapes"
+domains:
+  - "oci"
+  - "compute"
 ---
-
 # OCI Compute Management - Expert Knowledge
+
+## Do NOT load this skill when
+
+Do not load this skill for unrelated general programming, non-Oracle cloud work, or questions covered by a narrower sibling skill.
+When the request is only asking to find or install skills, use `find-skills` instead.
+
+## When to Use
+
+Load this skill for: the user asks to "launch OCI compute", "choose an OCI shape", "debug compute capacity", "configure instance principals", or "optimize OCI instance cost".
+
+Prefer this skill only for its named domain. For broader OCI architecture triage, start with `best-practices` as the router.
 
 ## NEVER Do This
 
@@ -137,3 +165,7 @@ Load [`references/oci-compute-shapes-reference.md`](references/oci-compute-shape
 - Need official Oracle specs (memory limits, OCPU counts, network bandwidth)
 
 Do NOT load for quick cost comparisons, capacity troubleshooting, or shape selection — this file covers those.
+
+## Arguments
+
+$ARGUMENTS: Optional user-provided target, path, environment, symptom, or constraint. When empty, infer the narrowest safe scope from the current repository context and ask only if multiple high-impact choices remain.

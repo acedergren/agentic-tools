@@ -1,9 +1,36 @@
 ---
 name: oracle-idcs-org-provisioning
-description: "Use when mapping IDCS claims to org membership after OAuth login succeeds. Covers mapProfileToUser, session.create.before, session.create.after hooks, MERGE INTO upserts, tenant-org mapping, and first-admin bootstrap. Keywords: IDCS groups, org_members, provisioning, session hooks, tenant map, MERGE INTO."
+description: "Use when the user asks to \"map IDCS groups to orgs\", \"provision org_members from identity domains\", \"fix Better Auth active org\", or \"bootstrap first admin\"."
+version: 2.0.0
+keywords:
+  - "OCI IAM Identity Domains"
+  - "identity domain"
+  - "IDCS"
+  - "Better Auth"
+  - "org_members"
+  - "groups claim"
+  - "tenant map"
+  - "MERGE INTO"
+aliases:
+  - "oci-identity-org-provisioning"
+  - "idcs-org-provisioning"
+domains:
+  - "oracle"
+  - "identity"
+  - "auth"
 ---
-
 # Oracle IDCS Org Provisioning
+
+## Do NOT load this skill when
+
+Do not load this skill for unrelated general programming, non-Oracle cloud work, or questions covered by a narrower sibling skill.
+When the request is only asking to find or install skills, use `find-skills` instead.
+
+## When to Use
+
+Load this skill for: the user asks to "map IDCS groups to orgs", "provision org_members from identity domains", "fix Better Auth active org", or "bootstrap first admin".
+
+Prefer this skill only for its named domain. For broader OCI architecture triage, start with `best-practices` as the router.
 
 Use when login succeeds but tenant, role, or org membership still has to become real in Oracle.
 

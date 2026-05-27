@@ -1,9 +1,31 @@
 ---
 name: fastify-better-auth-bridge
-description: "Use when integrating Better Auth session resolution into a Fastify 5 application via onRequest hooks, decorateRequest, and Web Request bridging. Covers cookie forwarding, org context patching for IDCS-provisioned users, and Symbol-backed decorator state. Keywords: Better Auth, Fastify 5, decorateRequest, onRequest, auth.api.getSession, session bridge, cookie forwarding, IDCS, org context."
+description: "Use when the user asks to \"bridge Better Auth into Fastify\", \"fix Fastify session resolution\", \"forward auth cookies\", \"patch IDCS org context\", or \"decorate Fastify request auth\"."
+version: 2.0.0
+keywords:
+  - "Better Auth"
+  - "Fastify 5"
+  - "IDCS"
+  - "identity domain"
+  - "cookie forwarding"
+  - "Web Request"
+  - "decorateRequest"
+  - "org context"
+  - "activeOrganizationId"
+aliases:
+  - "fastify-auth-bridge"
+  - "better-auth-fastify"
+domains:
+  - "auth"
+  - "oracle-adjacent"
 ---
-
 # Fastify Better Auth Bridge
+
+## When to Use
+
+Load this skill for: the user asks to "bridge Better Auth into Fastify", "fix Fastify session resolution", "forward auth cookies", "patch IDCS org context", or "decorate Fastify request auth".
+
+Prefer this skill only for its named domain. For broader OCI architecture triage, start with `best-practices` as the router.
 
 Wire Better Auth session resolution into Fastify 5 via the `onRequest` hook. Use this when Better Auth already exists but Fastify lacks the framework bridge.
 
