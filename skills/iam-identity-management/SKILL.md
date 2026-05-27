@@ -1,6 +1,6 @@
 ---
 name: iam-identity-management
-description: "Use when the user asks to \"write OCI IAM policy\", \"debug OCI 403\", \"configure dynamic groups\", \"use identity domains\", or \"fix IDCS federation\"."
+description: "Use when the user asks to \"write OCI IAM policy\", \"debug OCI 403\", \"Terraform apply gets 403\", \"configure dynamic groups\", or \"use identity domains\"."
 version: 2.0.0
 keywords:
   - "OCI IAM"
@@ -13,6 +13,9 @@ keywords:
   - "tenancy"
   - "federation"
   - "OIDC"
+  - "Terraform apply 403"
+  - "Resource Manager"
+  - "orm-family"
 aliases:
   - "oci-iam"
   - "identity-domains"
@@ -29,7 +32,7 @@ When the request is only asking to find or install skills, use `find-skills` ins
 
 ## When to Use
 
-Load this skill for: the user asks to "write OCI IAM policy", "debug OCI 403", "configure dynamic groups", "use identity domains", or "fix IDCS federation".
+Load this skill for: the user asks to "write OCI IAM policy", "debug OCI 403", "Terraform apply gets 403", "configure dynamic groups", "use identity domains", or "fix IDCS federation".
 
 Prefer this skill only for its named domain. For broader OCI architecture triage, start with `best-practices` as the router.
 
@@ -119,6 +122,18 @@ Caller is identified but explicitly lacks permission.
 ```
 inspect < read < use < manage
 ```
+
+### Terraform and Resource Manager 403s
+
+Before changing HCL, identify the principal and scope:
+
+| Symptom | Check first |
+| --- | --- |
+| Terraform local apply gets 403 | API key user, session-token profile, identity-domain group mapping, and target resource policy |
+| Terraform on Compute gets 403 | Instance dynamic group membership and policy on target resource family |
+| Resource Manager stack/job gets 403 | `orm-*` permissions plus target service permissions in the target compartment |
+| Resource Manager dynamic group cannot create VCN | Whether the principal is actually a Resource Manager/user context, and whether `manage virtual-network-family` is granted where the VCN is created |
+| Identity-domain group can log in but cannot apply | Group mapping, exact group name, policy subject, compartment policy location |
 
 ## Policy Syntax Gotchas
 
@@ -238,6 +253,8 @@ Load [`references/oci-iam-policies-reference.md`](references/oci-iam-policies-re
 - Implementing least-privilege access for a specific service
 
 Do NOT load for quick syntax examples, troubleshooting 403/404, or dynamic group rules — this file covers those.
+
+Load [`../infrastructure-as-code/references/oci-terraform-auth-matrix.md`](../infrastructure-as-code/references/oci-terraform-auth-matrix.md) when Terraform, OCI DevOps, Resource Manager, Compute instance principals, resource principals, OKE workload identity, Cloud Shell, or CI/CD federation affect the caller.
 
 ## Arguments
 

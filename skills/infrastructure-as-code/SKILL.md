@@ -1,253 +1,115 @@
 ---
 name: infrastructure-as-code
-description: "Use when the user asks to \"write Terraform for OCI\", \"debug terraform-provider-oci\", \"configure OCI Resource Manager\", \"fix OCI state\", or \"build OCI IaC\"."
+description: "Use when the user asks to \"Terraform state on OCI\", \"native OCI backend\", \"debug terraform-provider-oci\", \"Terraform import OCI\", or \"Terraform apply 403\"."
 version: 2.0.0
 keywords:
   - "OCI"
+  - "Oracle Cloud"
   - "Terraform"
   - "terraform-provider-oci"
+  - "native OCI backend"
+  - "Terraform state"
   - "Resource Manager"
-  - "Object Storage backend"
-  - "state"
-  - "drift"
-  - "import"
-  - "landing zone"
+  - "Terraform import"
+  - "moved block"
+  - "provider pinning"
+  - "government cloud Terraform"
+  - "OCI Terraform auth"
+  - "OCI module quality"
 aliases:
   - "oci-terraform"
   - "oci-iac"
+  - "terraform-oci"
 domains:
   - "oci"
   - "iac"
 ---
-# OCI Infrastructure as Code - Expert Knowledge
+# OCI Terraform Hub
 
-## Do NOT load this skill when
-
-Do not load this skill for unrelated general programming, non-Oracle cloud work, or questions covered by a narrower sibling skill.
-When the request is only asking to find or install skills, use `find-skills` instead.
+Use this skill as the canonical router for Terraform and OpenTofu-style OCI infrastructure work. Keep high-drift provider, backend, region, and cost facts in references and verify official docs before giving current claims.
 
 ## When to Use
 
-Load this skill for: the user asks to "write Terraform for OCI", "debug terraform-provider-oci", "configure OCI Resource Manager", "fix OCI state", or "build OCI IaC".
+Load this skill for: the user asks to "Terraform state on OCI", "native OCI backend", "debug terraform-provider-oci", "Terraform import OCI", "OCI Terraform auth", "OCI module quality", "government cloud Terraform", "Terraform apply 403", or "build OCI IaC".
 
-Prefer this skill only for its named domain. For broader OCI architecture triage, start with `best-practices` as the router.
+Also load it when Terraform touches an OCI sibling domain, then load the sibling skill only for that domain detail:
+
+| Terraform task | Also load |
+| --- | --- |
+| Resource Manager stack, job, source provider, or private endpoint | `oci-resource-manager` |
+| VCN, subnet, route table, DRG, Service Gateway, NAT Gateway | `networking-management` |
+| IAM policy, identity domain, dynamic group, 403/404 | `iam-identity-management` |
+| Vault secret, wallet, password, private key, sensitive output | `secrets-management` |
+| Capacity, quota, shape, boot volume, instance principal | `compute-management` |
+| Estimate, budget, Resource Scheduler, egress, quota cost | `finops-cost-optimization` |
+
+## Do NOT load this skill when
+
+Do not load this skill for unrelated general programming, non-Oracle cloud work, or pure Oracle service operations without Terraform. Use `oci` for OCI skill-pack routing and `best-practices` for broad OCI architecture triage.
 
 ## NEVER Do This
 
-**NEVER hardcode OCIDs in Terraform (breaks portability)**
-```hcl
-# WRONG - breaks when moving between regions/tenancies
-resource "oci_core_instance" "web" {
-  compartment_id = "ocid1.compartment.oc1..aaaaaa..."  # Hardcoded!
-  subnet_id      = "ocid1.subnet.oc1.phx.bbbbbb..."   # Hardcoded!
-}
+**NEVER default new Terraform state on OCI to S3-compatible Object Storage.**
+For Terraform v1.12 and later, prefer the native `backend "oci"` with Object Storage, state locking, and bucket versioning. Use S3-compatible Object Storage only as a legacy fallback when the target Terraform runtime cannot use the native OCI backend.
 
-# RIGHT - variables or data sources
-resource "oci_core_instance" "web" {
-  compartment_id = var.compartment_ocid
-  subnet_id      = data.oci_core_subnet.existing.id
-}
-```
+**NEVER put credentials, generated passwords, wallets, or private keys in durable state by accident.**
+`sensitive = true` redacts CLI/UI output but does not remove values from state or plan files. Prefer passing secret OCIDs, letting workloads retrieve secrets at runtime, and using Terraform ephemeral or write-only features only when the Terraform version and OCI provider/resource support them.
 
-**NEVER hardcode availability domain names**
-```hcl
-# WRONG - AD names are tenant-specific (fMgC: prefix differs per tenancy)
-availability_domain = "fMgC:US-ASHBURN-AD-1"
+**NEVER treat Resource Manager as just "Terraform in the console."**
+Resource Manager owns stack state, job execution, variables, provider retrieval, source providers, private endpoints, and IAM behavior. Route those cases to `oci-resource-manager`.
 
-# RIGHT - query dynamically
-data "oci_identity_availability_domains" "ads" {
-  compartment_id = var.tenancy_ocid
-}
-resource "oci_core_instance" "web" {
-  availability_domain = data.oci_identity_availability_domains.ads.availability_domains[0].name
-}
-```
+**NEVER diagnose `Terraform apply gets 403` before identifying the caller.**
+Decide whether the caller is a local API key user, session-token profile, CI principal, instance principal, resource principal, Resource Manager job/user, or OKE workload identity. Then check policy location, principal type, verb, resource family, and compartment scope.
 
-**NEVER use `preserve_boot_volume = true` in dev/test (default behavior is true!)**
-```hcl
-# WRONG - default! Orphans boot volumes when instance is destroyed
-resource "oci_core_instance" "dev" {
-  # preserve_boot_volume not set = defaults to true
-}
+**NEVER trust an Oracle-branded Terraform module just because it is official.**
+Check release recency, provider constraints, issue activity, examples, supported resources, sensitive outputs, generated plan shape, and upgrade path before recommending any module.
 
-# RIGHT - explicit cleanup in dev/test
-resource "oci_core_instance" "dev" {
-  preserve_boot_volume = false
-}
-```
-Cost impact: dev team with 10 instances cycling through testing = $50–500/month in silent orphaned volumes.
+**NEVER hardcode tenancy-specific values unless the deployment contract requires it.**
+Avoid hardcoded availability-domain names, compartment OCIDs, subnet IDs, region domains, and provider endpoints. Query or inject them as variables/data sources and document the owning tenancy boundary.
 
-**NEVER skip `lifecycle` blocks on production databases**
-```hcl
-# RIGHT - protect production resources from accidental destroy
-resource "oci_database_autonomous_database" "prod" {
-  lifecycle {
-    prevent_destroy = true
-    ignore_changes  = [defined_tags]  # Ignore tag edits made via console
-  }
-}
-```
-Without this: a mistyped `terraform destroy -target` deletes a production database permanently.
+## Decision Rules
 
-**NEVER use `count` for resources that shouldn't be replaced on list reorder**
-```hcl
-# WRONG - reordering instance_names from ["web1","web2"] to ["web0","web1","web2"]
-#         causes Terraform to RECREATE all instances
-resource "oci_core_instance" "web" {
-  count        = length(var.instance_names)
-  display_name = var.instance_names[count.index]
-}
+### State backend
 
-# RIGHT - for_each with stable keys
-resource "oci_core_instance" "web" {
-  for_each     = toset(var.instance_names)
-  display_name = each.value
-}
-```
+1. Terraform v1.12+ and normal team collaboration: use native `backend "oci"`.
+2. Resource Manager stack: let Resource Manager manage state; do not force a local backend into the stack.
+3. Terraform older than v1.12 or constrained runtime: use S3-compatible Object Storage only as a documented legacy fallback.
+4. Local state: use only for disposable experiments; never for team or production state.
 
-**NEVER store Terraform state locally for team use**
-```hcl
-# WRONG - no locking, no collaboration
-terraform { backend "local" {} }
+### Auth
 
-# RIGHT - Terraform v1.12+ native OCI Object Storage backend
-terraform {
-  backend "oci" {
-    bucket    = "terraform-state"
-    namespace = "<object-storage-namespace>"
-    key       = "prod/terraform.tfstate"
-    region    = "us-phoenix-1"
-  }
-}
-```
-Use the S3-compatible Object Storage backend only as a legacy fallback. Oracle marks that path deprecated for Terraform versions that support the native OCI backend.
+Choose auth by execution context, not habit:
 
-## OCI Provider Authentication Gotchas
+| Context | Default direction |
+| --- | --- |
+| Local laptop | API key profile or short-lived security token profile |
+| GitHub Actions / external CI | Approved federation/OIDC if configured; otherwise tightly scoped API key secret |
+| OCI DevOps | Service/resource principal with dynamic group policies |
+| Resource Manager | Region-only provider block; stack/user/job IAM handled by Resource Manager |
+| Compute instance | `auth = "InstancePrincipal"` with matching dynamic group and policies |
+| Function or supported OCI service | `auth = "ResourcePrincipal"` |
+| OKE workload | `auth = "OKEWorkloadIdentity"` when supported |
 
-**Authentication precedence** (silent override is a common footgun):
-1. Explicit provider block credentials
-2. `TF_VAR_*` environment variables
-3. `~/.oci/config` file (DEFAULT profile)
-4. Instance Principal (`auth = "InstancePrincipal"`)
+### Adoption and drift
 
-Common mistake: setting env vars but an explicit provider block overrides them without any warning.
+Prefer provider pinning, `terraform import`, import blocks, moved blocks, lifecycle review, and official import IDs. Treat delete/recreate as a last resort after confirming data-loss, replacement, and downtime risk.
 
-**Instance Principal for Terraform running on OCI compute:**
-```hcl
-provider "oci" {
-  auth   = "InstancePrincipal"
-  region = var.region
-}
-```
-Critical: the instance must be in the dynamic group BEFORE Terraform runs. If added after, auth fails with the cryptic error: `"authorization failed or requested resource not found"`.
+### Realms and regions
 
-## State Management
+Verify region identifier, realm domain, service availability, Resource Manager availability, FIPS requirements, and dedicated endpoint settings before writing Terraform for government, defense, dedicated, or sovereign environments.
 
-### Fixing State Drift
+## Reference Loading
 
-State drift happens when resources are modified outside Terraform (console, CLI, API).
+Load only the narrow reference needed for the task:
 
-```bash
-terraform plan    # Shows unexpected changes — identifies drift
-terraform refresh # Updates state to match actual OCI reality (safe read-only op)
-
-# For new resources created outside Terraform:
-terraform import oci_core_vcn.main ocid1.vcn.oc1.phx.xxxxx
-```
-
-Suppress drift from console tag edits (common source of noise):
-```hcl
-lifecycle {
-  ignore_changes = [defined_tags, freeform_tags]
-}
-```
-
-### Fixing "409 Conflict — Resource Already Exists"
-
-Cause: resource exists in OCI but not in state file (e.g., created manually or previous import failure).
-
-```bash
-terraform import oci_core_vcn.main ocid1.vcn.oc1.phx.xxxxx
-terraform plan   # Should now show no changes for that resource
-```
-
-### State File Corruption Recovery
-
-```bash
-# 1. Backup first
-cp terraform.tfstate terraform.tfstate.backup
-
-# 2. Try state pull repair
-terraform state pull > recovered.tfstate
-mv recovered.tfstate terraform.tfstate
-
-# 3. If that fails, restore from Object Storage versioning
-# 4. Last resort: reconstruct with terraform import for each resource
-```
-
-Prevention: enable Object Storage bucket versioning on the state backend.
-
-## Destroy Failures (Dependency Order)
-
-```
-Error: Resource still in use
-```
-
-OCI enforces strict dependency order on destroy: instances must be terminated before subnets, subnets before VCN, etc.
-
-```bash
-# Visualize the dependency graph
-terraform graph | dot -Tpng > graph.png
-
-# Destroy in reverse dependency order
-terraform destroy -target=oci_core_instance.web
-terraform destroy -target=oci_core_subnet.private
-terraform destroy -target=oci_core_vcn.main
-```
-
-## Timeouts for Long-Running OCI Resources
-
-OCI resource provisioning times vary significantly. Default Terraform timeouts often cause false failures:
-
-```hcl
-# Autonomous Database: 15-30 min to provision (default 20m is borderline)
-resource "oci_database_autonomous_database" "prod" {
-  timeouts {
-    create = "60m"
-    update = "60m"
-    delete = "30m"
-  }
-}
-
-# Compute: usually fast, but capacity issues can cause retries
-resource "oci_core_instance" "web" {
-  timeouts {
-    create = "30m"
-  }
-}
-```
-
-## OCI Landing Zones
-
-Use [oracle-terraform-modules/terraform-oci-landing-zones](https://github.com/oracle-terraform-modules/terraform-oci-landing-zones) for:
-- Greenfield tenancy setup requiring CIS OCI Foundations Benchmark compliance
-- Multi-environment (dev/test/prod) with hub-and-spoke networking
-- Centralized logging, Cloud Guard, and Security Zones
-
-**Do NOT use Landing Zone for:**
-- Brownfield (existing infrastructure) — too opinionated, causes state conflicts
-- Simple single-app deployments — the module overhead exceeds the value
-
-## Progressive Loading Reference
-
-Load [`references/oci-terraform-patterns.md`](references/oci-terraform-patterns.md) when:
-- Setting up provider configuration (multi-region, auth methods)
-- Resource Manager stack operations via CLI
-- Common resource patterns with full HCL examples (VCN, compute, ADB)
-- Landing Zone module usage examples
-
-Do NOT load for NEVER-list gotchas, lifecycle management, or state troubleshooting — this file covers those.
+- [`references/oci-terraform-state-backends.md`](references/oci-terraform-state-backends.md) for native OCI backend, S3 fallback, locking, state versioning, and backend credential safety.
+- [`references/oci-terraform-auth-matrix.md`](references/oci-terraform-auth-matrix.md) for local, CI, OCI DevOps, Resource Manager, Compute, Cloud Shell, resource principal, and OKE auth choices.
+- [`references/oci-terraform-secrets-state.md`](references/oci-terraform-secrets-state.md) for state leakage, sensitive values, generated passwords, wallets, private keys, Vault, and outputs.
+- [`references/oci-terraform-import-drift.md`](references/oci-terraform-import-drift.md) for imports, moved blocks, provider pinning, eventual consistency, and adoption of existing resources.
+- [`references/oci-terraform-module-quality.md`](references/oci-terraform-module-quality.md) for official-module review and stale-module detection.
+- [`references/oci-terraform-realms-regions.md`](references/oci-terraform-realms-regions.md) for government cloud, realms, FIPS, dedicated endpoints, and region availability.
+- [`references/oci-terraform-patterns.md`](references/oci-terraform-patterns.md) only for the official source map and compact cross-reference list.
 
 ## Arguments
 
-$ARGUMENTS: Optional user-provided target, path, environment, symptom, or constraint. When empty, infer the narrowest safe scope from the current repository context and ask only if multiple high-impact choices remain.
+$ARGUMENTS: Optional user-provided target, path, environment, symptom, Terraform version, execution context, or constraint. When empty, infer the narrowest safe scope from the current repository context and ask only if multiple high-impact choices remain.

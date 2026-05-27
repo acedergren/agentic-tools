@@ -56,6 +56,8 @@ The `oci` skill pack is the visible repository boundary for OCI and Oracle-relat
 | ----- | ----------- | ------- |
 | **oci** | OCI and Oracle skill-pack router | v1.0.0 |
 | **best-practices** | OCI architecture review router | v2.0.0 |
+| **infrastructure-as-code** | OCI Terraform hub | v2.0.0 |
+| **oci-resource-manager** | OCI Resource Manager operations | v2.0.0 |
 | **oracle-dba** | Autonomous AI Database operations | v2.0.0 |
 | **secrets-management** | OCI Vault and secret operations | v2.0.0 |
 
@@ -91,6 +93,7 @@ CI validates that registry coverage stays in sync with the filesystem and docs.
 | **oci** | "find OCI skills", "route Oracle Cloud work", "install the OCI skill pack", "review OCI skill ownership", or "separate Oracle skills" |
 | **oci-events** | "create OCI Events rule", "trigger Functions from events", "route events to Streaming", "debug Events delivery", or "filter CloudEvents" |
 | **oci-pptx** | "create Oracle slides", "edit an Oracle deck", "build a CloudWorld presentation", "review Oracle-branded PPTX", or "apply Oracle brand to slides" |
+| **oci-resource-manager** | "configure OCI Resource Manager", "debug Resource Manager job", "create ORM stack", "use Resource Manager private endpoint", or "fix Resource Manager dynamic group" |
 | **oracle-dba** | "manage Autonomous AI Database", "debug ADB performance", "fix wallet connection", "optimize ECPU cost", or "use SQLcl with Oracle Database" |
 | **oracle-idcs-better-auth-setup** | "connect Better Auth to OCI IAM", "configure identity domain OIDC", "fix IDCS callback URL", "set trusted origins", or "bootstrap Oracle auth provider" |
 | **oracle-idcs-org-provisioning** | "map IDCS groups to orgs", "provision org_members from identity domains", "fix Better Auth active org", or "bootstrap first admin" |
@@ -137,4 +140,4 @@ Skills placed in `.claude/skills/` are automatically available as `/skill-name` 
 
 ---
 
-**Last Updated**: March 2026
+**Last Updated**: May 2026

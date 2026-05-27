@@ -44,7 +44,8 @@ Do not load this skill for a narrow OCI task that already maps to one specialist
 | IAM policies, identity domains, dynamic groups, IDCS | `iam-identity-management` |
 | Autonomous AI Database, ADB wallet, SQLcl, ECPU | `oracle-dba` |
 | OCI DB Systems, PDB/CDB lifecycle, DB provisioning | `database-management` |
-| Terraform, Resource Manager, OCI state, drift | `infrastructure-as-code` |
+| Terraform, native OCI backend, provider auth, import, drift | `infrastructure-as-code` |
+| Resource Manager stacks, jobs, source providers, private endpoints | `oci-resource-manager` |
 | Landing zones, compartments, Security Zones, Cloud Guard | `landing-zones` |
 | Monitoring, alarms, MQL, Service Connector | `monitoring-operations` |
 | Billing, budgets, egress, Resource Scheduler savings | `finops-cost-optimization` |

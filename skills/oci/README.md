@@ -17,6 +17,7 @@ The specialist skills stay at `skills/<skill-name>/` for installer and external 
 - `monitoring-operations`
 - `networking-management`
 - `oci-events`
+- `oci-resource-manager`
 - `oracle-dba`
 - `secrets-management`
 

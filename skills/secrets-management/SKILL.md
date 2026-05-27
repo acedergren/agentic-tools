@@ -1,6 +1,6 @@
 ---
 name: secrets-management
-description: "Use when the user asks to \"store OCI secrets\", \"rotate Vault secrets\", \"debug secret retrieval 403\", \"use instance principals for Vault\", or \"replicate secrets\"."
+description: "Use when the user asks to \"store OCI secrets\", \"rotate Vault secrets\", \"debug secret retrieval 403\", \"use instance principals for Vault\", or \"Terraform state secret\"."
 version: 2.0.0
 keywords:
   - "OCI"
@@ -13,6 +13,9 @@ keywords:
   - "replication"
   - "dynamic group"
   - "instance principal"
+  - "Terraform state"
+  - "sensitive"
+  - "wallet"
 aliases:
   - "oci-secrets"
   - "oci-vault"
@@ -29,7 +32,7 @@ When the request is only asking to find or install skills, use `find-skills` ins
 
 ## When to Use
 
-Load this skill for: the user asks to "store OCI secrets", "rotate Vault secrets", "debug secret retrieval 403", "use instance principals for Vault", or "replicate secrets".
+Load this skill for: the user asks to "store OCI secrets", "rotate Vault secrets", "debug secret retrieval 403", "use instance principals for Vault", "replicate secrets", or "Terraform state secret".
 
 Prefer this skill only for its named domain. For broader OCI architecture triage, start with `best-practices` as the router.
 
@@ -62,6 +65,8 @@ GOOD: "Allow dynamic-group app-prod to read secret-family in compartment AppSecr
 - Force refresh on authentication failures that may indicate rotated downstream credentials.
 
 ❌ **NEVER confuse Console plaintext with API payload encoding** — Console plaintext entry is encoded before submission; API/SDK automation should send BASE64 secret content explicitly.
+
+❌ **NEVER assume Vault prevents Terraform state leakage** — Terraform can still store secret values, generated passwords, wallets, private keys, or sensitive outputs in state and plan files. For Terraform work, pass secret OCIDs and let workloads retrieve secrets at runtime unless state exposure is explicitly accepted and protected.
 
 ❌ **NEVER hardcode Vault OCIDs in code** — store in environment variables; OCIDs leak to repos and aren't portable across tenancies
 
@@ -191,6 +196,8 @@ secrets_client = oci.secrets.SecretsClient(config={}, signer=signer)
 ## Reference Files
 
 **Load** [`references/oci-vault-reference.md`](references/oci-vault-reference.md) only when you need current Oracle documentation anchors for Vault/KMS, BASE64 secret content, automatic generation, rotation, promotion, or cross-region replication. Use the links in the reference instead of loading broad external docs.
+
+**Load** [`../infrastructure-as-code/references/oci-terraform-secrets-state.md`](../infrastructure-as-code/references/oci-terraform-secrets-state.md) when Terraform may write passwords, wallets, private keys, Vault secret content, stack variables, or sensitive outputs to state.
 
 ## Arguments
 

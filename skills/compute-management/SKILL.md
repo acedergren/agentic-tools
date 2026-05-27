@@ -13,6 +13,9 @@ keywords:
   - "boot volume"
   - "capacity"
   - "instance principal"
+  - "Terraform"
+  - "quota"
+  - "service limits"
 aliases:
   - "oci-compute"
   - "compute-shapes"
@@ -92,6 +95,8 @@ Without `--preserve-boot-volume false`: orphaned boot volumes can keep charging 
    └─ Create capacity reservation (guarantees future launches)
 ```
 
+Terraform plans do not prove compute capacity or quota availability. Before applying compute resources, check live service limits, regional availability, shape availability, and compartment quotas; then treat "out of host capacity" separately from service-limit exhaustion.
+
 ## Shape Selection: Cost vs Performance
 
 **Budget-critical**:
@@ -162,6 +167,10 @@ Load [`references/oci-compute-shapes-reference.md`](references/oci-compute-shape
 - Need official Oracle specs (memory limits, OCPU counts, network bandwidth)
 
 Do NOT load for quick cost comparisons, capacity troubleshooting, or shape selection — this file covers those.
+
+Load [`../infrastructure-as-code/references/oci-terraform-auth-matrix.md`](../infrastructure-as-code/references/oci-terraform-auth-matrix.md) when Terraform runs on OCI Compute and should use instance principals rather than local API keys.
+
+Load [`../infrastructure-as-code/references/oci-terraform-realms-regions.md`](../infrastructure-as-code/references/oci-terraform-realms-regions.md) when shape availability, government regions, FIPS, or realm-specific endpoints may affect Terraform.
 
 ## Arguments
 

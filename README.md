@@ -11,7 +11,7 @@
 **Portable Agent Skills, workflows, and automation for AI-assisted development**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Skills](https://img.shields.io/badge/Skills-46-brightgreen)](#skills)
+[![Skills](https://img.shields.io/badge/Skills-47-brightgreen)](#skills)
 [![Agents](https://img.shields.io/badge/Agents-2-blue)](#agents)
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-SKILL.md-blue)](#agent-skills-standard)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Compatible-blueviolet)](https://claude.com/claude-code)
@@ -23,7 +23,7 @@
 
 ## What This Is
 
-`agentic-tools` is a curated library of 46 Agent Skills plus Claude Code agents, hooks, and workflow templates. It is built around the late-May 2026 Agent Skills model: each skill is a focused `skills/<name>/SKILL.md` package with trigger-oriented metadata, progressive disclosure, optional scripts or references, and validation gates that keep install surfaces in sync.
+`agentic-tools` is a curated library of 47 Agent Skills plus Claude Code agents, hooks, and workflow templates. It is built around the late-May 2026 Agent Skills model: each skill is a focused `skills/<name>/SKILL.md` package with trigger-oriented metadata, progressive disclosure, optional scripts or references, and validation gates that keep install surfaces in sync.
 
 The library has two jobs:
 
@@ -183,6 +183,8 @@ The OCI skills stay individually installable at `skills/<skill-name>/` for compa
 | ----- | ------------ | ----------- |
 | **[/oci](skills/oci/)** | OCI and Oracle skill-pack router | Canonical manifest for separation of duties |
 | **[/best-practices](skills/best-practices/)** | OCI architecture review router | Cross-domain triage into specialist skills |
+| **[/infrastructure-as-code](skills/infrastructure-as-code/)** | OCI Terraform hub | Native OCI backend, auth, import, drift, modules, and realm guardrails |
+| **[/oci-resource-manager](skills/oci-resource-manager/)** | OCI Resource Manager operations | Stacks, jobs, state, source providers, private endpoints, and IAM boundaries |
 | **[/oracle-dba](skills/oracle-dba/)** | Autonomous AI Database operations | ADB, SQLcl, wallet, ECPU, backup, and tuning guidance |
 | **[/secrets-management](skills/secrets-management/)** | OCI Vault and secret operations | Rotation, replication, instance principals, and retrieval guardrails |
 
@@ -217,6 +219,7 @@ The install surfaces expose every immediate child under `skills/`. CI validates 
 | **[/oci](skills/oci/)** | "find OCI skills", "route Oracle Cloud work", "install the OCI skill pack", "review OCI skill ownership", or "separate Oracle skills" |
 | **[/oci-events](skills/oci-events/)** | "create OCI Events rule", "trigger Functions from events", "route events to Streaming", "debug Events delivery", or "filter CloudEvents" |
 | **[/oci-pptx](skills/oci-pptx/)** | "create Oracle slides", "edit an Oracle deck", "build a CloudWorld presentation", "review Oracle-branded PPTX", or "apply Oracle brand to slides" |
+| **[/oci-resource-manager](skills/oci-resource-manager/)** | "configure OCI Resource Manager", "debug Resource Manager job", "create ORM stack", "use Resource Manager private endpoint", or "fix Resource Manager dynamic group" |
 | **[/oracle-dba](skills/oracle-dba/)** | "manage Autonomous AI Database", "debug ADB performance", "fix wallet connection", "optimize ECPU cost", or "use SQLcl with Oracle Database" |
 | **[/oracle-idcs-better-auth-setup](skills/oracle-idcs-better-auth-setup/)** | "connect Better Auth to OCI IAM", "configure identity domain OIDC", "fix IDCS callback URL", "set trusted origins", or "bootstrap Oracle auth provider" |
 | **[/oracle-idcs-org-provisioning](skills/oracle-idcs-org-provisioning/)** | "map IDCS groups to orgs", "provision org_members from identity domains", "fix Better Auth active org", or "bootstrap first admin" |

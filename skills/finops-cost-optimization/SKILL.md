@@ -13,6 +13,9 @@ keywords:
   - "Resource Scheduler"
   - "ECPU"
   - "boot volume"
+  - "quota"
+  - "service limits"
+  - "Terraform plan"
 aliases:
   - "oci-finops"
   - "oci-cost"
@@ -173,6 +176,18 @@ Use the current Oracle Always Free docs before quoting limits or savings:
 
 ---
 
+## Terraform Plan Cost and Capacity Guardrail
+
+Terraform plans do not prove OCI quota, limit, capacity, or price availability. Before presenting cost or apply confidence:
+
+1. Check current Oracle pricing for the exact region, currency, subscription model, and service.
+2. Check service limits and compartment quotas for the exact resource family.
+3. Distinguish service-limit exhaustion from transient host capacity.
+4. Include non-obvious adjacent costs such as boot volumes, backups, reserved public IPs, load balancers, NAT Gateway processing, Object Storage operations, and cross-region transfer.
+5. Use Resource Scheduler as the default supported stop/start mechanism for dev/test savings; use custom Functions only when Scheduler cannot express the policy.
+
+---
+
 ## Storage Lifecycle Optimization
 
 ```
@@ -253,6 +268,8 @@ oci os bucket list --all --fields approximateCount,approximateSize
 - Querying usage reports via CLI (`oci usage-api`)
 - Managing service limits and quotas
 - Downloading detailed cost and usage reports
+
+Load [`../infrastructure-as-code/references/oci-terraform-realms-regions.md`](../infrastructure-as-code/references/oci-terraform-realms-regions.md) when Terraform cost or quota claims depend on region, realm, government cloud, FIPS, or service availability.
 
 ## Arguments
 

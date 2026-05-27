@@ -18,6 +18,7 @@
         "monitoring-operations",
         "networking-management",
         "oci-events",
+        "oci-resource-manager",
         "oracle-dba",
         "secrets-management"
       ]

@@ -13,6 +13,11 @@ keywords:
   - "DRG"
   - "FastConnect"
   - "VPN"
+  - "Terraform"
+  - "route table"
+  - "private endpoint"
+  - "DNS resolver"
+  - "NAT Gateway"
 aliases:
   - "oci-networking"
   - "vcn-management"
@@ -205,6 +210,8 @@ NSG db:   Allow 1521 from app NSG only
 - Complex routing troubleshooting
 - Network Firewall setup
 - VCN CIDR add/modify docs or subnet CLI reference
+
+**Load** [`references/oci-terraform-networking-patterns.md`](references/oci-terraform-networking-patterns.md) when Terraform manages VCNs, subnets, route tables, NSGs, security lists, DRGs, Service Gateway, NAT Gateway, DNS resolver settings, or private endpoints.
 
 ## Arguments
 
