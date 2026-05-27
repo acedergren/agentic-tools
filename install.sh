@@ -41,6 +41,7 @@ SKILLS=(
   "migrate"
   "monitoring-operations"
   "networking-management"
+  "oci"
   "oci-events"
   "oci-pptx"
   "oracle-dba"
@@ -65,6 +66,29 @@ SKILLS=(
   "tdd"
   "turborepo"
   "write-tests"
+)
+
+# OCI and Oracle-owned skills. Keep in sync with skills/oci/manifest.json.
+OCI_SKILLS=(
+  "oci"
+  "best-practices"
+  "compute-management"
+  "database-management"
+  "finops-cost-optimization"
+  "genai-services"
+  "iam-identity-management"
+  "infrastructure-as-code"
+  "landing-zones"
+  "monitoring-operations"
+  "networking-management"
+  "oci-events"
+  "oracle-dba"
+  "secrets-management"
+  "fastify-better-auth-bridge"
+  "oci-pptx"
+  "oracle-idcs-better-auth-setup"
+  "oracle-idcs-org-provisioning"
+  "sqlite-to-oracle-planner"
 )
 
 for skill in "${SKILLS[@]}"; do

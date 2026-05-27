@@ -47,6 +47,17 @@ These skills chain into a complete implementation workflow:
 | **fastify-better-auth-bridge** | Fastify Better Auth bridge | v1.0.0  |
 | **oracle-idcs-org-provisioning** | IDCS org provisioning | v1.0.0  |
 
+## OCI and Oracle Skills
+
+The `oci` skill pack is the visible repository boundary for OCI and Oracle-related work. Specialist skills remain top-level for compatibility, while `skills/oci/manifest.json` records the canonical ownership set and CI checks it against metadata, CLI, installer, and docs.
+
+| Skill | Description | Version |
+| ----- | ----------- | ------- |
+| **oci** | OCI and Oracle skill-pack router | v1.0.0 |
+| **best-practices** | OCI architecture review router | v2.0.0 |
+| **oracle-dba** | Autonomous AI Database operations | v2.0.0 |
+| **secrets-management** | OCI Vault and secret operations | v2.0.0 |
+
 ## Full Library Coverage
 
 The install surfaces (`bin/cli.js`, `install.sh`, and `npx skills add`) are expected to expose every directory in `skills/`.
@@ -76,6 +87,7 @@ CI validates that registry coverage stays in sync with the filesystem and docs.
 | **migrate** | Use when bulk-migrating import paths, renaming workspace packages, or reorganizing modules across many files in a monore |
 | **monitoring-operations** | "create OCI alarms", "debug missing metrics", "write MQL", "configure Service Connector", or "monitor OCI resources" |
 | **networking-management** | "design OCI networking", "debug VCN connectivity", "configure Service Gateway", "choose NSG vs security list", or "plan FastConnect or VPN" |
+| **oci** | "find OCI skills", "route Oracle Cloud work", "install the OCI skill pack", "review OCI skill ownership", or "separate Oracle skills" |
 | **oci-events** | "create OCI Events rule", "trigger Functions from events", "route events to Streaming", "debug Events delivery", or "filter CloudEvents" |
 | **oci-pptx** | "create Oracle slides", "edit an Oracle deck", "build a CloudWorld presentation", "review Oracle-branded PPTX", or "apply Oracle brand to slides" |
 | **oracle-dba** | "manage Autonomous AI Database", "debug ADB performance", "fix wallet connection", "optimize ECPU cost", or "use SQLcl with Oracle Database" |

@@ -28,6 +28,7 @@ const SKILLS = [
   "migrate",
   "monitoring-operations",
   "networking-management",
+  "oci",
   "oci-events",
   "oci-pptx",
   "oracle-dba",
@@ -54,6 +55,29 @@ const SKILLS = [
   "write-tests",
 ];
 
+// OCI and Oracle-owned skills. Keep in sync with skills/oci/manifest.json.
+const OCI_SKILLS = [
+  "oci",
+  "best-practices",
+  "compute-management",
+  "database-management",
+  "finops-cost-optimization",
+  "genai-services",
+  "iam-identity-management",
+  "infrastructure-as-code",
+  "landing-zones",
+  "monitoring-operations",
+  "networking-management",
+  "oci-events",
+  "oracle-dba",
+  "secrets-management",
+  "fastify-better-auth-bridge",
+  "oci-pptx",
+  "oracle-idcs-better-auth-setup",
+  "oracle-idcs-org-provisioning",
+  "sqlite-to-oracle-planner",
+];
+
 const AGENTS = ["mock-debugger.md", "security-reviewer.md"];
 
 function usage() {
@@ -72,8 +96,17 @@ function usage() {
 }
 
 function list() {
-  console.log("\n  Skills:");
-  for (const skill of SKILLS) {
+  const ociSet = new Set(OCI_SKILLS);
+
+  console.log("\n  OCI Skills:");
+  for (const skill of OCI_SKILLS) {
+    const dir = join(ROOT, "skills", skill);
+    const exists = existsSync(dir);
+    console.log(`    ${exists ? "+" : "-"} /${skill}`);
+  }
+
+  console.log("\n  Other Skills:");
+  for (const skill of SKILLS.filter((skill) => !ociSet.has(skill))) {
     const dir = join(ROOT, "skills", skill);
     const exists = existsSync(dir);
     console.log(`    ${exists ? "+" : "-"} /${skill}`);

@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-05-27
+
+### Added
+- Added the `oci` skill pack as the repository ownership boundary for OCI and Oracle-related skills.
+- Added `skills/oci/manifest.json` and CI checks that keep OCI skill metadata, CLI grouping, installer grouping, and docs aligned.
+
 ## 2026-03-09
 
 ### Added

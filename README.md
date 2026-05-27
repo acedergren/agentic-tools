@@ -11,7 +11,7 @@
 **Production-grade AI agent skills, workflows, and automation for Claude Code**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Skills](https://img.shields.io/badge/Skills-23-brightgreen)](#skills)
+[![Skills](https://img.shields.io/badge/Skills-45-brightgreen)](#skills)
 [![Agents](https://img.shields.io/badge/Agents-2-blue)](#agents)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Compatible-blueviolet)](https://claude.com/claude-code)
 [![Community Project](https://img.shields.io/badge/Community-Maintained-success)](https://github.com/acedergren/agentic-tools)
@@ -142,6 +142,17 @@ These skills chain together into a full implementation workflow.
 | **[/fastify-better-auth-bridge](skills/fastify-better-auth-bridge/)** | Fastify Better Auth bridge | Web Request forwarding, decorators, and org-context patching |
 | **[/oracle-idcs-org-provisioning](skills/oracle-idcs-org-provisioning/)** | IDCS org provisioning | Group gating, tenant-org resolution, MERGE INTO upserts |
 
+### OCI and Oracle Skill Pack
+
+The OCI skills stay individually installable at `skills/<skill-name>/` for compatibility, while [skills/oci](skills/oci/) provides the visible ownership boundary for Oracle-related work. Its [manifest](skills/oci/manifest.json) is validated in CI against skill metadata, the CLI, and the Bash installer.
+
+| Skill | What It Does | Key Feature |
+| ----- | ------------ | ----------- |
+| **[/oci](skills/oci/)** | OCI and Oracle skill-pack router | Canonical manifest for separation of duties |
+| **[/best-practices](skills/best-practices/)** | OCI architecture review router | Cross-domain triage into specialist skills |
+| **[/oracle-dba](skills/oracle-dba/)** | Autonomous AI Database operations | ADB, SQLcl, wallet, ECPU, backup, and tuning guidance |
+| **[/secrets-management](skills/secrets-management/)** | OCI Vault and secret operations | Rotation, replication, instance principals, and retrieval guardrails |
+
 ---
 
 ## Complete Skill Directory
@@ -170,6 +181,7 @@ The install surfaces expose every skill under `skills/`:
 | **[/migrate](skills/migrate/)** | Use when bulk-migrating import paths, renaming workspace packages, or reorganizing modules across many files in a monore |
 | **[/monitoring-operations](skills/monitoring-operations/)** | "create OCI alarms", "debug missing metrics", "write MQL", "configure Service Connector", or "monitor OCI resources" |
 | **[/networking-management](skills/networking-management/)** | "design OCI networking", "debug VCN connectivity", "configure Service Gateway", "choose NSG vs security list", or "plan FastConnect or VPN" |
+| **[/oci](skills/oci/)** | "find OCI skills", "route Oracle Cloud work", "install the OCI skill pack", "review OCI skill ownership", or "separate Oracle skills" |
 | **[/oci-events](skills/oci-events/)** | "create OCI Events rule", "trigger Functions from events", "route events to Streaming", "debug Events delivery", or "filter CloudEvents" |
 | **[/oci-pptx](skills/oci-pptx/)** | "create Oracle slides", "edit an Oracle deck", "build a CloudWorld presentation", "review Oracle-branded PPTX", or "apply Oracle brand to slides" |
 | **[/oracle-dba](skills/oracle-dba/)** | "manage Autonomous AI Database", "debug ADB performance", "fix wallet connection", "optimize ECPU cost", or "use SQLcl with Oracle Database" |
