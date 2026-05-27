@@ -8,27 +8,48 @@
        |___/
 ```
 
-**Production-grade AI agent skills, workflows, and automation for Claude Code**
+**Portable Agent Skills, workflows, and automation for AI-assisted development**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Skills](https://img.shields.io/badge/Skills-46-brightgreen)](#skills)
 [![Agents](https://img.shields.io/badge/Agents-2-blue)](#agents)
+[![Agent Skills](https://img.shields.io/badge/Agent%20Skills-SKILL.md-blue)](#agent-skills-standard)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Compatible-blueviolet)](https://claude.com/claude-code)
 [![Community Project](https://img.shields.io/badge/Community-Maintained-success)](https://github.com/acedergren/agentic-tools)
 
 </div>
 
-> **Independent Community Project** — No official affiliation with Anthropic or the Claude Code team. Skills are designed for Claude Code but are community-created.
+> **Independent Community Project** — No official affiliation with Anthropic, OpenAI, Oracle, or any other mentioned product team. Skills are community-created and use the portable `SKILL.md` Agent Skills format.
 
 ## What This Is
 
-A battle-tested collection of Claude Code skills, custom agents, hooks, and configuration templates that form a complete development workflow pipeline. Built from real production use across 276 sessions, 435 commits, and 1,700+ passing tests.
+`agentic-tools` is a curated library of 46 Agent Skills plus Claude Code agents, hooks, and workflow templates. It is built around the late-May 2026 Agent Skills model: each skill is a focused `skills/<name>/SKILL.md` package with trigger-oriented metadata, progressive disclosure, optional scripts or references, and validation gates that keep install surfaces in sync.
 
-The core pipeline takes you from requirements to merged PR:
+The library has two jobs:
+
+- Provide a practical development pipeline from requirements to review.
+- Package repeatable domain expertise, including a distinct OCI and Oracle skill pack, in a portable format that can be reused by skills-compatible agents.
+
+The core development pipeline:
 
 ```
 /prd → /prd --to-plan → /orchestrate → agents use /implement → /review-all → /health-check → PR
 ```
+
+## Agent Skills Standard
+
+As of late May 2026, Agent Skills are a lightweight open format built around a directory containing a required `SKILL.md` file plus optional `scripts/`, `references/`, and `assets/`. Agents use progressive disclosure: they first see only the `name` and `description`, load the full `SKILL.md` when the task matches, and load bundled resources only when needed.
+
+This repo follows that model with a few local quality gates:
+
+- Every immediate child of `skills/` is installable and must contain `SKILL.md`.
+- `name` must match the folder name.
+- Descriptions are trigger-oriented and include quoted user phrases for reliable discovery.
+- Skill bodies include load boundaries, anti-patterns, and an `## Arguments` section.
+- Large or high-drift material belongs in focused `references/` files, not in the always-loaded body.
+- `scripts/ci/validate-skill-library.mjs` checks skills, registries, READMEs, referenced scripts, and the OCI manifest together.
+
+References: [Agent Skills overview](https://agentskills.io/home), [Agent Skills specification](https://agentskills.io/specification), [Agent Skills best practices](https://agentskills.io/skill-creation/best-practices), [Claude custom Skills guide](https://support.claude.com/en/articles/12512198-how-to-create-custom-skills), and [OpenAI Academy: Skills](https://academy.openai.com/public/resources/skills).
 
 ## Packages
 
@@ -80,6 +101,16 @@ cp -r skills/implement /path/to/project/.claude/skills/
 ln -s $(pwd)/skills/implement /path/to/project/.claude/skills/
 ```
 
+### Validate the Library
+
+```bash
+# Validate all skills, installer coverage, docs coverage, scripts, and OCI manifest
+npm run skills:validate
+
+# Run the full local skill CI: validation, install smoke, and secret scan
+npm run skills:ci
+```
+
 ### Try It
 
 ```bash
@@ -91,6 +122,7 @@ ln -s $(pwd)/skills/implement /path/to/project/.claude/skills/
 /health-check
 /review-all
 /prod-readiness
+/oci route this OCI architecture review to the right specialist skills
 ```
 
 ---
@@ -158,7 +190,7 @@ The OCI skills stay individually installable at `skills/<skill-name>/` for compa
 
 ## Complete Skill Directory
 
-The install surfaces expose every skill under `skills/`:
+The install surfaces expose every immediate child under `skills/`. CI validates this table, `bin/cli.js`, `install.sh`, and each skill directory together.
 
 | Skill | Trigger Summary |
 | ----- | --------------- |
@@ -206,6 +238,7 @@ The install surfaces expose every skill under `skills/`:
 | **[/tanstack-query](skills/tanstack-query/)** | Use when debugging TanStack Query / React Query issues: v4→v5 migration errors (gcTime, isPending, throwOnError), infini |
 | **[/tdd](skills/tdd/)** | Use when implementing features, fixing bugs, or adding deliberate test coverage. Enforces test-first (red-green-refactor |
 | **[/turborepo](skills/turborepo/)** | Use when making Turborepo monorepo architecture decisions: choosing between monorepo vs polyrepo, deciding when to split |
+| **[/write-natural-swedish](skills/write-natural-swedish/)** | Use when improving Swedish writing, Swedish translations, or Swedish product copy with natural contemporary phrasing |
 | **[/write-tests](skills/write-tests/)** | Use when adding or improving test coverage for existing source code without changing production behavior. Selects mock s |
 
 
@@ -368,41 +401,31 @@ npx spectral lint openapi.json --ruleset .spectral.yaml
 ```
 agentic-tools/
 ├── README.md
-├── install.sh                        # One-command installer
+├── package.json                      # npm package + skill CI scripts
+├── install.sh                        # Shell installer
 ├── LICENSE
 │
-├── skills/                           # Claude Code skills
-│   ├── implement/SKILL.md            # Full TDD pipeline
-│   ├── tdd/SKILL.md                  # Test-driven development
-│   ├── write-tests/SKILL.md          # Test generation
-│   ├── bugfix/SKILL.md               # Autonomous bug fix pipeline
-│   ├── migrate/SKILL.md              # Bulk import/module migration
-│   ├── review-all/SKILL.md           # Parallel review pipeline
-│   ├── health-check/SKILL.md         # Codebase diagnostics
-│   ├── prod-readiness/SKILL.md       # 5-agent pre-release review
-│   ├── api-audit/SKILL.md            # Route-type contract audit
-│   ├── doc-sync/SKILL.md             # Documentation drift
-│   ├── phase-kickoff/SKILL.md        # Phase scaffolding
-│   ├── prd/                          # PRD management
-│   │   ├── SKILL.md
-│   │   ├── template.md
-│   │   ├── validation.md
-│   │   └── drift-prevention.md
-│   ├── orchestrate/                  # Multi-agent coordination
-│   │   ├── SKILL.md
-│   │   ├── wave-template.md
-│   │   ├── agent-roles.md
-│   │   └── headless-runner.md
-│   ├── quality-commit/SKILL.md       # Quality gates + commit
-│   ├── humanizer/                    # AI pattern removal
-│   ├── firecrawl/                    # Web scraping
-│   ├── shadcn-svelte/                # shadcn-svelte patterns
-│   ├── tanstack-query/               # TanStack Query v5
-│   ├── turborepo/                    # Monorepo patterns
-│   └── refactor-module/              # Terraform extraction
-│   ├── oracle-idcs-better-auth-setup/   # Oracle + IDCS + Better Auth router
-│   ├── fastify-better-auth-bridge/      # Fastify session bridge patterns
-│   └── oracle-idcs-org-provisioning/    # IDCS org membership provisioning
+├── bin/
+│   └── cli.js                        # npx agentic-tools init/list/help
+│
+├── scripts/ci/                       # Skill library validation gates
+│   ├── validate-skill-library.mjs
+│   ├── install-smoke.mjs
+│   ├── secret-scan.mjs
+│   └── run-all.mjs
+│
+├── skills/                           # 46 Agent Skills, one folder per skill
+│   ├── README.md                     # Skill catalog and standards
+│   ├── oci/                          # OCI/Oracle ownership boundary
+│   │   ├── SKILL.md                  # OCI skill-pack router
+│   │   ├── README.md
+│   │   └── manifest.json             # Canonical OCI skill inventory
+│   ├── implement/                    # Full TDD feature pipeline
+│   ├── review-all/                   # Parallel review pipeline
+│   ├── health-check/                 # Codebase diagnostics
+│   ├── oracle-dba/                   # Autonomous AI Database operations
+│   ├── infrastructure-as-code/       # OCI Terraform / Resource Manager
+│   └── ...                           # Remaining skill packages
 │
 ├── claude/
 │   ├── agents/                       # Custom agent definitions
@@ -429,10 +452,13 @@ agentic-tools/
 
 Found a missing pattern or have a battle-tested skill? PRs welcome.
 
-1. Follow the existing skill format (YAML frontmatter + markdown body)
-2. Include anti-patterns with WHY explanations
-3. Keep core content under 300 lines (use progressive disclosure with reference files)
-4. Test the skill in a real project before submitting
+1. Put the skill at `skills/<skill-name>/SKILL.md`; keep the folder name and frontmatter `name` identical.
+2. Write a trigger-oriented `description` with concrete quoted user phrases.
+3. Include `## When to Use`, `## Do NOT load this skill when`, anti-patterns, and `## Arguments`.
+4. Keep the always-loaded body lean; move detailed docs, volatile facts, examples, and API notes into `references/`.
+5. Add scripts only when they provide deterministic value, and make sure every referenced script exists.
+6. Update `bin/cli.js`, `install.sh`, `README.md`, and `skills/README.md`; use `skills/oci/manifest.json` for Oracle-related skills.
+7. Run `npm run skills:ci` before opening a PR.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for full guidelines.
 
@@ -446,5 +472,6 @@ MIT License — see [LICENSE](LICENSE) for details.
 
 ---
 
-**Last Updated**: February 2026
-**Claude Code Version**: Compatible with latest CLI
+**Last Reviewed**: May 27, 2026
+
+**Compatibility**: Agent Skills `SKILL.md` format; local installers target Claude Code `.claude/skills/` by default.
