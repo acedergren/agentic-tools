@@ -16,12 +16,20 @@ const topLevelSkillDirs = readdirSync(skillsDir, { withFileTypes: true })
   .map((entry) => entry.name)
   .filter((skill) => hasSkillFile(skill));
 
-const nestedOciSkillDirs = readdirSync(join(skillsDir, 'oci'), { withFileTypes: true })
-  .filter((entry) => entry.isDirectory())
-  .map((entry) => `oci/${entry.name}`)
-  .filter((skill) => hasSkillFile(skill));
+function nestedPackSkillDirs(pack) {
+  const packDir = join(skillsDir, pack);
+  if (!existsSync(packDir)) {
+    return [];
+  }
+  return readdirSync(packDir, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => `${pack}/${entry.name}`)
+    .filter((skill) => hasSkillFile(skill));
+}
 
-const skillDirs = [...new Set([...topLevelSkillDirs, ...nestedOciSkillDirs])]
+const nestedSpecialistSkillDirs = ['oci', 'plane'].flatMap((pack) => nestedPackSkillDirs(pack));
+
+const skillDirs = [...new Set([...topLevelSkillDirs, ...nestedSpecialistSkillDirs])]
   .sort();
 
 for (const skill of skillDirs) {
@@ -54,8 +62,10 @@ function parseBashArrayLiteral(source, label) {
 
 const cliSkills = parseJsArrayLiteral(readFileSync(join(root, 'bin', 'cli.js'), 'utf8'), 'SKILLS');
 const cliOciSkills = parseJsArrayLiteral(readFileSync(join(root, 'bin', 'cli.js'), 'utf8'), 'OCI_SKILLS');
+const cliPlaneSkills = parseJsArrayLiteral(readFileSync(join(root, 'bin', 'cli.js'), 'utf8'), 'PLANE_SKILLS');
 const installSkills = parseBashArrayLiteral(readFileSync(join(root, 'install.sh'), 'utf8'), 'SKILLS');
 const installOciSkills = parseBashArrayLiteral(readFileSync(join(root, 'install.sh'), 'utf8'), 'OCI_SKILLS');
+const installPlaneSkills = parseBashArrayLiteral(readFileSync(join(root, 'install.sh'), 'utf8'), 'PLANE_SKILLS');
 
 const missingInCli = skillDirs.filter((skill) => !cliSkills.includes(skill));
 const missingInInstall = skillDirs.filter((skill) => !installSkills.includes(skill));
@@ -102,30 +112,48 @@ function yamlList(frontmatter, label) {
   return values;
 }
 
-const ociManifestPath = join(skillsDir, 'oci', 'manifest.json');
-if (!existsSync(ociManifestPath)) {
-  throw new Error('Missing skills/oci/manifest.json');
-}
-
-const ociManifest = JSON.parse(readFileSync(ociManifestPath, 'utf8'));
-const manifestOciSkills = [...new Set([
-  ociManifest.packSkill,
-  ...ociManifest.groups.flatMap((group) => group.skills),
-])].sort();
-const oracleTaggedSkills = skillDirs.filter((skill) => {
-  const frontmatter = parseFrontmatter(readFileSync(join(skillsDir, skill, 'SKILL.md'), 'utf8'));
-  const domains = yamlList(frontmatter, 'domains');
-  return domains.some((domain) => ['oci', 'oracle', 'oracle-adjacent'].includes(domain));
-}).sort();
-
-for (const skill of manifestOciSkills) {
-  if (!skillDirs.includes(skill)) {
-    throw new Error(`OCI manifest references missing skill: ${skill}`);
+function validatePackManifest({ packId, domainTags, cliPackSkills, installPackSkills, label }) {
+  const manifestPath = join(skillsDir, packId, 'manifest.json');
+  if (!existsSync(manifestPath)) {
+    throw new Error(`Missing skills/${packId}/manifest.json`);
   }
+
+  const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
+  const manifestSkills = [...new Set([
+    manifest.packSkill,
+    ...manifest.groups.flatMap((group) => group.skills),
+  ])].sort();
+  const taggedSkills = skillDirs.filter((skill) => {
+    const frontmatter = parseFrontmatter(readFileSync(join(skillsDir, skill, 'SKILL.md'), 'utf8'));
+    const domains = yamlList(frontmatter, 'domains');
+    return domains.some((domain) => domainTags.includes(domain));
+  }).sort();
+
+  for (const skill of manifestSkills) {
+    if (!skillDirs.includes(skill)) {
+      throw new Error(`${label} manifest references missing skill: ${skill}`);
+    }
+  }
+  assertSameSet(`skills/${packId}/manifest.json tagged skill coverage`, manifestSkills, taggedSkills);
+  assertSameSet(`bin/cli.js ${label}_SKILLS`, cliPackSkills, manifestSkills);
+  assertSameSet(`install.sh ${label}_SKILLS`, installPackSkills, manifestSkills);
 }
-assertSameSet('skills/oci/manifest.json Oracle-tagged skill coverage', manifestOciSkills, oracleTaggedSkills);
-assertSameSet('bin/cli.js OCI_SKILLS', cliOciSkills, manifestOciSkills);
-assertSameSet('install.sh OCI_SKILLS', installOciSkills, manifestOciSkills);
+
+validatePackManifest({
+  packId: 'oci',
+  domainTags: ['oci', 'oracle', 'oracle-adjacent'],
+  cliPackSkills: cliOciSkills,
+  installPackSkills: installOciSkills,
+  label: 'OCI',
+});
+
+validatePackManifest({
+  packId: 'plane',
+  domainTags: ['plane', 'plane-api', 'plane-content', 'plane-agent'],
+  cliPackSkills: cliPlaneSkills,
+  installPackSkills: installPlaneSkills,
+  label: 'PLANE',
+});
 
 const readme = readFileSync(join(root, 'README.md'), 'utf8');
 const skillsReadme = readFileSync(join(root, 'skills', 'README.md'), 'utf8');

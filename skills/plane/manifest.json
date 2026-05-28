@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "packSkill": "plane",
+  "purpose": "Canonical ownership boundary for Plane API, content management, MCP, and automation skills in agentic-tools.",
+  "groups": [
+    {
+      "name": "core-plane-operations",
+      "description": "API, MCP, identity, transport, work item, page, planning, and reporting operations for Plane.",
+      "skills": [
+        "plane/api-operations",
+        "plane/work-item-management",
+        "plane/planning-structure",
+        "plane/pages-content",
+        "plane/reporting-audit"
+      ]
+    },
+    {
+      "name": "plane-automation-and-triage",
+      "description": "Event-driven Plane apps, agents, webhook handlers, intake, customer, and request workflows.",
+      "skills": [
+        "plane/intake-customer-triage",
+        "plane/agent-webhook-automation"
+      ]
+    },
+    {
+      "name": "pack-and-routing",
+      "description": "Routing entry point for Plane skill discovery and ownership.",
+      "skills": [
+        "plane",
+        "plane/api-operations",
+        "plane/work-item-management",
+        "plane/planning-structure",
+        "plane/pages-content",
+        "plane/intake-customer-triage",
+        "plane/agent-webhook-automation",
+        "plane/reporting-audit"
+      ]
+    }
+  ],
+  "reviewTriggers": [
+    "Plane REST API endpoint or response-shape changes",
+    "Plane OAuth scope, token, or app-installation flow changes",
+    "Plane MCP server tool-name or transport changes",
+    "Self-hosted Plane OpenAPI schema changes",
+    "New Plane specialist skill added to skills/plane"
+  ]
+}

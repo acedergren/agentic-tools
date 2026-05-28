@@ -45,6 +45,23 @@ These skills chain into a complete implementation workflow:
 | **refactor-module**     | Terraform module extraction   | v3.0.0  |
 | **write-natural-swedish** | Natural Swedish writing with contemporary and tech-company presets | v1.0.0 |
 
+## Plane Skills
+
+The `plane` skill pack is the visible repository boundary for Plane API, MCP, content-management, and automation work. All Plane specialists live under `skills/plane/<skill-name>/` with IDs such as `plane/work-item-management`. `skills/plane/manifest.json` records the canonical ownership set and CI checks it against metadata, CLI, installer, and docs.
+
+For concrete example prompts, routing guidance, and multi-skill workflows, see [`plane/USE_CASES.md`](plane/USE_CASES.md).
+
+| Skill | Description | Version |
+| ----- | ----------- | ------- |
+| **plane** | Plane skill-pack router | v1.0.0 |
+| **plane/api-operations** | Plane REST, MCP, OAuth, OpenAPI, and pagination operations | v1.0.0 |
+| **plane/work-item-management** | Plane work item create/search/update/comment/link/worklog workflows | v1.0.0 |
+| **plane/planning-structure** | Projects, cycles, modules, epics, milestones, initiatives | v1.0.0 |
+| **plane/pages-content** | Workspace/project pages and wiki content | v1.0.0 |
+| **plane/intake-customer-triage** | Intake, customers, customer requests, and customer links | v1.0.0 |
+| **plane/agent-webhook-automation** | OAuth apps, webhooks, mentionable agents, and agent runs | v1.0.0 |
+| **plane/reporting-audit** | Read-only Plane reports and audits | v1.0.0 |
+
 ## OCI and Oracle Skills
 
 The `oci` skill pack is the visible repository boundary for OCI and Oracle-related work. All OCI and Oracle-related specialists live under `skills/oci/<skill-name>/` with IDs such as `oci/zpr-security`. `skills/oci/manifest.json` records the canonical ownership set and CI checks it against metadata, CLI, installer, and docs.
@@ -112,6 +129,14 @@ CI validates that registry coverage stays in sync with the filesystem and docs.
 | **oci/oracle-idcs-org-provisioning** | "map IDCS groups to orgs", "provision org_members from identity domains", "fix Better Auth active org", or "bootstrap first admin" |
 | **orchestrate** | Use when executing a multi-task implementation plan with parallel agents. Coordinates task assignment, wave sequencing,  |
 | **phase-kickoff** | Use when starting a new development phase or sprint that needs branch creation, TDD test shell, and roadmap entry done t |
+| **plane** | "manage Plane content", "route Plane API work", "use Plane MCP", "create Plane work items", "publish Plane pages", or "build Plane agent automation" |
+| **plane/api-operations** | "call Plane API", "debug Plane API", "configure Plane MCP", "verify Plane credentials", "export Plane OpenAPI", or "fix Plane pagination" |
+| **plane/work-item-management** | "create Plane work items", "update Plane issue", "mark ENG-42 done", "add Plane comment", "link Plane work items", or "log time in Plane" |
+| **plane/planning-structure** | "plan Plane sprint", "create Plane cycle", "manage Plane module", "create Plane epic", "roll over incomplete work", or "organize Plane roadmap" |
+| **plane/pages-content** | "publish Plane page", "update Plane wiki", "create Plane runbook", "write Plane project page", or "sync docs to Plane" |
+| **plane/intake-customer-triage** | "triage Plane intake", "manage Plane customers", "create Plane customer request", "link customer to work item", or "process customer feedback in Plane" |
+| **plane/agent-webhook-automation** | "build Plane agent", "handle Plane webhook", "create Plane OAuth app", "respond to Plane @mentions", or "send Plane agent run activity" |
+| **plane/reporting-audit** | "report on Plane", "audit Plane work", "find stale Plane issues", "summarize Plane activity", or "show Plane sprint health" |
 | **prd** | Use when creating, updating, validating, or phasing a PRD. Drives interactive discovery, technical architecture, phasing |
 | **prod-readiness** | Use when assessing release readiness or running a pre-launch review. Spawns 5 specialist agents in parallel (security, t |
 | **publish-skill** | Use when creating a new skill and publishing it to a GitHub repo for installation via npx skills add. Covers scaffold, s |
