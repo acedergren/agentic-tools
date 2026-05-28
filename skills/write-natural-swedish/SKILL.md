@@ -1,6 +1,6 @@
 ---
 name: write-natural-swedish
-description: "Use when drafting, translating, polishing, or reviewing Swedish text so it sounds natural, fluent, contemporary, and appropriate for its audience. Triggers include \"write better Swedish\", \"make this sound natural in Swedish\", \"translate into Swedish\", \"polish this Swedish\", \"tech company Swedish\", \"contemporary Swedish words\", \"Swedish developer docs\", and \"avoid Anglicisms\"."
+description: "Use when drafting, translating, polishing, or reviewing Swedish text so it sounds natural, fluent, contemporary, and appropriate for its audience. Triggers include \"write better Swedish\", \"make this sound natural in Swedish\", \"translate into Swedish\", \"polish this Swedish\", \"tech company Swedish\", \"contemporary Swedish words\", \"Swedish developer docs\", \"Swedish dialect flavor\", \"Östgötska\", \"Linköping dialect\", and \"avoid Anglicisms\"."
 ---
 
 # Write Natural Swedish
@@ -12,12 +12,13 @@ Improve Swedish writing so it reads like confident, idiomatic Sweden Swedish rat
 - `text`: Swedish or source-language text to polish, translate, rewrite, or review.
 - `audience`: Reader group, for example customers, developers, internal product team, public-sector readers, executives, or language learners.
 - `mode`: `polish`, `rewrite`, `translate`, `explain`, or `check`.
-- `preset`: `contemporary`, `tech-company`, `developer-docs`, `product-marketing`, `startup-internal`, `klarsprak`, or `learner-friendly`.
+- `preset`: `contemporary`, `tech-company`, `developer-docs`, `product-marketing`, `startup-internal`, `dialect-flavor`, `klarsprak`, or `learner-friendly`.
 - `register`: informal, neutral, professional, formal, academic, product, support, or public-sector.
+- `dialect`: optional regional flavor such as `linkoping-ostgotska`, `goteborgska`, `skanska`, `gotlandska`, `norrländska`, or `dalmalsfarg`.
 
 ## When to Use
 
-Load this skill when the user asks for Swedish-language writing quality, Swedish translation, Swedish grammar, Swedish tone, Swedish tech-company copy, Swedish developer documentation, contemporary Swedish vocabulary, klarsprak, or help avoiding English-shaped Swedish.
+Load this skill when the user asks for Swedish-language writing quality, Swedish translation, Swedish grammar, Swedish tone, Swedish tech-company copy, Swedish developer documentation, contemporary Swedish vocabulary, dialect-flavored Swedish, klarsprak, or help avoiding English-shaped Swedish.
 
 Do NOT load this skill when the task is only about English writing, code implementation, non-Swedish localization, or language facts that do not require producing or judging Swedish prose.
 
@@ -53,6 +54,10 @@ Keep claims specific and credible. Translate value propositions into Swedish ben
 
 Allow a warmer, faster team tone while keeping Swedish grammar, compounds, and prepositions clean.
 
+### Dialect Flavor
+
+Add regional warmth without turning the text into a caricature. Use dialect features sparingly, explain that written dialect is approximate, and prefer place-specific rhythm or vocabulary over heavy phonetic spelling.
+
 ### Klarsprak
 
 Use clear public-facing Swedish: reader-oriented structure, everyday words, explained terms, short sentences where possible, and direct responsibility.
@@ -65,6 +70,7 @@ Use natural Swedish but keep sentence structure and vocabulary accessible. Add 2
 
 - Read `references/natural-swedish-style.md` for the revision checklist and style principles.
 - Read `references/presets-tech-company-swedish.md` for contemporary wording, tech-company Swedish, product copy, developer docs, startup tone, SaaS/cloud/AI/security/FinOps language, or modern vocabulary.
+- Read `references/marquee-dialects.md` when the user asks for dialect flavor, regional voice, Östgötska, Linköping, or other Swedish dialect profiles.
 - Read `references/resource-map.md` for source lookup order, current caveats, and resource links.
 - Read `references/revision-patterns.md` for recurring English-to-Swedish and learner-Swedish revision patterns.
 
@@ -77,6 +83,7 @@ Load only the files needed for the task.
 - Never use contemporary terms as decoration. Modern Swedish should still be precise and context-fit.
 - Never replace established technical product names, CLI flags, code identifiers, API paths, or UI labels with Swedish translations.
 - Never over-polish workplace Swedish into stiff myndighetssvenska unless the user asks for that register.
+- Never fake a full dialect from stereotypes. Dialects vary by place, speaker age, class, context, and writing purpose.
 - Never pretend one formulation is the only correct one when Swedish usage allows variation.
 
 ## Output Standards
