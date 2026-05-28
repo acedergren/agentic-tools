@@ -53,9 +53,10 @@ Environment:
 PLANE_BASE_URL=https://api.plane.so
 export PLANE_TOKEN=...
 PLANE_WORKSPACE_SLUG=...
+PLANE_PROJECT_ID=...
 ```
 
-Use `PLANE_ACCESS_TOKEN` instead of `PLANE_TOKEN` for OAuth bearer tokens. Accept `PLANE_API_KEY` only as a compatibility fallback for older local tooling.
+Use `PLANE_PROJECT_ID` only when a project-level read should be verified after auth and workspace checks. Use `PLANE_ACCESS_TOKEN` instead of `PLANE_TOKEN` for OAuth bearer tokens. Accept `PLANE_API_KEY` only as a compatibility fallback for older local tooling.
 
 ## Transport Selection
 

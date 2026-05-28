@@ -28,4 +28,4 @@ For concrete example prompts, routing guidance, and multi-skill workflows, see [
 
 ## Helper Scripts
 
-- `scripts/plane-smoke-check.mjs` verifies Plane API credentials and optional workspace connectivity without printing secrets. Export `PLANE_TOKEN` for the Plane API key; `PLANE_API_KEY` remains a compatibility fallback.
+- `scripts/plane-smoke-check.mjs` verifies Plane API credentials plus optional workspace and project connectivity without printing secrets. Export `PLANE_TOKEN` for the Plane API key; `PLANE_API_KEY` remains a compatibility fallback. Set `PLANE_WORKSPACE_SLUG` and `PLANE_PROJECT_ID` for deeper checks.

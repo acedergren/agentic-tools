@@ -4,6 +4,7 @@ const baseUrl = (process.env.PLANE_BASE_URL || "https://api.plane.so").replace(/
 const apiKey = process.env.PLANE_TOKEN || process.env.PLANE_API_KEY;
 const accessToken = process.env.PLANE_ACCESS_TOKEN;
 const workspaceSlug = process.env.PLANE_WORKSPACE_SLUG;
+const projectId = process.env.PLANE_PROJECT_ID;
 
 if (!apiKey && !accessToken) {
   console.error("Missing auth. Set PLANE_TOKEN for API key auth, or PLANE_ACCESS_TOKEN for OAuth bearer auth.");
@@ -67,6 +68,23 @@ try {
       ? projectResult.body.total_results
       : projectResult.body?.count;
     console.log(`Workspace ${workspaceSlug} reachable; project result count: ${count ?? "unknown"}`);
+
+    if (projectId) {
+      const projectDetailPath = `/api/v1/workspaces/${encodeURIComponent(workspaceSlug)}/projects/${encodeURIComponent(projectId)}/`;
+      const projectDetailResult = await requestJson(projectDetailPath);
+      if (!projectDetailResult.response.ok) {
+        console.error(`Project check failed for ${projectId}: HTTP ${projectDetailResult.response.status}`);
+        console.error(JSON.stringify(projectDetailResult.body, null, 2));
+        process.exit(1);
+      }
+
+      const projectName = projectDetailResult.body?.name || "(name unavailable)";
+      const projectIdentifier = projectDetailResult.body?.identifier || "(identifier unavailable)";
+      console.log(`Project ${projectId} reachable: ${projectIdentifier} - ${projectName}`);
+    }
+  } else if (projectId) {
+    console.error("PLANE_PROJECT_ID requires PLANE_WORKSPACE_SLUG.");
+    process.exit(2);
   }
 } catch (error) {
   console.error(`Plane smoke check failed: ${error.message}`);

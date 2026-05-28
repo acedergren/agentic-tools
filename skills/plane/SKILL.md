@@ -79,7 +79,7 @@ Before executing writes through any transport, confirm the base URL, workspace s
 
 ## Scripts
 
-Use `node scripts/plane-smoke-check.mjs` from inside this skill directory to verify Plane API credentials without exposing token material. The script reads `PLANE_BASE_URL`, `PLANE_TOKEN` as the Plane API key, optional compatibility fallback `PLANE_API_KEY`, optional OAuth `PLANE_ACCESS_TOKEN`, and optional `PLANE_WORKSPACE_SLUG`.
+Use `node scripts/plane-smoke-check.mjs` from inside this skill directory to verify Plane API credentials without exposing token material. The script reads `PLANE_BASE_URL`, `PLANE_TOKEN` as the Plane API key, optional compatibility fallback `PLANE_API_KEY`, optional OAuth `PLANE_ACCESS_TOKEN`, optional `PLANE_WORKSPACE_SLUG`, and optional `PLANE_PROJECT_ID`.
 
 ## NEVER Do This
 
