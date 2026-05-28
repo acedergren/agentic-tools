@@ -11,7 +11,7 @@
 **Portable Agent Skills, workflows, and automation for AI-assisted development**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Skills](https://img.shields.io/badge/Skills-50-brightgreen)](#skills)
+[![Skills](https://img.shields.io/badge/Skills-58-brightgreen)](#skills)
 [![Agents](https://img.shields.io/badge/Agents-2-blue)](#agents)
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-SKILL.md-blue)](#agent-skills-standard)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Compatible-blueviolet)](https://claude.com/claude-code)
@@ -23,12 +23,12 @@
 
 ## What This Is
 
-`agentic-tools` is a curated library of 50 Agent Skills plus Claude Code agents, hooks, and workflow templates. It is built around the late-May 2026 Agent Skills model: each skill is a focused `SKILL.md` package with trigger-oriented metadata, progressive disclosure, optional scripts or references, and validation gates that keep install surfaces in sync.
+`agentic-tools` is a curated library of 58 Agent Skills plus Claude Code agents, hooks, and workflow templates. It is built around the late-May 2026 Agent Skills model: each skill is a focused `SKILL.md` package with trigger-oriented metadata, progressive disclosure, optional scripts or references, and validation gates that keep install surfaces in sync.
 
 The library has two jobs:
 
 - Provide a practical development pipeline from requirements to review.
-- Package repeatable domain expertise, including a distinct OCI and Oracle skill pack, in a portable format that can be reused by skills-compatible agents.
+- Package repeatable domain expertise, including distinct OCI/Oracle and Plane skill packs, in a portable format that can be reused by skills-compatible agents.
 
 The core development pipeline:
 
@@ -123,6 +123,7 @@ npm run skills:ci
 /review-all
 /prod-readiness
 /oci route this OCI architecture review to the right specialist skills
+/plane route this Plane API content-management task to the right specialist skills
 ```
 
 ---
@@ -172,6 +173,23 @@ These skills chain together into a full implementation workflow.
 | **[/refactor-module](skills/refactor-module/)**   | Terraform module extraction | Decision framework for when to extract    |
 | **[/write-natural-swedish](skills/write-natural-swedish/)** | Natural Swedish writing | Contemporary Swedish + tech-company presets |
 
+### Plane Skill Pack
+
+The Plane skills stay individually installable while [skills/plane](skills/plane/) provides the visible ownership boundary for Plane API, MCP, content-management, and automation work. All Plane specialists live under `skills/plane/<skill-name>/` and use skill IDs like `plane/work-item-management`. The [manifest](skills/plane/manifest.json) is validated in CI against skill metadata, the CLI, and the Bash installer.
+
+See the [Plane Skill Catalog and Use Cases](skills/plane/USE_CASES.md) for concrete example prompts, routing guidance, and multi-skill workflows.
+
+| Skill | What It Does | Key Feature |
+| ----- | ------------ | ----------- |
+| **[/plane](skills/plane/)** | Plane skill-pack router | Canonical manifest for Plane content and automation ownership |
+| **[/plane/api-operations](skills/plane/api-operations/)** | Plane REST, MCP, OAuth, OpenAPI, and pagination operations | Uses `PLANE_TOKEN` as the API key env var with smoke-check support |
+| **[/plane/work-item-management](skills/plane/work-item-management/)** | Plane work item create/search/update/comment/link/worklog workflows | Human identifier to UUID resolution before mutation |
+| **[/plane/planning-structure](skills/plane/planning-structure/)** | Projects, cycles, modules, epics, milestones, initiatives | Safe sprint rollover and roadmap grouping |
+| **[/plane/pages-content](skills/plane/pages-content/)** | Workspace/project pages and wiki content | Diff-before-overwrite page publishing |
+| **[/plane/intake-customer-triage](skills/plane/intake-customer-triage/)** | Intake, customers, customer requests, and customer links | Customer-sensitive triage into accepted work |
+| **[/plane/agent-webhook-automation](skills/plane/agent-webhook-automation/)** | OAuth apps, webhooks, mentionable agents, and agent runs | Immediate thought, stop-signal, and idempotent webhook patterns |
+| **[/plane/reporting-audit](skills/plane/reporting-audit/)** | Read-only Plane reports and audits | Paginated stale-work and sprint-health reporting |
+
 ### OCI and Oracle Skill Pack
 
 The OCI skills stay individually installable while [skills/oci](skills/oci/) provides the visible ownership boundary for Oracle-related work. All OCI and Oracle-related specialists live under `skills/oci/<skill-name>/` and use skill IDs like `oci/zpr-security`. The [manifest](skills/oci/manifest.json) is validated in CI against skill metadata, the CLI, and the Bash installer.
@@ -202,7 +220,7 @@ See the [OCI Skill Catalog and Use Cases](skills/oci/USE_CASES.md) for concrete 
 
 ## Complete Skill Directory
 
-The install surfaces expose every registered skill package under `skills/`, including nested OCI skill IDs. CI validates this table, `bin/cli.js`, `install.sh`, and each skill directory together.
+The install surfaces expose every registered skill package under `skills/`, including nested OCI and Plane skill IDs. CI validates this table, `bin/cli.js`, `install.sh`, and each skill directory together.
 
 | Skill | Trigger Summary |
 | ----- | --------------- |
@@ -238,6 +256,14 @@ The install surfaces expose every registered skill package under `skills/`, incl
 | **[/oci/oracle-idcs-org-provisioning](skills/oci/oracle-idcs-org-provisioning/)** | "map IDCS groups to orgs", "provision org_members from identity domains", "fix Better Auth active org", or "bootstrap first admin" |
 | **[/orchestrate](skills/orchestrate/)** | Use when executing a multi-task implementation plan with parallel agents. Coordinates task assignment, wave sequencing,  |
 | **[/phase-kickoff](skills/phase-kickoff/)** | Use when starting a new development phase or sprint that needs branch creation, TDD test shell, and roadmap entry done t |
+| **[/plane](skills/plane/)** | "manage Plane content", "route Plane API work", "use Plane MCP", "create Plane work items", "publish Plane pages", or "build Plane agent automation" |
+| **[/plane/api-operations](skills/plane/api-operations/)** | "call Plane API", "debug Plane API", "configure Plane MCP", "verify Plane credentials", "export Plane OpenAPI", or "fix Plane pagination" |
+| **[/plane/work-item-management](skills/plane/work-item-management/)** | "create Plane work items", "update Plane issue", "mark ENG-42 done", "add Plane comment", "link Plane work items", or "log time in Plane" |
+| **[/plane/planning-structure](skills/plane/planning-structure/)** | "plan Plane sprint", "create Plane cycle", "manage Plane module", "create Plane epic", "roll over incomplete work", or "organize Plane roadmap" |
+| **[/plane/pages-content](skills/plane/pages-content/)** | "publish Plane page", "update Plane wiki", "create Plane runbook", "write Plane project page", or "sync docs to Plane" |
+| **[/plane/intake-customer-triage](skills/plane/intake-customer-triage/)** | "triage Plane intake", "manage Plane customers", "create Plane customer request", "link customer to work item", or "process customer feedback in Plane" |
+| **[/plane/agent-webhook-automation](skills/plane/agent-webhook-automation/)** | "build Plane agent", "handle Plane webhook", "create Plane OAuth app", "respond to Plane @mentions", or "send Plane agent run activity" |
+| **[/plane/reporting-audit](skills/plane/reporting-audit/)** | "report on Plane", "audit Plane work", "find stale Plane issues", "summarize Plane activity", or "show Plane sprint health" |
 | **[/prd](skills/prd/)** | Use when creating, updating, validating, or phasing a PRD. Drives interactive discovery, technical architecture, phasing |
 | **[/prod-readiness](skills/prod-readiness/)** | Use when assessing release readiness or running a pre-launch review. Spawns 5 specialist agents in parallel (security, t |
 | **[/publish-skill](skills/publish-skill/)** | Use when creating a new skill and publishing it to a GitHub repo for installation via npx skills add. Covers scaffold, s |
@@ -430,7 +456,7 @@ agentic-tools/
 │   ├── secret-scan.mjs
 │   └── run-all.mjs
 │
-├── skills/                           # 50 Agent Skills, registered from top-level and OCI nested packages
+├── skills/                           # 58 Agent Skills, registered from top-level plus OCI and Plane nested packages
 │   ├── README.md                     # Skill catalog and standards
 │   ├── oci/                          # OCI/Oracle ownership boundary
 │   │   ├── SKILL.md                  # OCI skill-pack router
@@ -444,6 +470,15 @@ agentic-tools/
 │   │   ├── managed-bastion-access/
 │   │   ├── zpr-security/
 │   │   └── ...                       # Remaining OCI and Oracle-related packages
+│   ├── plane/                        # Plane API/content/automation ownership boundary
+│   │   ├── SKILL.md                  # Plane skill-pack router
+│   │   ├── README.md
+│   │   ├── manifest.json             # Canonical Plane skill inventory
+│   │   ├── api-operations/           # REST, MCP, OAuth, OpenAPI, pagination
+│   │   ├── work-item-management/     # Work item create/update/comment/link/worklog
+│   │   ├── planning-structure/       # Cycles, modules, epics, milestones, initiatives
+│   │   ├── pages-content/            # Workspace/project page publishing
+│   │   └── ...                       # Remaining Plane packages and shared references
 │   ├── implement/                    # Full TDD feature pipeline
 │   ├── review-all/                   # Parallel review pipeline
 │   ├── health-check/                 # Codebase diagnostics

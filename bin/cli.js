@@ -40,6 +40,14 @@ const SKILLS = [
   "oci/oracle-idcs-org-provisioning",
   "orchestrate",
   "phase-kickoff",
+  "plane",
+  "plane/api-operations",
+  "plane/work-item-management",
+  "plane/planning-structure",
+  "plane/pages-content",
+  "plane/intake-customer-triage",
+  "plane/agent-webhook-automation",
+  "plane/reporting-audit",
   "prd",
   "prod-readiness",
   "publish-skill",
@@ -87,6 +95,18 @@ const OCI_SKILLS = [
   "oci/sqlite-to-oracle-planner",
 ];
 
+// Plane-owned skills. Keep in sync with skills/plane/manifest.json.
+const PLANE_SKILLS = [
+  "plane",
+  "plane/api-operations",
+  "plane/work-item-management",
+  "plane/planning-structure",
+  "plane/pages-content",
+  "plane/intake-customer-triage",
+  "plane/agent-webhook-automation",
+  "plane/reporting-audit",
+];
+
 const AGENTS = ["mock-debugger.md", "security-reviewer.md"];
 
 function usage() {
@@ -106,6 +126,7 @@ function usage() {
 
 function list() {
   const ociSet = new Set(OCI_SKILLS);
+  const planeSet = new Set(PLANE_SKILLS);
 
   console.log("\n  OCI Skills:");
   for (const skill of OCI_SKILLS) {
@@ -114,8 +135,15 @@ function list() {
     console.log(`    ${exists ? "+" : "-"} /${skill}`);
   }
 
+  console.log("\n  Plane Skills:");
+  for (const skill of PLANE_SKILLS) {
+    const dir = join(ROOT, "skills", skill);
+    const exists = existsSync(dir);
+    console.log(`    ${exists ? "+" : "-"} /${skill}`);
+  }
+
   console.log("\n  Other Skills:");
-  for (const skill of SKILLS.filter((skill) => !ociSet.has(skill))) {
+  for (const skill of SKILLS.filter((skill) => !ociSet.has(skill) && !planeSet.has(skill))) {
     const dir = join(ROOT, "skills", skill);
     const exists = existsSync(dir);
     console.log(`    ${exists ? "+" : "-"} /${skill}`);

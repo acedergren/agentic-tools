@@ -53,6 +53,14 @@ SKILLS=(
   "oci/oracle-idcs-org-provisioning"
   "orchestrate"
   "phase-kickoff"
+  "plane"
+  "plane/api-operations"
+  "plane/work-item-management"
+  "plane/planning-structure"
+  "plane/pages-content"
+  "plane/intake-customer-triage"
+  "plane/agent-webhook-automation"
+  "plane/reporting-audit"
   "prd"
   "prod-readiness"
   "publish-skill"
@@ -98,6 +106,18 @@ OCI_SKILLS=(
   "oci/oracle-idcs-better-auth-setup"
   "oci/oracle-idcs-org-provisioning"
   "oci/sqlite-to-oracle-planner"
+)
+
+# Plane-owned skills. Keep in sync with skills/plane/manifest.json.
+PLANE_SKILLS=(
+  "plane"
+  "plane/api-operations"
+  "plane/work-item-management"
+  "plane/planning-structure"
+  "plane/pages-content"
+  "plane/intake-customer-triage"
+  "plane/agent-webhook-automation"
+  "plane/reporting-audit"
 )
 
 for skill in "${SKILLS[@]}"; do

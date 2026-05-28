@@ -1,0 +1,36 @@
+{
+  "name": "plane",
+  "version": "0.1.0",
+  "description": "Plane API, content-management, and automation skills for Codex.",
+  "author": {
+    "name": "Alex Cedergren",
+    "url": "https://github.com/acedergren"
+  },
+  "homepage": "https://github.com/acedergren/agentic-tools",
+  "repository": "https://github.com/acedergren/agentic-tools",
+  "license": "MIT",
+  "keywords": [
+    "plane",
+    "plane-api",
+    "project-management",
+    "agent-skills"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Plane",
+    "shortDescription": "Manage Plane content from Codex.",
+    "longDescription": "Plane packages skills for safe Plane API use, content management, planning, pages, customer intake, reporting, and agent automation. Tokens stay external and are read from PLANE_TOKEN at runtime.",
+    "developerName": "Alex Cedergren",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Use PLANE_TOKEN to verify my Plane workspace.",
+      "Create Plane work items from this plan.",
+      "Publish this runbook as a Plane page."
+    ],
+    "brandColor": "#4F46E5"
+  }
+}
