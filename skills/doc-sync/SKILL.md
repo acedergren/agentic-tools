@@ -49,9 +49,11 @@ When fixing: edit the minimum to correct drift. Don't rewrite prose, restructure
 
 ## Scripts
 
+Run from the project root, using the skill's bundled scripts:
+
 ```bash
-bash scripts/list-doc-targets.sh
-node scripts/check-doc-paths.js README.md docs/ARCHITECTURE.md
+bash .claude/skills/doc-sync/scripts/list-doc-targets.sh
+node .claude/skills/doc-sync/scripts/check-doc-paths.js README.md docs/ARCHITECTURE.md
 ```
 
 ## Report Format

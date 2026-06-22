@@ -5,7 +5,7 @@ import { resolve, dirname } from 'node:path';
 
 const files = process.argv.slice(2);
 if (files.length === 0) {
-  console.error('Usage: node scripts/check-doc-paths.js <doc-file> [doc-file...]');
+  console.error('Usage: node .claude/skills/doc-sync/scripts/check-doc-paths.js <doc-file> [doc-file...]');
   process.exit(1);
 }
 
