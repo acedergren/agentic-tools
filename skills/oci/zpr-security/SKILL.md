@@ -74,9 +74,11 @@ Treat all resource metadata as non-secret operational metadata.
 5. Confirm the resource type is currently supported for security attributes.
 6. Review recent policy or attribute changes before changing network rules.
 
+Last verified: 2026-09-30 (docs.oracle.com ZPR Policy Syntax and Policy Examples)
+
 ## Reference Files
 
-- Load [`references/zpr-reference.md`](references/zpr-reference.md) for official docs, rollout order, policy/attribute decision trees, troubleshooting, limits, and pressure scenarios.
+- Load [`references/zpr-reference.md`](references/zpr-reference.md) for ZPL syntax (same-VCN and two-VCN forms), verified policy examples, rollout order, decision tree, and troubleshooting.
 - Load [`../infrastructure-as-code/references/oci-terraform-zpr.md`](../infrastructure-as-code/references/oci-terraform-zpr.md) when Terraform manages ZPR configuration, attributes, policies, imports, or production rollout sequencing.
 - Load `../networking-management/references/oci-networking-reference.md` only when the ZPR task also requires route, NSG, security list, DRG, or private connectivity details.
 
