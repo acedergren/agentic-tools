@@ -16,7 +16,7 @@
 |------------|---------------|------------------|
 | High Availability | Deploy across multiple ADs | Check instance distribution |
 | Backup Strategy | Configure automatic backups | `oci bv backup list --compartment-id <id>` |
-| Disaster Recovery | Set up cross-region replication | `oci os replication-policy list` |
+| Disaster Recovery | Set up cross-region replication | `oci os replication list-replication-policies --bucket-name <bucket>` |
 | Load Balancing | Use regional load balancers | `oci lb load-balancer list --compartment-id <id>` |
 
 ### Pillar 3: Performance and Cost Optimization
@@ -61,8 +61,8 @@ oci iam policy list --compartment-id <tenancy-ocid> --all --query "data[?contain
 # 2.1 Ensure no security lists allow 0.0.0.0/0 ingress
 oci network security-list list --compartment-id <id> --all --query "data[].{Name:\"display-name\",Rules:\"ingress-security-rules\"[?source=='0.0.0.0/0']}"
 
-# 2.2 Ensure VCN Flow Logs are enabled
-oci network flow-log list --compartment-id <id>
+# 2.2 Ensure VCN flow logs are enabled (flow logs are Logging service logs, source service "flowlogs")
+oci logging log list --log-group-id <log-group-id> --source-service flowlogs --all
 
 # 2.3 Ensure Service Gateway is used for OCI services
 oci network service-gateway list --compartment-id <id>

@@ -1,5 +1,7 @@
 # OCI Database Cloud Service CLI Reference
 
+Last verified: 2026-09-30 against OCI CLI 3.94.1 (`oci db ... --help`).
+
 ## Database System Operations
 
 ### List Database Systems
@@ -79,9 +81,9 @@ oci db database create \
   --db-version "19.0.0.0"
 
 # Delete database (CAUTION)
+# (no final-backup flag: take a backup first with `oci db backup create`)
 oci db database delete \
-  --database-id <database-ocid> \
-  --perform-final-backup true
+  --database-id <database-ocid>
 ```
 
 ## Backup and Recovery
@@ -129,9 +131,8 @@ oci db database update \
 ### Enable Data Guard
 ```bash
 # Create standby database
-oci db data-guard-association create \
+oci db data-guard-association create with-new-db-system \
   --database-id <primary-database-ocid> \
-  --creation-type "NewDbSystem" \
   --database-admin-password "<password>" \
   --protection-mode "MAXIMUM_PERFORMANCE" \
   --transport-type "ASYNC" \
@@ -171,22 +172,23 @@ oci db data-guard-association reinstate \
 ### View Available Patches
 ```bash
 # List available patches
-oci db patch list \
+oci db patch list by-db-system \
   --db-system-id <db-system-ocid>
 
 # Get patch details
-oci db patch get \
+oci db patch get by-db-system \
+  --db-system-id <db-system-ocid> \
   --patch-id <patch-ocid>
 ```
 
 ### Apply Patches
 ```bash
-# Apply patch to DB system
-oci db db-system-patch-history-entry list \
+# List patches available for a DB system
+oci db patch list by-db-system \
   --db-system-id <db-system-ocid>
 
 # Check patch history
-oci db patch-history list \
+oci db patch-history list by-db-system \
   --db-system-id <db-system-ocid>
 ```
 
@@ -217,7 +219,7 @@ oci db vm-cluster create \
   --cpu-core-count 8 \
   --display-name "prod-vmcluster" \
   --gi-version "19.0.0.0" \
-  --ssh-public-keys-file ~/.ssh/id_rsa.pub
+  --ssh-public-keys "[\"$(cat ~/.ssh/id_ed25519.pub)\"]"
 ```
 
 ## Common Troubleshooting
@@ -231,7 +233,7 @@ oci db system get --db-system-id <ocid> --query "data.\"lifecycle-state\""
 oci db node list --compartment-id <id> --db-system-id <db-system-ocid>
 
 # Verify NSG rules
-oci network nsg-security-rule list --nsg-id <nsg-ocid>
+oci network nsg rules list --nsg-id <nsg-ocid> --all
 ```
 
 ### Performance Diagnostics

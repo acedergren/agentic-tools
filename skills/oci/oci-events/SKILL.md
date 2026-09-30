@@ -54,8 +54,11 @@ Problem: Events don't monitor metrics!
 
 CORRECT tool: Alarms
 oci monitoring alarm create \
-  --metric-name CpuUtilization \
-  --threshold 80
+  --compartment-id "$C" --metric-compartment-id "$C" \
+  --display-name "CPU > 80%" --namespace oci_computeagent \
+  --query-text 'CpuUtilization[5m].mean() > 80' \
+  --pending-duration PT5M --severity CRITICAL \
+  --destinations '["<topic-ocid>"]' --is-enabled true
 ```
 
 **Why critical**: Events are for **state changes** (instance created, bucket deleted), NOT continuous metrics. Using Events for thresholds wastes time — the rule will never fire.
@@ -80,8 +83,6 @@ oci events rule create \
 # GOOD - add a Streaming action when the architecture needs durable capture/replay
 # Treat Streaming as event capture, not as proof of built-in failed-delivery DLQ semantics
 ```
-
-**Cost impact**: Lost events = lost business transactions. E-commerce: 1 lost order event = $50-500 revenue loss. Healthcare: 1 lost patient record event = compliance violation.
 
 **NEVER use overly broad event filters (noise + cost)**
 ```json
@@ -235,6 +236,8 @@ Load [`oci-events-reference.md`](references/oci-events-reference.md) only when:
 - Quick event rule creation (CLI examples above)
 - Common event patterns (architecture patterns in this skill)
 - Events vs Alarms decision (decision table above)
+
+Last verified: 2026-09-30 (OCI CLI 3.94.1 for all commands)
 
 ## Arguments
 

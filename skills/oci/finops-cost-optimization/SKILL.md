@@ -37,28 +37,27 @@ Prefer this skill only for its named domain. For broader OCI architecture triage
 
 ## NEVER Do This
 
-**NEVER terminate instances without `--preserve-boot-volume false`**
+**NEVER assume terminate keeps (or deletes) the boot volume without saying so**
 ```bash
-# DEFAULT OCI behavior: boot volume PRESERVED after instance termination
+# OCI default (CLI and API): the boot volume is DELETED on terminate
+# (--preserve-boot-volume defaults to false)
 oci compute instance terminate --instance-id <ocid> --force
-# Instance gone, but the boot volume can keep charging until deleted
 
-# RIGHT: explicitly delete boot volume
-oci compute instance terminate \
-  --instance-id <ocid> \
-  --preserve-boot-volume false
+# Keep it on purpose (e.g. forensic copy) — and then track it, because it keeps billing
+oci compute instance terminate --instance-id <ocid> --preserve-boot-volume true --force
 
-# In Terraform (must set explicitly — default is true):
+# Terraform: preserve_boot_volume is optional and unset means the API default (delete).
 resource "oci_core_instance" "dev" {
-  preserve_boot_volume = false
+  preserve_boot_volume = false   # be explicit either way
 }
-# Estimate waste with live pricing:
-# orphaned_boot_volume_cost = count * gb_per_volume * live_boot_volume_rate
 ```
+Orphaned boot volumes come from explicit `--preserve-boot-volume true`, boot volume replacement, or
+detached volumes. Find them with the audit commands below.
 
 **NEVER leave reserved public IPs unattached**
 ```
-Reserved public IPs can keep charging while reserved, whether attached or not.
+The Oracle price list has no public IP SKU (checked 2026-09-30): the cost of a stray reserved IP is
+service-limit exhaustion and an exposed, forgotten address, not a line item.
 Ephemeral public IPs are released with the instance lifecycle.
 
 Use RESERVED only when you need a static IP that survives instance termination.
@@ -70,15 +69,16 @@ Detection: oci network public-ip list --scope REGION --lifetime RESERVED
 **NEVER assume stopped resources = zero cost**
 ```
 Stopped Compute Instance:
-  Compute billing may pause while stopped
-  Boot volumes can continue charging
+  Standard shapes (and VM.GPU.A10): compute billing pauses while stopped
+  Dense I/O and most GPU shapes: billing CONTINUES while stopped — terminate to stop it
+  Boot volumes continue charging
   Block volumes can continue charging
   Reserved public IPs can continue charging
 
 Stopped Autonomous Database:
-  CPU/ECPU billing may stop while stopped
-  Storage can continue charging
-  Backups or retention can continue charging
+  ECPU billing stops while stopped
+  Storage continues charging
+  Backups continue charging for their retention period
 
 Rule: Stopped = compute paused, storage still charged.
 For long-term idle (>30 days): terminate + backup, restore when needed.
@@ -97,18 +97,15 @@ Cheaper alternatives:
 3. Cross-region transfer: verify current Oracle price list and source/destination services before calling it free
 ```
 
-**NEVER over-commit Universal Credits without understanding non-transferability**
+**NEVER over-commit Universal Credits**
 ```
-Credits are NON-TRANSFERABLE between service categories:
-  Compute credits → compute only
-  Database credits → database only
-  Cannot move surplus to another category
+Universal Credits (annual commit) can be spent on any eligible IaaS/PaaS service in any region —
+they are not locked to a service category. The risk is the other direction:
+unused credits are forfeited at the end of the commitment term (no rollover).
 
-Monthly credits can expire without rollover depending on the contract.
-Unused committed spend in one service category may not offset another category.
-
-RIGHT: Analyze 6 months historical usage per category.
-       Commit to 70-80% of baseline, not peak.
+RIGHT: Analyze 6+ months of historical usage (oci usage-api usage-summary request-summarized-usages).
+       Commit to a conservative baseline, not peak; pay-as-you-go covers the rest.
+       Track burn-down against the commitment monthly (query-type CREDIT / EXPIREDCREDIT).
 ```
 
 **NEVER rely on FORECAST budget alerts as your primary alert**
@@ -121,18 +118,12 @@ Use FORECAST for trend awareness only, not budget enforcement.
 Budgets are ALERTING only — cannot block spending.
 ```
 
-**NEVER use NAT Gateway for high-traffic applications**
+**NEVER put public IPs on private workloads "to save NAT cost"**
 ```
-NAT Gateway can include both hourly and per-GB processing charges.
-Estimate with live pricing:
-  nat_gateway_cost = (hours * live_hourly_rate) + (processed_gb * live_processing_rate)
-
-Alternative: Ephemeral public IP on instance
-Cost depends on current public IP and data-transfer pricing.
-
-NAT Gateway makes sense for:
-  - Private subnets with low outbound traffic
-  - Security requirement (no public IPs on instances)
+NAT Gateway has no SKU in the Oracle price list (checked 2026-09-30) — it is free.
+Outbound data through NAT is billed as normal outbound data transfer (first 10 TB/month free in
+most regions), the same as through an internet gateway.
+Oracle service traffic (Object Storage, etc.) should go via a Service Gateway instead of NAT.
 ```
 
 ---
@@ -182,7 +173,7 @@ Terraform plans do not prove OCI quota, limit, capacity, or price availability. 
 1. Check current Oracle pricing for the exact region, currency, subscription model, and service.
 2. Check service limits and compartment quotas for the exact resource family.
 3. Distinguish service-limit exhaustion from transient host capacity.
-4. Include non-obvious adjacent costs such as boot volumes, backups, reserved public IPs, load balancers, NAT Gateway processing, Object Storage operations, and cross-region transfer.
+4. Include non-obvious adjacent costs such as boot volumes, backups, load balancers (flexible LB bandwidth), Network Firewall, Object Storage requests and retrieval, and outbound/cross-region data transfer.
 5. Use Resource Scheduler as the default supported stop/start mechanism for dev/test savings; use custom Functions only when Scheduler cannot express the policy.
 
 ---
@@ -232,33 +223,42 @@ Implementation:
 ## Hidden Cost Detection (Monthly Audit)
 
 ```bash
-# 1. Orphaned boot volumes (most common waste)
-oci bv boot-volume list --all --lifecycle-state AVAILABLE \
-  | jq '.data[] | select(."attached-instance-id" == null)'
+# 1. Orphaned boot volumes: boot volumes minus attached boot volumes (per AD)
+oci bv boot-volume list -c "$C" --availability-domain "$AD" --all \
+  --query 'data[?"lifecycle-state"==`AVAILABLE`].id' > /tmp/bv.json
+oci compute boot-volume-attachment list -c "$C" --availability-domain "$AD" --all \
+  --query 'data[?"lifecycle-state"==`ATTACHED`]."boot-volume-id"' > /tmp/bva.json
+jq -n --slurpfile a /tmp/bv.json --slurpfile b /tmp/bva.json '$a[0] - $b[0]'
 
-# 2. Unattached block volumes
-oci bv volume list --all --lifecycle-state AVAILABLE
+# 2. Unattached block volumes: same pattern with
+oci bv volume list -c "$C" --all --lifecycle-state AVAILABLE
+oci compute volume-attachment list -c "$C" --all
 
 # 3. Reserved IPs without attachment
-oci network public-ip list --scope REGION --lifetime RESERVED \
+oci network public-ip list -c "$C" --scope REGION --lifetime RESERVED --all \
   | jq '.data[] | select(."assigned-entity-id" == null)'
 
 # 4. Stopped instances still paying for volumes
-oci compute instance list --lifecycle-state STOPPED
+oci compute instance list -c "$C" --all --lifecycle-state STOPPED
 
 # 5. Old backups (filter by date)
 # export CUTOFF_DATE=2026-01-01
-oci bv backup list --all \
+oci bv backup list -c "$C" --all \
   | jq --arg cutoff "$CUTOFF_DATE" '.data[] | select(.["time-created"] < $cutoff)'
 
 # 6. Load balancers with no backends
-oci lb load-balancer list --all
+oci lb load-balancer list -c "$C" --all
 
 # 7. Object Storage buckets that may be empty
-oci os bucket list --all --fields approximateCount,approximateSize
+for b in $(oci os bucket list -c "$C" --all --query 'data[].name' --raw-output | jq -r '.[]'); do
+  oci os bucket get --bucket-name "$b" --fields approximateCount --fields approximateSize \
+    --query 'data.{name:name,count:"approximate-count",bytes:"approximate-size"}'
+done
 ```
 
 ---
+
+Last verified: 2026-09-30 (Oracle price list API; OCI CLI 3.94.1; terraform-provider-oci source; docs.oracle.com "Resource Billing for Stopped Instances", Universal Credits billing FAQ)
 
 ## Reference Files
 

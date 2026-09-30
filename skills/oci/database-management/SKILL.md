@@ -32,7 +32,7 @@ Use it when the database type is unclear or when the request mixes Autonomous AI
 
 ## Do NOT load this skill when
 
-Do not use this router for already-narrow ADB operations such as wallet failures, SQL tuning, ECPU scaling, backups, clones, or stop/start cost analysis. Load `oci/oracle-dba` directly.
+Do not use this router for already-narrow ADB operations such as wallet failures, ECPU scaling, backups, clones, or stop/start cost analysis. Load `oci/oracle-dba` directly. For SQL tuning and SQLcl, use Oracle's `oracle/skills` `db` pack.
 
 Do not load this skill for unrelated general programming, non-Oracle databases, or skill discovery requests.
 
@@ -40,7 +40,8 @@ Do not load this skill for unrelated general programming, non-Oracle databases, 
 
 | User intent | Load |
 | --- | --- |
-| Autonomous AI Database, ADB, ATP/ADW, wallet, SQLcl, ECPU, wait events | `oci/oracle-dba` |
+| Autonomous AI Database, ADB, ATP/ADW, wallet, ECPU, backups, clones | `oci/oracle-dba` |
+| SQLcl, SQL tuning, wait events, users/privileges | Oracle's `oracle/skills` `db` pack (not in this repo) |
 | OCI DB Systems, VM DB, Bare Metal DB, RAC, Exadata, PDB/CDB lifecycle | this skill plus `references/oci-dbcs-cli.md` |
 | Database network path, private endpoint, NSG, Service Gateway | `oci/networking-management` |
 | IAM policy or dynamic group for database automation | `oci/iam-identity-management` |
@@ -49,7 +50,7 @@ Do not load this skill for unrelated general programming, non-Oracle databases, 
 
 ## NEVER Do This
 
-- NEVER duplicate detailed ADB guidance here. Route to `oci/oracle-dba` so ECPU, wallet, backup, service-name, and billing guidance has one owner.
+- NEVER duplicate detailed ADB guidance here. Route to `oci/oracle-dba` so ECPU, wallet, backup, and billing guidance has one owner.
 - NEVER quote static database prices or Always Free limits from memory. Verify current Oracle pricing and Free Tier docs before giving numbers.
 - NEVER delete a container database, DB System, or Exadata resource without enumerating dependent PDBs and backups first.
 - NEVER assume stopped database resources have no cost. CPU billing can stop, but storage, backups, licenses, or retained resources may continue depending on service and configuration.
@@ -69,6 +70,8 @@ Connect applications to the PDB service, not the CDB root service. Before unplug
 Load [`references/oci-dbcs-cli.md`](references/oci-dbcs-cli.md) only when the task is about DB Systems, RAC, Exadata, PDB/CDB lifecycle, patching, maintenance, or Data Guard outside Autonomous AI Database.
 
 For Autonomous AI Database or ADB work, load `oci/oracle-dba` instead of this reference.
+
+Last verified: 2026-09-30 (OCI CLI 3.94.1 for commands in references/oci-dbcs-cli.md)
 
 ## Arguments
 

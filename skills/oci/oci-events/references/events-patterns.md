@@ -209,17 +209,19 @@ VCN (com.oraclecloud.virtualnetwork.*):
 ├─ CreateSecurityList          # Security list created
 └─ CreateNetworkSecurityGroup  # NSG created
 
-Complete list: 100+ event types across all OCI services
-Use: oci events event-type list --all
+Not a complete list. Look up event types in the Console rule editor or the
+"Services that Produce Events" docs page (there is no CLI listing command).
 ```
 
 ## Action Types and Use Cases
 
-| Action Type | Target | Use Case | Cost | Max Actions |
-|-------------|--------|----------|------|-------------|
-| **ONS** | Notification Topic | Email, PagerDuty, webhook | $0.60/million | 5 |
-| **FAAS** | Function | Data processing, API calls | $0.0000002/GB-sec | 5 |
-| **OSS** | Streaming | High-volume event buffer | $0.025/stream-hour | 5 |
+| Action Type | Target | Use Case |
+|-------------|--------|----------|
+| **ONS** | Notification Topic | Email, PagerDuty, webhook |
+| **FAAS** | Function | Data processing, API calls |
+| **OSS** | Streaming | High-volume event buffer, replay |
+
+Check the Oracle price list for Notifications, Functions and Streaming pricing before estimating cost.
 
 **Choosing Action Type:**
 - **1-10 events/minute** → ONS (notifications)
