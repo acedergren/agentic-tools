@@ -89,7 +89,7 @@ cd packages/server && npx tsc --noEmit 2>&1 | head -20
 
 Common causes of type errors after migration:
 - Import path changed but exported symbol name also differs → check the actual export
-- Package not yet built → `pnpm --filter @portal/server build`
+- Package not yet built → `pnpm --filter <package-name> build`
 - Circular dependency introduced → `pnpm run check:circular`
 
 ### Step 5: Residual Check

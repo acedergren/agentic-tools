@@ -47,7 +47,7 @@ done
 Block on critical/high findings. Warn on medium/low. Skip if not installed.
 
 ### TypeCheck workspace commands
-- **frontend**: `npx svelte-check --tsconfig ./tsconfig.json --threshold error` (11 pre-existing errors in test files are known baseline — ignore)
+- **frontend**: `npx svelte-check --tsconfig ./tsconfig.json --threshold error` (if the repo has a documented baseline of known errors, compare against it rather than ignoring errors)
 - **api**: `npx tsc --noEmit`
 - **shared**: `npx tsc --noEmit`
 
