@@ -1,6 +1,6 @@
 ---
 name: shadcn-data-table
-description: Build powerful data tables using TanStack Table v8 with Svelte 5 and shadcn-svelte components. Use when working with tabular data, building admin interfaces, dashboards, or any UI requiring sortable/filterable/paginated tables. Covers column definitions, cell formatting, row actions, pagination, sorting, filtering, visibility controls, and row selection. Essential for Laneweaver TMS load boards, carrier lists, customer dashboards, and any data-heavy Svelte 5 application.
+description: Build powerful data tables using TanStack Table v8 with Svelte 5 and shadcn-svelte components. Use when working with tabular data, building admin interfaces, dashboards, or any UI requiring sortable/filterable/paginated tables. Covers column definitions, cell formatting, row actions, pagination, sorting, filtering, visibility controls, and row selection. Useful for admin lists, dashboards, and any data-heavy Svelte 5 application.
 ---
 
 # shadcn-svelte Data Tables

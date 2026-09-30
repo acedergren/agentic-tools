@@ -106,9 +106,11 @@ Walk through form creation workflow:
 
    <form method="POST" use:enhance>
      <Form.Field {form} name="email">
-       <Form.Control let:attrs>
-         <Form.Label>Email</Form.Label>
-         <Input {...attrs} type="email" bind:value={$formData.email} />
+       <Form.Control>
+         {#snippet children({ props })}
+           <Form.Label>Email</Form.Label>
+           <Input {...props} type="email" bind:value={$formData.email} />
+         {/snippet}
        </Form.Control>
        <Form.FieldErrors />
      </Form.Field>
@@ -156,7 +158,7 @@ Guide through DataTable setup with TanStack Table v8:
    - `renderComponent` for interactive cells
    - `renderSnippet` for formatted cells
 
-5. **For complete examples**: Reference `datatable-tanstack-svelte5.md` and `shadcn-datatable.md`
+5. **For complete examples**: Reference `shadcn-datatable.md`
 
 6. **Next steps**: Form integration, dialog patterns
 
@@ -179,12 +181,14 @@ Explain modal/dialog/drawer patterns:
      import * as Dialog from "$lib/components/ui/dialog";
      import { Button } from "$lib/components/ui/button";
 
-     let open = false;
+     let open = $state(false);
    </script>
 
    <Dialog.Root bind:open>
-     <Dialog.Trigger asChild let:builder>
-       <Button builders={[builder]}>Open Dialog</Button>
+     <Dialog.Trigger>
+       {#snippet child({ props })}
+         <Button {...props}>Open Dialog</Button>
+       {/snippet}
      </Dialog.Trigger>
      <Dialog.Content>
        <Dialog.Header>
@@ -193,7 +197,7 @@ Explain modal/dialog/drawer patterns:
        </Dialog.Header>
        <p>Content here</p>
        <Dialog.Footer>
-         <Button on:click={() => (open = false)}>Close</Button>
+         <Button onclick={() => (open = false)}>Close</Button>
        </Dialog.Footer>
      </Dialog.Content>
    </Dialog.Root>
@@ -207,8 +211,10 @@ Explain modal/dialog/drawer patterns:
    </script>
 
    <Drawer.Root>
-     <Drawer.Trigger asChild let:builder>
-       <Button builders={[builder]} variant="outline">Open Drawer</Button>
+     <Drawer.Trigger>
+       {#snippet child({ props })}
+         <Button {...props} variant="outline">Open Drawer</Button>
+       {/snippet}
      </Drawer.Trigger>
      <Drawer.Content>
        <Drawer.Header>
@@ -334,7 +340,7 @@ Provide guidance for that specific component:
 3. **Use Tailwind v4.1 patterns** (not v3 syntax)
 4. **Include imports** in all code examples
 5. **For complex features**: Reference `workflows.md`
-6. **For DataTables**: Reference `datatable-tanstack-svelte5.md`
+6. **For DataTables**: Reference `shadcn-datatable.md`
 
 ---
 
