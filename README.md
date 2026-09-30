@@ -187,7 +187,7 @@ See the [OCI Skill Catalog and Use Cases](skills/oci/USE_CASES.md) for concrete 
 | **[/oci/zpr-security](skills/oci/zpr-security/)** | Zero Trust Packet Routing | ZPR policy, security attributes, protected resources, and rollout safety |
 | **[/oci/managed-bastion-access](skills/oci/managed-bastion-access/)** | OCI Bastion access | Managed SSH, port forwarding, dynamic SOCKS5, allowlists, and plugin troubleshooting |
 | **[/oci/database-management](skills/oci/database-management/)** | Oracle database router | DB Systems/PDB work and ADB handoff to oracle-dba |
-| **[/oci/oracle-dba](skills/oci/oracle-dba/)** | Autonomous AI Database operations | ADB, SQLcl, wallet, ECPU, backup, and tuning guidance |
+| **[/oci/oracle-dba](skills/oci/oracle-dba/)** | Autonomous AI Database control plane | ECPU/auto-scaling billing, wallets, mTLS/ACL, backups, clones; SQL work goes to Oracle's `oracle/skills` `db` pack |
 | **[/oci/secrets-management](skills/oci/secrets-management/)** | OCI Vault and secret operations | Rotation, replication, instance principals, and retrieval guardrails |
 | **[/oci/fastify-better-auth-bridge](skills/oci/fastify-better-auth-bridge/)** | Fastify Better Auth bridge | Web Request forwarding, decorators, and org-context patching |
 | **[/oci/oracle-idcs-better-auth-setup](skills/oci/oracle-idcs-better-auth-setup/)** | Oracle + IDCS auth setup | Routes setup work across shared Better Auth foundations |
@@ -225,7 +225,7 @@ The install surfaces expose every registered skill package under `skills/`, incl
 | **[/oci/oci-resource-manager](skills/oci/oci-resource-manager/)** | "configure OCI Resource Manager", "debug Resource Manager job", "create ORM stack", "use Resource Manager private endpoint", or "fix Resource Manager dynamic group" |
 | **[/oci/oci-security-control-plane](skills/oci/oci-security-control-plane/)** | "choose OCI security control", "route OCI security issue", "compare Cloud Guard vs Security Zones", "decide ZPR vs NSG", or "use Bastion vs public SSH" |
 | **[/oci/zpr-security](skills/oci/zpr-security/)** | "configure ZPR", "debug Zero Trust Packet Routing", "write ZPL policy", "apply security attributes", or "protect OCI resources with ZPR" |
-| **[/oci/oracle-dba](skills/oci/oracle-dba/)** | "manage Autonomous AI Database", "debug ADB performance", "fix wallet connection", "optimize ECPU cost", or "use SQLcl with Oracle Database" |
+| **[/oci/oracle-dba](skills/oci/oracle-dba/)** | "provision Autonomous AI Database", "estimate ADB ECPU cost", "configure ADB auto scaling", "fix ADB wallet or mTLS connection", or "manage ADB backups and clones" |
 | **[/oci/oracle-idcs-better-auth-setup](skills/oci/oracle-idcs-better-auth-setup/)** | "connect Better Auth to OCI IAM", "configure identity domain OIDC", "fix IDCS callback URL", "set trusted origins", or "bootstrap Oracle auth provider" |
 | **[/oci/oracle-idcs-org-provisioning](skills/oci/oracle-idcs-org-provisioning/)** | "map IDCS groups to orgs", "provision org_members from identity domains", "fix Better Auth active org", or "bootstrap first admin" |
 | **[/orchestrate](skills/orchestrate/)** | Use when executing a multi-task implementation plan with parallel agents. Coordinates task assignment, wave sequencing,  |

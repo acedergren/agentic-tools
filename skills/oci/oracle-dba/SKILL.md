@@ -1,18 +1,17 @@
 ---
 name: oracle-dba
-description: "Use when the user asks to \"manage Autonomous AI Database\", \"debug ADB performance\", \"fix wallet connection\", \"optimize ECPU cost\", or \"use SQLcl with Oracle Database\"."
-version: 2.0.0
+description: "Use when the user asks to \"provision Autonomous AI Database\", \"estimate ADB ECPU cost\", \"configure ADB auto scaling\", \"fix ADB wallet or mTLS connection\", or \"manage ADB backups and clones\"."
+version: 3.0.0
 keywords:
-  - "Oracle Database"
   - "Autonomous AI Database"
   - "ADB"
   - "ECPU"
-  - "OCPU"
+  - "auto scaling"
   - "wallet"
-  - "SQLcl"
-  - "SQL_ID"
-  - "wait events"
-  - "Data Guard"
+  - "mTLS"
+  - "long-term backup"
+  - "refreshable clone"
+  - "oci db autonomous-database"
 aliases:
   - "autonomous-database"
   - "oracle-autonomous-database"
@@ -21,248 +20,118 @@ domains:
   - "oracle"
   - "database"
 ---
-# Oracle Autonomous AI Database - Expert Knowledge
+# Autonomous AI Database: Control-Plane Operations
 
-Use Autonomous AI Database and ADB as current/common terminology. Prefer ECPU wording for new guidance; keep OCPU only when quoting legacy configurations, API fields, or older docs that still use it.
+Scope: the OCI side of **Autonomous AI Database Serverless** — provisioning, ECPU and storage billing,
+auto scaling, stop/start, wallets and network access, backups, clones, and ADB metrics.
+
+For everything *inside* the database — SQL, SQLcl, tuning, wait events, users and privileges,
+auditing, drivers, Select AI — use Oracle's official skills pack
+**[oracle/skills `db`](https://github.com/oracle/skills/tree/main/db)**. This skill does not
+duplicate it.
 
 ## Do NOT load this skill when
 
-Do not load this skill for unrelated general programming, non-Oracle cloud work, or questions covered by a narrower sibling skill.
+- The question is SQL, PL/SQL, SQLcl, optimizer/AWR, or schema security → `oracle/skills` `db` pack.
+- The database is Base Database Service / Exadata DB systems → `oci/database-management`.
+- Unrelated general programming or non-Oracle cloud work.
 
 ## When to Use
 
-Load this skill for: the user asks to "manage Autonomous AI Database", "debug ADB performance", "fix wallet connection", "optimize ECPU cost", or "use SQLcl with Oracle Database".
-
-Prefer this skill only for its named domain. For broader OCI architecture triage, start with `oci/best-practices` as the router.
+Load for: "provision Autonomous AI Database", "estimate ADB ECPU cost", "configure ADB auto scaling",
+"fix ADB wallet or mTLS connection", "manage ADB backups and clones", "stop ADB to save money".
 
 ## NEVER Do This
 
-**NEVER use ADMIN user in application code**
-
-ADMIN has full database control; audit trail shows all actions as ADMIN (no accountability); ADMIN cannot be locked/disabled without breaking automation.
-```sql
--- RIGHT: create app-specific user with least privilege
-CREATE USER app_user IDENTIFIED BY :password;
-GRANT CREATE SESSION, SELECT ON schema.table TO app_user;
+**NEVER promise a "max ECPU cap" for compute auto scaling**
 ```
-
-**NEVER scale ECPUs without checking wait events first**
-
-Scaling ECPUs without proof can waste budget. If root cause is bad SQL, more compute only hides the defect.
+Compute auto scaling (on by default for ECPU databases) lets the database use up to 3x the base
+ECPU count. There is no configurable ceiling below 3x — the only controls are the base ECPU count
+and turning auto scaling off (--is-auto-scaling-enabled false).
 ```
-Decision path:
-1. Check v$system_event for top wait events
-2. High 'CPU time' → Bad SQL, optimize first (do NOT scale)
-3. High 'db file sequential read' → Missing indexes (do NOT scale)
-4. High 'User I/O' sustained → Scale storage IOPS OR enable auto-scaling
-5. Only scale ECPUs if: CPU wait sustained + SQL already optimized
-```
+Billing: usage is measured per second in whole ECPUs and averaged over each hour; you pay the base
+plus any extra averaged usage. Example from Oracle's docs: base 4 ECPU, running at 8 ECPU for half
+an hour, bills as 6 ECPU for that hour. Minimum billing is 1 minute.
+With auto scaling on, CPU% in Database Actions is relative to 3x the base ECPU count.
+
+**NEVER assume storage stops growing (or shrinks) by itself**
+- Storage auto scaling is **off** by default; when on, the database can grow to 3x reserved base storage.
+- Beyond base, allocated storage is billed rounded up to the TB (Lakehouse) or GB (Transaction
+  Processing, APEX, JSON) per hour.
+- Deleting data does not lower allocated storage; run a shrink (`oci db autonomous-database shrink`)
+  to bring allocated storage (and the bill) back down.
 
 **NEVER assume stopped ADB = zero cost**
 ```
-Stopped ADB charges:
-  CPU/ECPU billing: stopped
-  Storage: continues
-  Backups and retained resources: can continue
-
-For long-term idle (>60 days): Export via Data Pump, delete ADB, restore from backup.
+Stopped: ECPU billing stops.
+Still billed: database storage, and (ECPU model) automatic backup storage for the retention period,
+plus any long-term backups.
 ```
 
-**NEVER create manual backups without retention (kept forever)**
+**NEVER keep a long-term backup "just in case" without a retention period**
+Long-term backups require `--is-long-term-backup true --retention-period-in-days N`, where the
+retention is 3 months to 10 years; they incur additional backup storage cost. At least one automatic
+backup must exist first, and long-term backups can't be created more than once in 7 days.
 ```bash
-# WRONG - retained until explicitly removed, with ongoing storage impact
 oci db autonomous-database-backup create \
-  --autonomous-database-id $ADB_ID \
-  --display-name "pre-upgrade-backup"
-
-# RIGHT - set retention
-oci db autonomous-database-backup create \
-  --autonomous-database-id $ADB_ID \
-  --display-name "pre-upgrade-backup" \
-  --retention-days 30
+  --autonomous-database-id "$ADB_ID" \
+  --display-name "pre-upgrade-2026-09" \
+  --is-long-term-backup true \
+  --retention-period-in-days 90
 ```
+Automatic backups (ECPU model): retention configurable from 1 to 60 days
+(`--backup-retention-period-in-days`), billed separately from database storage.
 
-**NEVER enable auto-scaling without setting a max ECPU limit**
-```
-Auto-scaling can bill for elevated usage during the hour.
-Base 2 ECPU → can scale to 6 ECPU (3× hard limit).
-Without max cap: surprise spend is easy.
+**NEVER rotate a regional wallet casually**
+`generate-wallet --generate-type ALL` returns a *regional* wallet covering every ADB in the region;
+rotating it invalidates connections for all of them. Use `--generate-type SINGLE` (instance wallet)
+for applications.
 
-RIGHT: Set a Max ECPU cap that matches the budget and workload SLO.
-```
+**NEVER disable mTLS without a network boundary**
+`--is-mtls-connection-required false` allows walletless TLS, but only makes sense with an access
+control list (`--whitelisted-ips`) or a private endpoint (`--subnet-id`, `--nsg-ids`). A public
+endpoint with no ACL and TLS is open to the internet.
 
-**NEVER use ROWNUM with ORDER BY (wrong results)**
-```sql
--- WRONG: ROWNUM applied BEFORE ORDER BY
-SELECT * FROM orders WHERE ROWNUM <= 10 ORDER BY created_at DESC;
+## Provisioning checklist
 
--- RIGHT: FETCH FIRST (Oracle 12c+)
-SELECT * FROM orders ORDER BY created_at DESC FETCH FIRST 10 ROWS ONLY;
-```
+| Decision | Flag (OCI CLI 3.94.1) | Notes |
+|----------|------------------------|-------|
+| Workload | `--db-workload OLTP\|DW\|AJD\|APEX\|LH` | OLTP = Transaction Processing, DW/LH = Lakehouse |
+| Compute | `--compute-model ECPU --compute-count N` | `--cpu-core-count` is the legacy OCPU field |
+| Auto scaling | `--is-auto-scaling-enabled`, `--is-auto-scaling-for-storage-enabled` | compute on by default; storage off |
+| Storage | `--data-storage-size-in-gbs` or `--data-storage-size-in-tbs` | |
+| License | `--license-model LICENSE_INCLUDED\|BRING_YOUR_OWN_LICENSE` | BYOL ECPU rate is ~24% of LI |
+| Network | `--subnet-id`, `--nsg-ids` (private endpoint) or `--whitelisted-ips` (ACL) | |
+| Free/dev | `--is-free-tier true` or `--is-dev-tier true` | |
 
----
+## Price anchors (Oracle price list API, USD pay-as-you-go, checked 2026-09-30)
 
-## Performance Troubleshooting Decision Tree
+| SKU | Item | Price |
+|-----|------|-------|
+| B95701 / B95702 | Lakehouse / Transaction Processing ECPU, license included | $0.336 per ECPU-hour |
+| B95703 / B95704 | Lakehouse / Transaction Processing ECPU, BYOL | $0.0807 per ECPU-hour |
+| B95706 | ADB storage for Transaction Processing | $0.1953 per GB-month |
+| B95754 | "Oracle Autonomous AI Database Storage" | $0.0299 per GB-month |
 
-```
-"Queries are slow"
-│
-├─ ONE query slow?
-│  └─ Get SQL_ID → check execution plan:
-│     SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY_CURSOR('&sql_id'));
-│     ├─ TABLE ACCESS FULL on large table → Add index
-│     ├─ Wrong join order → SQL hints or SQL Plan Baseline
-│     └─ Cartesian join → Fix query logic
-│
-├─ ALL queries slow (system-wide)?
-│  └─ Check wait events:
-│     SELECT event, time_waited_micro/1000000 AS wait_sec
-│     FROM v$system_event WHERE wait_class != 'Idle'
-│     ORDER BY time_waited_micro DESC FETCH FIRST 10 ROWS ONLY;
-│     ├─ 'CPU time' → Optimize SQL OR scale ECPU (check SQL first)
-│     ├─ 'db file sequential read' → Missing indexes
-│     ├─ 'db file scattered read' → Full table scans
-│     ├─ 'log file sync' → Too many commits (batch DML)
-│     └─ 'User I/O' → Scale storage IOPS or enable auto-scaling
-│
-└─ When did it start?
-   ├─ After schema change → DBMS_STATS.GATHER_TABLE_STATS
-   ├─ After data load → Gather stats + check partitioning
-   ├─ After version upgrade → Compare execution plans
-   └─ Gradual over time → Data growth, need indexing/partitioning
-```
+Quick math: 2 ECPU base, LI, 730 h, no scaling ≈ 2 × 0.336 × 730 ≈ $490/month compute, before storage.
+Re-check the price list (and your contract discounts) before quoting; these change.
 
----
+## Common connection errors
 
-## SQL_ID Debugging Workflow
-
-**Step 1: Find problem SQL_ID**
-```sql
-SELECT sql_id, elapsed_time/executions/1000 AS avg_ms,
-       executions, sql_text
-FROM v$sql
-WHERE executions > 0
-  AND last_active_time > SYSDATE - 1/24  -- last hour
-ORDER BY elapsed_time DESC
-FETCH FIRST 10 ROWS ONLY;
-```
-
-**Step 2: Get execution plan**
-```sql
-SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY_CURSOR('&sql_id'));
-```
-
-**Step 3: Create and run SQL Tuning Task**
-```sql
-DECLARE task_name VARCHAR2(30);
-BEGIN
-  task_name := DBMS_SQLTUNE.CREATE_TUNING_TASK(
-    sql_id => '&sql_id', task_name => 'tune_slow_query');
-  DBMS_SQLTUNE.EXECUTE_TUNING_TASK(task_name);
-END;
-/
-SELECT DBMS_SQLTUNE.REPORT_TUNING_TASK('tune_slow_query') FROM DUAL;
-```
-
-**Step 4: Implement fix**
-- Recommendation: Add index → create index
-- Recommendation: Use hint → test, then fix via SQL Plan Baseline
-- Recommendation: Gather stats → `EXEC DBMS_STATS.GATHER_TABLE_STATS('schema','table')`
-
----
-
-## ADB-Specific Behaviors
-
-**Auto-scaling hard limits (cannot change):**
-```
-Minimum: 1× base ECPU
-Maximum: 3× base ECPU
-Scale-up trigger: CPU > 80% for 5+ minutes
-Scale-down trigger: CPU < 60% for 10+ minutes
-Time to scale: 5-10 minutes
-Billing: charged for PEAK usage each hour
-```
-
-**ADMIN user restrictions in ADB (differs from on-premises):**
-```
-CANNOT: Create tablespaces (DATA auto-managed)
-CANNOT: Modify SYSTEM/SYSAUX tablespaces
-CANNOT: Access OS (no shell, no file system)
-CANNOT: Use SYSDBA privileges (not available in ADB)
-```
-
-**Service name performance impact:**
-
-| Service | Relative priority | Use For |
-|---------|-------------------|---------|
-| HIGH | Highest priority, least sharing | Interactive queries, OLTP |
-| MEDIUM | Balanced sharing | Reporting, batch |
-| LOW | Most sharing | Background tasks, ETL |
-
-Gotcha: Using HIGH for background jobs starves interactive users with no extra cost benefit.
-
-**Backup retention (automatic vs manual):**
-```
-Automatic: Daily incremental + weekly full, 60-day default, INCLUDED in storage cost
-Manual: On-demand, retained until policy or manual deletion
-Cost trap: forgotten manual backups keep consuming storage budget
-```
-
----
-
-## Version Feature Matrix
-
-| Feature | 19c | 21c | 23ai | 26ai | Use Case |
-|---------|-----|-----|------|------|----------|
-| JSON Relational Duality | - | - | ✓ | ✓ | REST + SQL modern apps |
-| AI Vector Search | - | - | ✓ | ✓ | RAG, semantic search |
-| JavaScript Stored Procs | - | - | - | ✓ | Node.js developers |
-| SELECT AI (NL→SQL) | - | - | ✓ | ✓ | Natural language queries |
-| Property Graphs | - | ✓ | ✓ | ✓ | Fraud detection, social |
-| True Cache | - | - | - | ✓ | Read-heavy workloads |
-| Blockchain Tables | - | ✓ | ✓ | ✓ | Immutable audit log |
-
-**Upgrade path**: 19c → 21c → 23ai → 26ai (downgrade NOT supported)
-**Rule**: Always test in clone before upgrading production.
-
----
-
-## Common ADB Errors
-
-| Error | Actual Cause | Fix |
-|-------|-------------|-----|
-| `ORA-01017: invalid username/password` | Wallet password wrong or expired | Re-download wallet |
-| `ORA-12170: Connect timeout` | NSG rules blocking OR wrong service name | Check NSG, verify tnsnames.ora |
-| `ORA-00604: error at recursive SQL level 1` | Automated task failure (stats, space mgmt) | Check DBA_SCHEDULER_JOB_RUN_DETAILS |
-| `ORA-30036: unable to extend segment` | ADB auto-manages DATA; if persists = bug | Contact Oracle Support |
-| `ORA-01031: insufficient privileges` | ADMIN attempting restricted operation | See ADMIN restrictions above |
-
----
+| Symptom | Check |
+|---------|-------|
+| `ORA-12506` / `ORA-12170` from outside OCI | ACL (`whitelisted-ips`) or private-endpoint routing/NSG |
+| Handshake/SSL errors with a wallet | Wallet regenerated/rotated? `TNS_ADMIN` points at the unzipped wallet dir? |
+| Works with wallet, fails without | `is-mtls-connection-required` still true, or no ACL/private endpoint for TLS |
+| `ORA-01017` | Wrong database user/password (the wallet password only protects the wallet files) |
 
 ## Reference Files
 
-**Load [`references/oci-cli-adb.md`](references/oci-cli-adb.md) when:**
-- Provisioning, scaling, or deleting ADB instances
-- Creating backups or clones (full vs metadata)
-- Downloading wallet files
-- Changing auto-scaling, license type, or version
+Load [`references/adb-cli-reference.md`](references/adb-cli-reference.md) for verified CLI commands
+(provision, scale, stop/start, wallets, backups, clones, metrics).
 
-**Load [`references/sqlcl-workflows.md`](references/sqlcl-workflows.md) when:**
-- Executing SQL queries via Bash (SQLcl)
-- Running DBMS_SQLTUNE tasks
-- Data Pump export/import
-- Generating DDL for schema objects
-
-**Load [`references/oci-adb-best-practices.md`](references/oci-adb-best-practices.md) when:**
-- Designing ADB architecture from scratch
-- Planning ATP vs ADW vs APEX vs JSON workload type
-- Migrating from on-premises Oracle to ADB
-
-**See [`references/adb-ha-dr.md`](references/adb-ha-dr.md) for:** Autonomous Data Guard setup, cross-region DR, RTO/RPO targets.
-
-**See [`references/adb-security.md`](references/adb-security.md) for:** mTLS wallet configuration, private endpoints, VCN Service Gateway setup.
-
-**Pricing reference:** See [`references/cost-reference.md`](references/cost-reference.md) for ECPU/storage pricing tables and auto-scaling cost calculations.
+Last verified: 2026-09-30 (OCI CLI 3.94.1 `--help`; docs.oracle.com ADB auto scaling, long-term backups,
+backup retention; Oracle price list API)
 
 ## Arguments
 

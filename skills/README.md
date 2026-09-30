@@ -60,7 +60,7 @@ For concrete example prompts, routing guidance, and multi-skill workflows, see [
 | **oci/zpr-security** | Zero Trust Packet Routing | v2.0.0 |
 | **oci/managed-bastion-access** | OCI Bastion access | v2.0.0 |
 | **oci/database-management** | Oracle database router | v2.0.0 |
-| **oci/oracle-dba** | Autonomous AI Database operations | v2.0.0 |
+| **oci/oracle-dba** | Autonomous AI Database control-plane operations | v3.0.0 |
 | **oci/secrets-management** | OCI Vault and secret operations | v2.0.0 |
 | **oci/fastify-better-auth-bridge** | Fastify Better Auth bridge | v1.0.0 |
 | **oci/oracle-idcs-better-auth-setup** | Oracle + IDCS auth setup | v1.0.0 |
@@ -99,7 +99,7 @@ CI validates that registry coverage stays in sync with the filesystem and docs.
 | **oci/oci-resource-manager** | "configure OCI Resource Manager", "debug Resource Manager job", "create ORM stack", "use Resource Manager private endpoint", or "fix Resource Manager dynamic group" |
 | **oci/oci-security-control-plane** | "choose OCI security control", "route OCI security issue", "compare Cloud Guard vs Security Zones", "decide ZPR vs NSG", or "use Bastion vs public SSH" |
 | **oci/zpr-security** | "configure ZPR", "debug Zero Trust Packet Routing", "write ZPL policy", "apply security attributes", or "protect OCI resources with ZPR" |
-| **oci/oracle-dba** | "manage Autonomous AI Database", "debug ADB performance", "fix wallet connection", "optimize ECPU cost", or "use SQLcl with Oracle Database" |
+| **oci/oracle-dba** | "provision Autonomous AI Database", "estimate ADB ECPU cost", "configure ADB auto scaling", "fix ADB wallet or mTLS connection", or "manage ADB backups and clones" |
 | **oci/oracle-idcs-better-auth-setup** | "connect Better Auth to OCI IAM", "configure identity domain OIDC", "fix IDCS callback URL", "set trusted origins", or "bootstrap Oracle auth provider" |
 | **oci/oracle-idcs-org-provisioning** | "map IDCS groups to orgs", "provision org_members from identity domains", "fix Better Auth active org", or "bootstrap first admin" |
 | **orchestrate** | Use when executing a multi-task implementation plan with parallel agents. Coordinates task assignment, wave sequencing,  |
