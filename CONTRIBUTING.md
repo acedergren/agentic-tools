@@ -142,19 +142,16 @@ docs: update installation instructions
 5. **Link related issues** if applicable
 6. **Request review** from maintainers
 
-## Skill Improvement Methodology
+## Skill Quality Bar
 
-This project uses TDD (Test-Driven Development) methodology for skill improvements:
+A skill earns its place only if it adds knowledge, guardrails, or workflows a strong model would not reliably produce on its own (recent or obscure facts, exact CLI flags, gotchas, opinionated procedures). Before opening a PR:
 
-1. **Baseline Evaluation**: Run skill-judge evaluation
-2. **Apply Improvements**: Use proven patterns:
-   - Strategic assessment frameworks
-   - "Why deceptively hard to debug" insights
-   - 4-step error recovery procedures
-   - MANDATORY loading triggers with conditions
-3. **Verify**: Re-evaluate to confirm A-grade (90%+)
-
-See `PROJECT-COMPLETE.md` and `SKILL-IMPROVEMENT-PROGRESS.md` for details on the proven methodology.
+1. **Cut generic advice.** Remove anything a frontier model already says unprompted ("tag your resources", "don't log secrets").
+2. **Verify every fact you add.** Check CLI flags with `<cli> <command> --help`, service behavior against the vendor docs, and prices against the vendor price list. If you cannot verify a claim, leave it out.
+3. **Date drift-prone content.** Add or update a `Last verified: YYYY-MM-DD` line in skills whose facts can drift.
+4. **Do not hard-code prices** unless they are verified, dated, and sourced.
+5. **Run `npm run skills:ci`.** It validates structure and registries, runs the install smoke test and secret scan, and lints OCI commands and IAM policy syntax (`scripts/ci/lint-oci-content.mjs`).
+6. **Use the OCI pressure scenarios** in `skills/oci-skill-pressure-scenarios.md` when editing Oracle skills.
 
 ## Reporting Issues
 
@@ -190,8 +187,6 @@ Include:
 ## Questions?
 
 - **Documentation**: See [README.md](README.md)
-- **Project Completion**: See [PROJECT-COMPLETE.md](PROJECT-COMPLETE.md)
-- **Skill Methodology**: See [SKILL-IMPROVEMENT-PROGRESS.md](SKILL-IMPROVEMENT-PROGRESS.md)
 - **Issues**: [GitHub Issues](https://github.com/acedergren/agentic-tools/issues)
 
 ---
