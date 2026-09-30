@@ -6,7 +6,7 @@ Agent team orchestration pipeline for [Claude Code](https://claude.com/claude-co
 /prd → /prd --to-plan → /orchestrate → /implement → /review-all → /health-check → PR
 ```
 
-Part of [agentic-tools](https://github.com/acedergren/agentic-tools). This package contains only the pipeline skills and agents — see the parent repo for standalone utilities (humanizer, firecrawl, shadcn-svelte, etc.).
+Part of [agentic-tools](https://github.com/acedergren/agentic-tools). This package contains only the pipeline skills and agents — see the parent repo for standalone utilities (shadcn-svelte, write-natural-swedish, the OCI pack, etc.).
 
 ## Install
 

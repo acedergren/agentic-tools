@@ -129,67 +129,53 @@ Hierarchy: Card > Form > (Label+Input)*2 + Button + Alert
 npx shadcn-svelte@latest add card form input button label alert
 ```
 
-**Phase 3 Output:**
+**Phase 3 Output** (Svelte 5 + sveltekit-superforms + Formsnap):
 ```svelte
 <script lang="ts">
-  import { enhance } from '$app/forms';
-  import { zodResolver } from "@hookform/resolvers/zod"
-  import { useForm } from "react-hook-form"
-  import * as z from "zod"
-  import { Button } from "$lib/components/ui/button"
-  import { Card, CardContent, CardHeader, CardTitle } from "$lib/components/ui/card"
-  import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "$lib/components/ui/form"
-  import { Input } from "$lib/components/ui/input"
+  import { superForm } from "sveltekit-superforms";
+  import { zodClient } from "sveltekit-superforms/adapters";
+  import { z } from "zod";
+  import * as Card from "$lib/components/ui/card";
+  import * as Form from "$lib/components/ui/form";
+  import { Input } from "$lib/components/ui/input";
 
-  const formSchema = z.object({
+  const loginSchema = z.object({
     email: z.string().email(),
     password: z.string().min(8),
-  })
-
-  export let form: HTMLFormElement;
-
-  // SvelteKit form action with progressive enhancement
-  const handleSubmit = enhance(() => {
-    return async ({ result, data }) => {
-      if (result.type === 'success') {
-        // Handle successful login
-        console.log('Login successful:', data);
-      } else {
-        // Handle errors
-        console.error('Login failed:', result.error);
-      }
-    };
   });
+
+  let { data } = $props();   // data.form comes from superValidate() in +page.server.ts
+
+  const form = superForm(data.form, { validators: zodClient(loginSchema) });
+  const { form: formData, enhance } = form;
 </script>
 
-<Card>
-  <CardHeader>
-    <CardTitle>Login</CardTitle>
-  </CardHeader>
-  <CardContent>
-    <form method="POST" action="/login" use:handleSubmit class="space-y-4">
-      <div class="space-y-2">
-        <label for="email">Email</label>
-        <Input
-          id="email"
-          name="email"
-          type="email"
-          placeholder="email@example.com"
-          required
-        />
-      </div>
-      <div class="space-y-2">
-        <label for="password">Password</label>
-        <Input
-          id="password"
-          name="password"
-          type="password"
-          placeholder="Enter password"
-          required
-        />
-      </div>
-      <Button type="submit" class="w-full">Login</Button>
+<Card.Root>
+  <Card.Header>
+    <Card.Title>Login</Card.Title>
+  </Card.Header>
+  <Card.Content>
+    <form method="POST" action="?/login" use:enhance class="space-y-4">
+      <Form.Field {form} name="email">
+        <Form.Control>
+          {#snippet children({ props })}
+            <Form.Label>Email</Form.Label>
+            <Input {...props} type="email" bind:value={$formData.email} />
+          {/snippet}
+        </Form.Control>
+        <Form.FieldErrors />
+      </Form.Field>
+      <Form.Field {form} name="password">
+        <Form.Control>
+          {#snippet children({ props })}
+            <Form.Label>Password</Form.Label>
+            <Input {...props} type="password" bind:value={$formData.password} />
+          {/snippet}
+        </Form.Control>
+        <Form.FieldErrors />
+      </Form.Field>
+      <Form.Button class="w-full">Login</Form.Button>
     </form>
-  </CardContent>
-</Card>
+  </Card.Content>
+</Card.Root>
 ```

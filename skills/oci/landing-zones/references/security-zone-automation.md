@@ -9,20 +9,20 @@ scale across compartments/environments. All commands assume OCI CLI.
 RECIPE_NAME="CIS-Prod-Recipe"
 OCI_REGION="us-ashburn-1"
 
-oci cloud-guard security-policy list --all \
+oci cloud-guard security-policy-collection list-security-policies --all \
   --query 'data[].{"name":"display-name","id":"id"}' --output table
 
 # capture policy OCIDs you want to enforce
 # Example filters for specific display names
-POLICY_IDS_JSON=$(oci cloud-guard security-policy list --all \
+POLICY_IDS_JSON=$(oci cloud-guard security-policy-collection list-security-policies --all \
   --query 'data[?"display-name"==`deny-public-ip` || "display-name"==`deny-public-bucket` || "display-name"==`require-encryption`].id')
 
-oci cloud-guard security-zone-recipe create \
+oci cloud-guard security-recipe create \
   --compartment-id "$TENANCY_OCID" \
   --display-name "$RECIPE_NAME" \
   --security-policies "$POLICY_IDS_JSON"
 
-RECIPE_ID=$(oci cloud-guard security-zone-recipe list --compartment-id "$TENANCY_OCID" \
+RECIPE_ID=$(oci cloud-guard security-recipe-collection list-security-recipes --compartment-id "$TENANCY_OCID" \
   --display-name "$RECIPE_NAME" --query 'data[0].id' --raw-output)
 ```
 
@@ -73,17 +73,18 @@ Apply after any manual change so state remains accurate.
 
 ```bash
 oci cloud-guard security-zone get --security-zone-id $ZONE_ID --query 'data."lifecycle-state"'
-oci cloud-guard security-zone list --compartment-id $TENANCY_OCID --all --output table
-oci cloud-guard security-zone list-problems --security-zone-id $ZONE_ID --all --output table
+oci cloud-guard security-zone-collection list-security-zones --compartment-id $TENANCY_OCID --all --output table
+oci cloud-guard problem list --compartment-id $TENANCY_OCID --problem-category SECURITY_ZONE \
+  --compartment-id-in-subtree true --access-level ACCESSIBLE --all --output table
 ```
 
-Alert SRE if any compartment re-enters `PROBLEM` state after remediation.
+Alert SRE if any compartment shows new `SECURITY_ZONE` problems after remediation.
 
 ## 5. Rollback / Removal
 
 ```bash
 oci cloud-guard security-zone delete --security-zone-id $ZONE_ID --force
-oci cloud-guard security-zone-recipe delete --security-zone-recipe-id $RECIPE_ID --force
+oci cloud-guard security-recipe delete --security-recipe-id $RECIPE_ID --force
 ```
 
 Only remove zones with compliance approval. Document reason in incident ticket.

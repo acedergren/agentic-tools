@@ -29,7 +29,9 @@ Benefits:
 - Shared services (DNS, monitoring, bastion)
 - Transitive routing via DRG
 
-Cost savings: $3,000-5,000/month via single NAT Gateway vs per-VCN
+Operational win: one inspected egress path (firewall/NAT) instead of one per VCN.
+NAT Gateway, DRG and Site-to-Site VPN have no hourly charge on OCI (price list checked 2026-09-30);
+the cost driver is outbound data beyond the free 10 TB/month and any Network Firewall you add.
 ```
 
 ### Pattern 2: Multi-Compartment Hierarchy
@@ -162,23 +164,22 @@ Key principle: Choose hierarchy that matches org structure + cost allocation
 │
 ├─ Multiple apps, need isolation, shared egress?
 │   └─ Hub-Spoke via DRG
-│       Cost: $100/month DRG + $45/month NAT (shared)
+│       Cost: DRG and NAT gateway carry no hourly charge; pay for Network Firewall if used
 │       Complexity: Medium
-│       Egress savings: $3,000-5,000/month
 │       Use when: Multi-app production
 │
 ├─ Multi-region disaster recovery?
 │   └─ Hub-Spoke + DRG Remote Peering
 │       Primary Region: Hub-Spoke
 │       DR Region: Hub-Spoke
-│       Cost: +$100/month DRG per region
+│       Cost: DRG has no hourly charge; pay for DR-region compute/storage and cross-region data transfer
 │       Use when: RTO < 1 hour required
 │
 └─ On-premises integration?
     └─ Hub-Spoke + FastConnect
         Hub VCN: FastConnect → On-prem
         Spokes: Route via hub
-        Cost: $500-2,000/month FastConnect
+        Cost: FastConnect port-hours (e.g. 1 Gbps = $0.2125/port-hour, price list 2026-09-30), no data charges on private VCs
         Use when: Hybrid cloud architecture
 ```
 

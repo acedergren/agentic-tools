@@ -5,13 +5,12 @@
   "groups": [
     {
       "name": "core-oci-operations",
-      "description": "OCI service operation, architecture, governance, automation, observability, cost, AI, events, secrets, and database skills.",
+      "description": "OCI service operation, architecture, governance, automation, observability, cost, events, secrets, and database skills.",
       "skills": [
         "oci/best-practices",
         "oci/compute-management",
         "oci/database-management",
         "oci/finops-cost-optimization",
-        "oci/genai-services",
         "oci/iam-identity-management",
         "oci/infrastructure-as-code",
         "oci/landing-zones",

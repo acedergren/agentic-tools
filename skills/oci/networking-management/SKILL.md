@@ -32,7 +32,6 @@ domains:
 ## Do NOT load this skill when
 
 Do not load this skill for unrelated general programming, non-Oracle cloud work, or questions covered by a narrower sibling skill.
-When the request is only asking to find or install skills, use `find-skills` instead.
 
 ## When to Use
 
@@ -53,7 +52,10 @@ With Service Gateway:
 - Keep supported Oracle service traffic on the Oracle Services Network path.
 - Verify current service-specific pricing before calling any transfer path free.
 
-Service Gateway covers: Object Storage (all tiers), ADB private endpoints, Oracle Services Network
+Service Gateway CIDR labels: "All <region> Services in Oracle Services Network" or "OCI <region> Object Storage".
+It gives private subnets access to Oracle *public* service endpoints (Object Storage, ADB public
+endpoints, OS Management, etc.). An ADB *private endpoint* is a private IP inside your own VCN and
+does not need the Service Gateway.
 ```
 ```bash
 # Add to private subnet route table
@@ -71,16 +73,14 @@ oci network vcn create --cidr-block "10.0.0.0/16"
 ```
 Oracle supports adding and modifying VCN CIDR ranges with restrictions. Treat edits as a controlled change: check subnet fit, route-table overlap, peer overlap, and DNS/security-rule blast radius before changing an existing VCN.
 
-❌ **NEVER use /27 or smaller for Load Balancer subnets**
-```bash
-# WRONG - only 32 IPs (27 usable after OCI reserves 5)
-oci network subnet create --cidr-block "10.0.1.0/27"
-# LB creation FAILS: "Insufficient IP space"
-
-# RIGHT - /24 minimum (hard requirement)
-oci network subnet create --cidr-block "10.0.1.0/24"
-# LB needs 2 subnets in different ADs for HA, each /24 minimum
-# OCI reserves IPs for future LB scaling even when not yet used
+❌ **NEVER size a Load Balancer subnet with no headroom**
+```
+There is no /24 requirement. Oracle recommends ONE regional subnet for a load balancer.
+- Public LB: uses 2 private IPs from the subnet (primary + standby).
+- Private LB: uses 3 private IPs (primary, standby, floating).
+- Every subnet also loses 3 addresses to OCI (first two + last).
+A /29 (8 addresses, 5 usable) technically fits a private LB, but leave room for more LBs,
+NSG-attached resources and future growth; /27–/26 is a sensible default.
 ```
 
 ❌ **NEVER assume VCN peering supports transitive routing**
@@ -121,7 +121,7 @@ oci network subnet update --security-list-ids '["<sl1>","<sl2>","<sl3>","<sl4>",
 # Error: "Maximum security lists (5) exceeded"
 
 # RIGHT - use NSGs for application-specific rules
-# NSGs: 5 per resource, 120 rules per NSG, unlimited NSGs per VCN
+# NSGs: a VNIC can be in at most 5 NSGs; check Service Limits for rule/NSG counts
 ```
 
 ## Security List vs NSG Decision Matrix
@@ -146,50 +146,51 @@ oci network subnet update --security-list-ids '["<sl1>","<sl2>","<sl3>","<sl4>",
 - Connect LPGs; add explicit routes in both route tables
 - Limitation: no transitivity — A↔B and B↔C does NOT give A↔C
 
-**Remote peering** (cross-region, $0.01/hr per DRG connection = $7.30/month):
-- DRG in each region, Remote Peering Connection on each DRG
+**Remote peering** (cross-region):
+- DRG in each region, Remote Peering Connection (RPC) on each DRG
+- DRGs and RPCs have no hourly charge in the Oracle price list (checked 2026-09-30); inter-region
+  data transfer is billed as outbound data transfer — check the price list for your source region.
 
 **Hub-and-spoke with DRG** (supports transitivity for on-premises):
 ```
 VCN-A → DRG ← On-Premises
 VCN-B → DRG ← On-Premises
 
-# DRG routes between all attached VCNs AND on-premises
-# This is the ONLY pattern where transitive routing works in OCI
+# DRG (v2) route tables + import distributions route between attached VCNs,
+# RPCs, VPN and FastConnect. Use a DRG, not LPG chains, when you need transit.
 ```
-
-3-region mesh (A↔B, B↔C, A↔C): 3 remote DRG connections = $21.90/month.
 
 ## FastConnect vs VPN Selection
 
+Prices from the Oracle price list API, USD pay-as-you-go, checked 2026-09-30. Re-check before quoting.
 ```
-VPN Site-to-Site:
-- Tunnel cost: $0.05/hr = $36.50/month
-- Data: FREE (no per-GB charge for VPN processing)
-- Egress: 500 GB × $0.0085 = $4.25/month
-Total: ~$41/month
+Site-to-Site VPN:
+- No port-hour charge ("Site-to-Site VPN is a free service").
+- Outbound data over the internet counts as normal outbound data transfer
+  (first 10 TB/month free in most regions, then per-GB).
+- Runs over the public internet: variable latency, no bandwidth guarantee.
 
-FastConnect (1 Gbps):
-- Port: $1,100/month flat
-- Data transfer: FREE
-Total: $1,100/month
+FastConnect:
+- Billed per port-hour, e.g. 1 Gbps = $0.2125/port-hour (≈ $155/month), SKU B88325.
+- No data transfer charges on private virtual circuits.
+- Partner/provider and cross-connect charges from third parties come on top.
 
 Decision:
-- <500 GB/month or dev/test → VPN
-- Production with latency SLA (5-20ms vs VPN's 30-50ms) → FastConnect
-- >500 GB/month predictable → FastConnect for economics
+- Dev/test, backup path, or low volume → VPN (free, quick to set up)
+- Predictable latency/bandwidth, large steady transfer, or compliance → FastConnect
+- Production FastConnect → keep a VPN as the backup path
 ```
 
 ## Subnet Sizing Guide
 
 | Application | CIDR | Usable IPs | Notes |
 |-------------|------|-----------|-------|
-| Small app tier | /26 | 59 | Basic workload |
-| Standard app tier | /24 | 251 | Recommended default |
-| Large app tier | /23 | 507 | High-density |
-| Load Balancer subnet | /24 minimum | 251 | Hard requirement, 2 subnets needed |
+| Small app tier | /26 | 61 | Basic workload |
+| Standard app tier | /24 | 253 | Recommended default |
+| Large app tier | /23 | 509 | High-density |
+| Load Balancer subnet | /27–/26 typical | 29–61 | 2 IPs (public) or 3 IPs (private) per LB; one regional subnet recommended |
 
-OCI reserves 5 IPs per subnet (first 3 + broadcast + reserved). Factor this in.
+OCI reserves 3 IPs per subnet: the first two and the last address in the CIDR.
 
 ## VCN Design Anti-Patterns
 
@@ -207,13 +208,11 @@ NSG db:   Allow 1521 from app NSG only
 
 **Gotcha**: The default VCN route table cannot be deleted (while VCN exists) — only modified. Create custom route tables and associate subnets to them; leave default unused.
 
+Last verified: 2026-09-30 (docs.oracle.com VCN/LB docs, Oracle price list API, OCI CLI 3.94.1)
+
 ## Reference Files
 
-**Load** [`references/oci-networking-reference.md`](references/oci-networking-reference.md) when you need:
-- DRG, FastConnect, or VPN detailed configuration
-- Complex routing troubleshooting
-- Network Firewall setup
-- VCN CIDR add/modify docs or subnet CLI reference
+**Load** [`references/oci-networking-reference.md`](references/oci-networking-reference.md) for verified subnet/LB/limit facts, a connectivity-debug checklist, and links to the Oracle pages for DRG, FastConnect, VPN, and VCN CIDR changes (it does not replace those docs).
 
 **Load** [`references/oci-terraform-networking-patterns.md`](references/oci-terraform-networking-patterns.md) when Terraform manages VCNs, subnets, route tables, NSGs, security lists, DRGs, Service Gateway, NAT Gateway, DNS resolver settings, or private endpoints.
 

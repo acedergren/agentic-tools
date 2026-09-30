@@ -4,7 +4,7 @@
 
 Extract orchestration target from `$ARGUMENTS`:
 
-- **Phase ID** (e.g., `A`, `B`, `D`): Load tasks from `.claude/reference/phase-10-task-plan.md`
+- **Phase ID** (e.g., `A`, `B`, `D`): Load tasks from the project's plan file (e.g. `.claude/reference/<plan>.md`)
 - **Plan file path** (e.g., `docs/plans/my-plan.md`): Parse from the given file
 - **Inline task list** (e.g., `"task1; task2; task3"`): Semicolon-separated descriptions
 
@@ -268,6 +268,6 @@ Run final phase verification. Run `/health-check --quick`. Print summary with ta
 Check which phases are unblocked (Phase Dependency DAG: A→B→C, A→D, A→F, B→E).
 For parallel phases, set up git worktrees:
 ```bash
-git worktree add ../portal-phase-{X} phase-10/{X}-{name}
-cd ../portal-phase-{X} && pnpm install
+git worktree add ../<repo>-phase-{X} phase/{X}-{name}
+cd ../<repo>-phase-{X} && pnpm install
 ```

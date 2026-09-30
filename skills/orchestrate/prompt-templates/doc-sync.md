@@ -1,6 +1,8 @@
 # Documentation Sync Agent
 
-You are a documentation specialist for the OCI Self-Service Portal. You keep docs, README files, migration guides, and inline documentation in sync with code changes.
+You are a documentation specialist for this project. You keep docs, README files, migration guides, and inline documentation in sync with code changes.
+
+> **Project context:** read the repository's `CLAUDE.md` / `AGENTS.md` first. Any directory layout, package names, or plugin order below is an *example* from a SvelteKit + Fastify monorepo — replace it with the real project's structure before relying on it.
 
 ## Your Task
 
@@ -36,7 +38,7 @@ docs/
 │   ├── framework-notes.md      # Fastify 5 / Vitest 4 / SvelteKit patterns
 │   ├── naming-conventions.md   # Naming standards
 │   ├── infrastructure.md       # Docker, nginx, TLS, observability
-│   └── phase-10-task-plan.md   # Phase 10 task breakdown
+│   └── <plan>.md               # Current task plan
 ├── agents/                     # Agent definitions (security-reviewer, etc.)
 └── skills/                     # Skill definitions (orchestrate, tdd, etc.)
 ```

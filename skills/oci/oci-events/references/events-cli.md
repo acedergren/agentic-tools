@@ -1,4 +1,6 @@
-# OCI CLI for Events Service Operations
+# OCI Events CLI Reference
+
+Last verified: 2026-09-30 against OCI CLI 3.94.1.
 
 Complete OCI CLI commands for event-driven automation and event rule management.
 
@@ -21,22 +23,13 @@ echo "Compartment: $COMPARTMENT_ID"
 ## List Available Event Types
 
 ```bash
-# List all event types across OCI services
-oci events event-type list --all --output table
-
-# Filter by service (e.g., compute)
-oci events event-type list \
-  --all \
-  | jq '.data[] | select(.name | contains("compute"))'
-
-# Common event types by service
-oci events event-type list --all \
-  | jq -r '.data[] | .name' \
-  | grep -E "^com.oraclecloud.(compute|database|objectstorage|iam)"
-
-# Get specific event type details
-oci events event-type get \
-  --event-type "com.oraclecloud.computeapi.launchinstance"
+# There is no CLI command that lists event types (`oci events` only has `rule`).
+# Find event type strings in:
+#  - the Console rule editor (Observability & Management > Events Service > Rules > Create Rule),
+#    which lists services and event types and shows the generated condition JSON
+#  - docs: "Services that Produce Events" and each service's events page
+# Inspect a real payload by routing the event to a Notifications email/HTTPS subscription or a stream.
+oci events rule list --compartment-id "$COMPARTMENT_ID" --all --output table
 ```
 
 ## Create Event Rules
@@ -333,10 +326,8 @@ oci iam policy create \
 ### Test Event Rule Condition
 
 ```bash
-# Get sample event payload for event type
-oci events event-type get \
-  --event-type "com.oraclecloud.computeapi.launchinstance" \
-  | jq '.data."schema"'
+# Get a sample payload: the service's events docs page shows example payloads,
+# or capture one by sending the event to a Notifications email/HTTPS subscription.
 
 # Manually trigger event (for testing)
 # Note: OCI Events doesn't support manual event injection
@@ -388,7 +379,6 @@ oci monitoring metric-data summarize-metrics-data \
 ONS_TOPIC=$(oci ons topic create \
   --compartment-id $COMPARTMENT_ID \
   --name "CSV-Processing-Topic" \
-  --wait-for-state ACTIVE \
   --query 'data.id' --raw-output)
 
 # Create function (assume already deployed)
@@ -528,10 +518,9 @@ oci events rule create \
 oci events rule get --rule-id $RULE_ID \
   | jq '.data."is-enabled"'
 
-# 2. Check if event type is correct
-oci events event-type list --all \
-  | jq -r '.data[] | .name' \
-  | grep -i "compute"
+# 2. Check the event type string against the Console rule editor or the
+#    service's events docs page (typos match nothing and fail silently)
+oci events rule get --rule-id "$RULE_ID" --query 'data.condition' --raw-output
 
 # 3. Check IAM policies
 oci iam policy list \
@@ -575,10 +564,7 @@ oci fn function get --function-id $FUNCTION_ID
 ### Event Filter Not Matching
 
 ```bash
-# Get event type schema to understand available fields
-oci events event-type get \
-  --event-type "com.oraclecloud.objectstorage.createobject" \
-  | jq '.data.schema'
+# Event payload fields: see the Object Storage events docs page for an example payload
 
 # Common filter fields:
 # - compartmentName: Name of compartment

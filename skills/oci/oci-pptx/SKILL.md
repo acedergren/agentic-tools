@@ -24,13 +24,15 @@ domains:
 ## Do NOT load this skill when
 
 Do not load this skill for unrelated general programming, non-Oracle cloud work, or questions covered by a narrower sibling skill.
-When the request is only asking to find or install skills, use `find-skills` instead.
 
 ## When to Use
 
 Load this skill for: the user asks to "create Oracle slides", "edit an Oracle deck", "build a CloudWorld presentation", "review Oracle-branded PPTX", or "apply Oracle brand to slides".
 
 Prefer this skill only for its named domain. For broader OCI architecture triage, start with `oci/best-practices` as the router.
+
+This skill holds Oracle brand and slide-design rules only. It does not bundle PPTX tooling: use `python-pptx` or PptxGenJS (see `references/implementation-examples.md`), or your agent's own PPTX skill, for file manipulation.
+
 ## Oracle-Branded Presentations with Cognitive Science
 
 ---
@@ -54,10 +56,10 @@ Do NOT load multiple references simultaneously.
 Based on Sweller (cognitive load theory), Mayer (multimedia learning), Phillips (Death by PowerPoint):
 
 ### 1. One Message Per Slide
-Each slide = exactly ONE key point. Multiple messages = divided attention = 0% retention of secondary message.
+Each slide = exactly ONE key point. Secondary messages compete for attention and are poorly retained.
 
 ### 2. Avoid Redundancy Effect
-Reading text while hearing speech = 0% retention (Mayer). Max 50 words per slide. Move details to speaker notes.
+Reading dense on-screen text while hearing the same words spoken hurts comprehension (Mayer's redundancy principle). Max 50 words per slide. Move details to speaker notes.
 
 ### 3. Size = Importance Hierarchy
 Largest element = most important content (may NOT be the headline). Make key metrics larger than titles when the metric IS the message.
@@ -74,7 +76,7 @@ Dark slides make the SPEAKER the highest-contrast object in the room — that's 
 
 ### 5. Maximum 6 Objects Per Slide
 Count ALL elements: images + shapes + text boxes + charts + decorative (exclude footer/header).
-Beyond 6: counting takes 500% more cognitive energy → audience disengages.
+Beyond about 6 elements the audience must scan instead of grasp the slide at a glance.
 Exception: Grid layouts where items form a single visual unit.
 
 ---
@@ -214,7 +216,7 @@ Oracle Sans Tab? Correct pillar palette? Background matches context? Footer corr
 ### Phase 4: Visual QA with Subagents
 ```bash
 # Convert to images for visual inspection
-python scripts/office/soffice.py --headless --convert-to pdf output.pptx
+soffice --headless --convert-to pdf output.pptx   # LibreOffice
 pdftoppm -jpeg -r 150 output.pdf slide
 ```
 
@@ -240,9 +242,9 @@ Do not declare success until at least one fix-and-verify cycle is complete.
 ## Reading/Inspecting Content
 
 ```bash
-python -m markitdown presentation.pptx        # Text extraction
-python scripts/thumbnail.py presentation.pptx  # Visual thumbnail grid
-python scripts/office/unpack.py file.pptx dir/ # Raw XML inspection
+python -m markitdown presentation.pptx         # Text extraction
+soffice --headless --convert-to pdf presentation.pptx && pdftoppm -jpeg -r 80 presentation.pdf thumb  # Visual check
+unzip -o presentation.pptx -d presentation_xml/  # Raw XML inspection (PPTX is a zip)
 ```
 
 ## Arguments

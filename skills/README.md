@@ -37,11 +37,7 @@ These skills chain into a complete implementation workflow:
 
 | Skill                   | Description                   | Version |
 | ----------------------- | ----------------------------- | ------- |
-| **humanizer**           | Remove AI writing patterns    | v3.0.0  |
-| **firecrawl**           | Web scraping CLI              | v3.0.0  |
 | **shadcn-svelte** | shadcn-svelte + Tailwind v4.1 | v3.0.0  |
-| **tanstack-query**      | TanStack Query v5 patterns    | v3.0.0  |
-| **turborepo**           | Monorepo architecture         | v3.0.0  |
 | **refactor-module**     | Terraform module extraction   | v3.0.0  |
 | **write-natural-swedish** | Natural Swedish writing with contemporary and tech-company presets | v1.0.0 |
 
@@ -64,7 +60,7 @@ For concrete example prompts, routing guidance, and multi-skill workflows, see [
 | **oci/zpr-security** | Zero Trust Packet Routing | v2.0.0 |
 | **oci/managed-bastion-access** | OCI Bastion access | v2.0.0 |
 | **oci/database-management** | Oracle database router | v2.0.0 |
-| **oci/oracle-dba** | Autonomous AI Database operations | v2.0.0 |
+| **oci/oracle-dba** | Autonomous AI Database control-plane operations | v3.0.0 |
 | **oci/secrets-management** | OCI Vault and secret operations | v2.0.0 |
 | **oci/fastify-better-auth-bridge** | Fastify Better Auth bridge | v1.0.0 |
 | **oci/oracle-idcs-better-auth-setup** | Oracle + IDCS auth setup | v1.0.0 |
@@ -87,12 +83,8 @@ CI validates that registry coverage stays in sync with the filesystem and docs.
 | **oci/database-management** | "create an OCI database", "choose DB System vs ADB", "manage PDB lifecycle", "route ADB work", or "plan Oracle database provisioning" |
 | **doc-sync** | Use when auditing or fixing drift between project documentation and the actual codebase. Detects stale architecture diag |
 | **oci/fastify-better-auth-bridge** | "bridge Better Auth into Fastify", "fix Fastify session resolution", "forward auth cookies", "patch IDCS org context", or "decorate Fastify request auth" |
-| **find-skills** | Use when user asks to find, install, or search for agent skills. Also use when user asks 'can you do X' or 'is there a s |
 | **oci/finops-cost-optimization** | "optimize OCI cost", "investigate an OCI bill", "estimate egress cost", "right-size OCI resources", or "plan Resource Scheduler savings" |
-| **firecrawl** | Use when scraping web pages, extracting content from JS-rendered sites or SPAs, running search-plus-scrape workflows, or |
-| **oci/genai-services** | "call OCI Generative AI", "choose an OCI GenAI model", "debug GenAI 429", "plan OCI RAG", or "compare Command A, Llama, Gemini, or gpt-oss" |
 | **health-check** | Use when running codebase quality gates (typecheck, lint, tests, security, dead code, circular deps, audits). Reports pa |
-| **humanizer** | Use when making text sound human, removing AI tells, or fixing writing that sounds like ChatGPT. Detects and rewrites AI |
 | **oci/iam-identity-management** | "write OCI IAM policy", "debug OCI 403", "configure dynamic groups", "use identity domains", or "fix IDCS federation" |
 | **implement** | Use when implementing a feature, adding an endpoint, or making a non-trivial code change that requires pre-flight valida |
 | **oci/infrastructure-as-code** | "Terraform state on OCI", "native OCI backend", "Terraform import OCI", "Terraform apply 403", "Terraform ZPR", or "Terraform Bastion" |
@@ -107,7 +99,7 @@ CI validates that registry coverage stays in sync with the filesystem and docs.
 | **oci/oci-resource-manager** | "configure OCI Resource Manager", "debug Resource Manager job", "create ORM stack", "use Resource Manager private endpoint", or "fix Resource Manager dynamic group" |
 | **oci/oci-security-control-plane** | "choose OCI security control", "route OCI security issue", "compare Cloud Guard vs Security Zones", "decide ZPR vs NSG", or "use Bastion vs public SSH" |
 | **oci/zpr-security** | "configure ZPR", "debug Zero Trust Packet Routing", "write ZPL policy", "apply security attributes", or "protect OCI resources with ZPR" |
-| **oci/oracle-dba** | "manage Autonomous AI Database", "debug ADB performance", "fix wallet connection", "optimize ECPU cost", or "use SQLcl with Oracle Database" |
+| **oci/oracle-dba** | "provision Autonomous AI Database", "estimate ADB ECPU cost", "configure ADB auto scaling", "fix ADB wallet or mTLS connection", or "manage ADB backups and clones" |
 | **oci/oracle-idcs-better-auth-setup** | "connect Better Auth to OCI IAM", "configure identity domain OIDC", "fix IDCS callback URL", "set trusted origins", or "bootstrap Oracle auth provider" |
 | **oci/oracle-idcs-org-provisioning** | "map IDCS groups to orgs", "provision org_members from identity domains", "fix Better Auth active org", or "bootstrap first admin" |
 | **orchestrate** | Use when executing a multi-task implementation plan with parallel agents. Coordinates task assignment, wave sequencing,  |
@@ -122,12 +114,7 @@ CI validates that registry coverage stays in sync with the filesystem and docs.
 | **semgrep-coderabbit** | Use when reviewing code changes before commit or PR merge. Covers tool sequencing, finding severity priorities, fix orde |
 | **shadcn-svelte** | Use when working with shadcn-svelte components, TanStack Table in Svelte 5, or Tailwind v4.1. Covers non-obvious reactiv |
 | **oci/sqlite-to-oracle-planner** | "migrate SQLite to Oracle", "replace better-sqlite3", "plan Oracle migration", "convert SQLite schema", or "find SQLite touch points" |
-| **stitch-design-system** | Use when extracting a design system from a Stitch project to create a DESIGN.md source-of-truth for consistent multi-scr |
-| **stitch-prompt-engineer** | Use when enhancing, polishing, or fixing Stitch UI generation prompts. Adds UI/UX keywords, injects design system tokens |
-| **stitch-to-react** | Use when converting Stitch designs into production React components. Enforces modular architecture: logic in hooks, data |
-| **tanstack-query** | Use when debugging TanStack Query / React Query issues: v4→v5 migration errors (gcTime, isPending, throwOnError), infini |
 | **tdd** | Use when implementing features, fixing bugs, or adding deliberate test coverage. Enforces test-first (red-green-refactor |
-| **turborepo** | Use when making Turborepo monorepo architecture decisions: choosing between monorepo vs polyrepo, deciding when to split |
 | **write-tests** | Use when adding or improving test coverage for existing source code without changing production behavior. Selects mock s |
 
 ## Skill Quality Standards

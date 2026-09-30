@@ -1,6 +1,8 @@
 # QA Lead Agent
 
-You are a QA and testing specialist for the OCI Self-Service Portal. You write tests, run quality gates, and watch for regressions using strict TDD methodology.
+You are a QA and testing specialist for this project. You write tests, run quality gates, and watch for regressions using strict TDD methodology.
+
+> **Project context:** read the repository's `CLAUDE.md` / `AGENTS.md` first. Any directory layout, package names, or plugin order below is an *example* from a SvelteKit + Fastify monorepo — replace it with the real project's structure before relying on it.
 
 ## Your Task
 
@@ -61,7 +63,6 @@ Only if the implementation can be cleaner. Re-run the full suite after.
 ```
 apps/api/src/
 ├── plugins/*.test.ts          — Unit tests alongside plugins
-├── mastra/**/*.test.ts        — Agent, RAG, storage, workflow tests
 └── tests/
     ├── plugins/*.test.ts      — Plugin integration tests
     ├── routes/*.test.ts       — Route tests
@@ -89,7 +90,7 @@ Both workspaces use `mockReset: true` — this is the single most important conf
 
 ```typescript
 const mockGetSession = vi.fn();
-vi.mock('@portal/shared/server/auth/config', () => ({
+vi.mock('@app/shared/server/auth/config', () => ({
 	auth: { api: { getSession: (...args: unknown[]) => mockGetSession(...args) } }
 }));
 // In beforeEach: mockGetSession.mockResolvedValue(null);
@@ -163,7 +164,7 @@ const res = await app.inject({ method: 'POST', url: '/api/chat', payload: {...} 
 ### Logger Mock (standard shape)
 
 ```typescript
-vi.mock('@portal/shared/server/logger', () => ({
+vi.mock('@app/shared/server/logger', () => ({
 	createLogger: () => ({
 		info: vi.fn(),
 		warn: vi.fn(),

@@ -242,21 +242,6 @@ dependencies:
 
 **References**: `references/oci-vault-reference.md`.
 
-### `oci/genai-services`
-
-**Purpose**: Handles OCI Generative AI usage, model selection, model catalog checks, RAG planning, SDK/API choices, throttling, and high-drift model availability.
-
-**Use cases**:
-
-- "Choose an OCI GenAI model for a RAG assistant."
-- "Debug OCI Generative AI 429 errors."
-- "Compare Command A, Llama, Gemini, and gpt-oss options with current docs."
-- "Plan an OCI RAG architecture without relying on stale model tables."
-
-**Pair with**: `oci/monitoring-operations`, `oci/secrets-management`, `oci/infrastructure-as-code`, and `oci/finops-cost-optimization`.
-
-**References**: `references/oci-genai-reference.md`.
-
 ### `oci/oci-events`
 
 **Purpose**: Handles OCI Events rules, filters, CloudEvents payloads, Functions, Streaming, Notifications, and event delivery troubleshooting.
@@ -308,18 +293,18 @@ dependencies:
 
 ### `oci/oracle-dba`
 
-**Purpose**: Canonical Autonomous AI Database and Oracle Database operations skill for ADB, wallet, SQLcl, ECPU guidance, HA/DR, performance, wait events, and security.
+**Purpose**: Autonomous AI Database control-plane operations: provisioning, ECPU and auto-scaling billing, stop/start cost, wallets and mTLS/ACL, backups, clones, and ADB metrics. SQL, SQLcl, tuning, and database security go to Oracle's `oracle/skills` `db` pack.
 
 **Use cases**:
 
-- "Manage an Autonomous AI Database wallet connection."
-- "Debug ADB performance using SQLcl and wait events."
-- "Optimize ECPU cost for an Autonomous AI Database."
-- "Review ADB backup, security, and HA/DR posture."
+- "Fix an Autonomous AI Database wallet or mTLS connection."
+- "Estimate ECPU cost with compute auto scaling on."
+- "Create a long-term backup or a refreshable clone."
+- "Should I stop this ADB overnight, and what still bills?"
 
 **Pair with**: `oci/database-management`, `oci/secrets-management`, `oci/monitoring-operations`, and `oci/finops-cost-optimization`.
 
-**References**: `references/sqlcl-workflows.md`, `references/oci-cli-adb.md`, `references/oci-adb-best-practices.md`, `references/adb-security.md`, `references/adb-ha-dr.md`, `references/sql-patterns.md`, `references/cost-reference.md`, `references/mcp-tools.md`, `references/api_reference.md`.
+**References**: `references/adb-cli-reference.md`.
 
 ### `oci/sqlite-to-oracle-planner`
 
@@ -423,7 +408,7 @@ Example prompt: "Can ZPR replace our NSGs, and how should Terraform roll it out 
 ### Autonomous Database Application Integration
 
 1. Load `oci/database-management` to confirm the database path.
-2. Load `oci/oracle-dba` for ADB wallet, SQLcl, ECPU, security, and performance work.
+2. Load `oci/oracle-dba` for ADB wallet, ECPU, backup, and clone work; use Oracle's `oracle/skills` `db` pack for SQLcl, SQL tuning, and database security.
 3. Load `oci/secrets-management` for wallet and secret handling.
 4. Load `oci/iam-identity-management` for dynamic group or service principal access.
 5. Load `oci/monitoring-operations` for database health and alarms.
@@ -452,4 +437,3 @@ Use these prompts to pressure-test routing after changing the pack:
 - "Create an OCI Events rule that triggers a Function."
 - "Review whether this Oracle deck follows brand rules."
 - "Estimate OCI egress risk without hardcoded stale prices."
-- "Choose an OCI GenAI model for a RAG app using current docs."

@@ -30,7 +30,6 @@ domains:
 ## Do NOT load this skill when
 
 Do not load this skill for unrelated general programming, non-Oracle cloud work, or questions covered by a narrower sibling skill.
-When the request is only asking to find or install skills, use `find-skills` instead.
 
 ## When to Use
 
@@ -61,11 +60,13 @@ Many "out of capacity" launch failures are quota or service-limit problems rathe
 - Breaks portability when moving between regions
 - Use AD-agnostic designs: spread via fault domains, not hardcoded ADs
 
-**NEVER forget boot volume preservation flag in dev/test**
+**NEVER terminate without deciding the boot volume's fate**
 ```bash
-oci compute instance terminate --instance-id <id> --preserve-boot-volume false
+# Default: boot volume is deleted (--preserve-boot-volume defaults to false)
+oci compute instance terminate --instance-id <id> --force
+# Keep it deliberately (and track it — it keeps billing)
+oci compute instance terminate --instance-id <id> --preserve-boot-volume true --force
 ```
-Without `--preserve-boot-volume false`: orphaned boot volumes can keep charging after the instance is gone.
 
 **NEVER enable public IP on production instances**
 - Use bastion service or private endpoints for access
@@ -156,19 +157,22 @@ Benefits: No credential rotation, no secrets to manage, automatic token refresh.
 
 **Boot Volume backups do NOT include instance config**
 - Backup captures disk only — NOT shape, networking, or metadata
-- For DR: use custom images (captures config) or Terraform for infrastructure
+- Custom images also capture only the boot disk (plus image capabilities), not shape, VNICs or NSGs
+- For DR: rebuild instances from Terraform, restoring boot/block volumes from backups or replicas
 
-**Instance Metadata Service has 3 versions — always use v2**
-- v1: `http://169.254.169.254/opc/v1/` (legacy, vulnerable to SSRF)
-- v2: `http://169.254.169.254/opc/v2/` (requires session token, prevents SSRF)
-- v1 is still enabled by default on older instances
+**Instance Metadata Service: use v2 and disable the legacy endpoints**
+- v1: `http://169.254.169.254/opc/v1/` (legacy, no header required — SSRF-prone)
+- v2: `http://169.254.169.254/opc/v2/` requires the header `Authorization: Bearer Oracle`
+- Disable v1: `oci compute instance update --instance-id <id> --instance-options '{"areLegacyImdsEndpointsDisabled": true}'`
+  (check that Oracle Cloud Agent and your tooling already use v2 first)
+
+Last verified: 2026-09-30 (OCI CLI 3.94.1; docs.oracle.com Instance Metadata Service, Resource Billing for Stopped Instances)
 
 ## Progressive Loading Reference
 
-Load [`references/oci-compute-shapes-reference.md`](references/oci-compute-shapes-reference.md) when:
-- Comparing flexible shape specs (E4 vs E5 vs E6 vs A1/A2/A4.Flex)
-- Looking up bare metal, GPU, Dense I/O, or HPC shapes
-- Need official Oracle specs (memory limits, OCPU counts, network bandwidth)
+Load [`references/oci-compute-shapes-reference.md`](references/oci-compute-shapes-reference.md) for links to
+the official shape, launch, and instance-principal pages (it is a source map, not a spec table). Query
+live shapes with `oci compute shape list -c <compartment-ocid>`.
 
 Do NOT load for quick cost comparisons, capacity troubleshooting, or shape selection — this file covers those.
 

@@ -41,6 +41,7 @@ Use these scenarios before and after editing Oracle-related skills. A passing an
 | `OCI Bastion`, `Managed SSH`, `port forwarding session`, `dynamic port forwarding`, `client CIDR allowlist`, `Bastion plugin` | `oci/managed-bastion-access` |
 | `Cloud Guard vs Security Zones`, `ZPR vs NSG`, `Bastion vs public SSH`, `choose OCI security control` | `oci/oci-security-control-plane` |
 | `IDCS groups`, `identity domain`, `dynamic group`, `OIDC` | `oci/iam-identity-management` or the relevant identity auth skill |
-| `ADB wallet`, `SQLcl`, `ECPU`, `Autonomous AI Database` | `oci/oracle-dba` |
+| `ADB wallet`, `ECPU`, `Autonomous AI Database` provisioning/backups/clones | `oci/oracle-dba` |
+| `SQLcl`, SQL tuning, wait events, DB users | Oracle's `oracle/skills` `db` pack (not in this repo) |
 | `Vault secret rotation`, `BASE64`, `Secret Management` | `oci/secrets-management` |
-| `OCI GenAI model`, `Command A`, `Llama`, `Gemini`, `gpt-oss` | `oci/genai-services` |
+| `OCI GenAI model`, `Command A`, `Llama`, `Gemini`, `gpt-oss` | Oracle's official `oracle/skills` pack (`oci/enterprise-ai`) — not in this repo |

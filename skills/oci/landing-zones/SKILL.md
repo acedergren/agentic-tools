@@ -25,7 +25,6 @@ domains:
 ## Do NOT load this skill when
 
 Do not load this skill for unrelated general programming, non-Oracle cloud work, or questions covered by a narrower sibling skill.
-When the request is only asking to find or install skills, use `find-skills` instead.
 
 ## When to Use
 
@@ -81,10 +80,12 @@ oci iam compartment create --compartment-id $PARENT --name "Prod"
 # Result: Anyone can create public IPs, unencrypted buckets, etc.
 
 # GOOD: Security Zone enforces policies BEFORE resource creation
-oci cloud-guard security-zone-recipe create \
+oci cloud-guard security-recipe create \
   --compartment-id $TENANCY_ID \
   --display-name "CIS-Prod-Recipe" \
-  --security-policies '["deny-public-ip","deny-public-bucket"]'
+  --security-policies "$POLICY_IDS_JSON"   # JSON list of security-policy OCIDs, not names
+# Look up policy OCIDs first:
+#   oci cloud-guard security-policy-collection list-security-policies --compartment-id $TENANCY_ID --all
 
 oci cloud-guard security-zone create \
   --compartment-id $PROD_COMPARTMENT_ID \
@@ -111,7 +112,7 @@ Developers with dev access can accidentally delete prod resources. Cannot set di
 
 **NEVER skip tagging strategy**
 ```bash
-# Without tags: "oci.compute.instance: $5,234/month" — which team? which project?
+# Without tags, the cost report shows spend per service but not which team or project owns it.
 # Cannot chargeback, cannot identify waste.
 
 # RIGHT: Create tag namespace with mandatory defaults
@@ -120,7 +121,7 @@ oci iam tag-namespace create --compartment-id $TENANCY_ID --name "Organization"
 # Apply tag-defaults at compartment level (auto-applied to all resources)
 oci iam tag-default create \
   --compartment-id $WORKLOAD_COMPARTMENT_ID \
-  --tag-definition-id $COSTCENTER_TAG_ID \
+  --tag-definition-id $OWNER_TAG_ID \
   --value '${iam.principal.name}'
 ```
 
@@ -128,7 +129,7 @@ oci iam tag-default create \
 ```
 BAD: Spoke subnet → Internet Gateway
 - Data exfiltration undetectable
-- Egress cost $3k-5k/month per spoke (unmetered)
+- Every spoke has its own egress path to monitor and govern
 - No DPI or egress filtering
 
 GOOD - hub-spoke with centralized control:
@@ -198,7 +199,7 @@ Guardrails:
 1. **Inventory compartments** — export JSON filtered by tag `Environment=Prod`
 2. **Create/update recipe** — clone Oracle CIS recipe, append custom policies (no public LB, require CMEK). See `references/security-zone-automation.md`
 3. **Apply via CLI/Terraform** — loop compartments or use Terraform module
-4. **Detect drift nightly** — `oci cloud-guard security-zone list-problems`; alert on `PROBLEM` state
+4. **Detect drift nightly** — `oci cloud-guard problem list --compartment-id $TENANCY_ID --problem-category SECURITY_ZONE --compartment-id-in-subtree true --access-level ACCESSIBLE`; alert on new problems
 5. **Rollback procedure** — only remove zones with CISO approval; delete recipe only after all zones removed
 
 Full scripts in `references/security-zone-automation.md`. Treat as MANDATORY for bulk Security Zone changes.
@@ -228,6 +229,8 @@ Full scripts in `references/security-zone-automation.md`. Treat as MANDATORY for
 - Preparing architectural review or compliance audit
 - Comparing Core Landing Zone vs Operating Entities Landing Zone
 - Need official Oracle guidance on all five pillars (Security, Reliability, Performance, Cost, Operations)
+
+Last verified: 2026-09-30 (OCI CLI 3.94.1 for all commands; Oracle price list API)
 
 ## Arguments
 

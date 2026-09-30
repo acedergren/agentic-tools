@@ -1,7 +1,7 @@
 # OCI-PPTX Implementation Examples
 
 **When to load**: MANDATORY when implementing Oracle presentations from scratch with code.
-**Do NOT load**: If editing existing templates (use editing.md workflow instead).
+**Do NOT load**: If editing an existing Oracle template, edit it with `python-pptx` and keep the template's layouts instead of rebuilding slides.
 
 ---
 
@@ -173,7 +173,7 @@ function validateCognitiveLoad(slide) {
     validation.passed = false;
     validation.issues.push(
       `Object count: ${objectCount} exceeds limit of 6. ` +
-      `Audience brains disengage beyond 6 objects (500% more cognitive energy).`
+      `Beyond about 6 objects the audience scans instead of grasping the slide at a glance.`
     );
   } else if (objectCount === 6) {
     validation.warnings.push(
@@ -187,7 +187,7 @@ function validateCognitiveLoad(slide) {
     validation.passed = false;
     validation.issues.push(
       `Word count: ${wordCount} exceeds limit of 50. ` +
-      `Redundancy effect: reading text while hearing speech = 0% retention. ` +
+      `Redundancy effect: dense slide text that duplicates the spoken words hurts comprehension. ` +
       `Move detailed text to speaker notes.`
     );
   }

@@ -12,7 +12,7 @@ Load this skill when the user request matches the frontmatter description for sh
 
 ## NEVER
 
-- Never destructure Bits UI builders at module level (`const { trigger } = Dialog`) — builders are reactive objects, destructuring captures stale references. Use `asChild let:builder` pattern.
+- Never copy Svelte 4 / Bits UI 0.x examples (`asChild let:builder`, `builders={[builder]}`, `let:attrs`, `on:click`) into a Svelte 5 project — current shadcn-svelte uses Bits UI 1.x, where a trigger renders a custom element through the `{#snippet child({ props })}` snippet and you spread `props`.
 - Never pass `data: myData` directly to `createSvelteTable` — Svelte 5 runes require getter accessors or data never updates.
 - Never use `@tailwind base/components/utilities` in Tailwind v4.1 — directives silently do nothing; use `@import "tailwindcss"`.
 - Never expect `npm update` to patch shadcn components — they're forked into your codebase; you own maintenance.
@@ -50,23 +50,27 @@ Start with `<table>`, upgrade to TanStack only when you need 2+ features.
 
 ## Critical Anti-Patterns
 
-### #1: Early Builder Destructuring (Bits UI)
+### #1: Svelte 4 trigger syntax in a Svelte 5 project
 
 ```svelte
-<!-- WRONG - breaks all click handlers silently -->
-<script>
-  const { trigger } = Dialog;  // stale reference
-</script>
+<!-- WRONG (Bits UI 0.x / Svelte 4): asChild and builders no longer exist -->
+<Dialog.Trigger asChild let:builder>
+  <Button builders={[builder]}>Open</Button>
+</Dialog.Trigger>
 
-<!-- CORRECT -->
-<Dialog.Root>
-  <Dialog.Trigger asChild let:builder>
-    <Button builders={[builder]}>Open</Button>
-  </Dialog.Trigger>
-</Dialog.Root>
+<!-- RIGHT (Bits UI 1.x / Svelte 5): simplest form — style the trigger itself -->
+<Dialog.Trigger class={buttonVariants({ variant: "outline" })}>Open</Dialog.Trigger>
+
+<!-- RIGHT: render your own component via the child snippet and spread props -->
+<Dialog.Trigger>
+  {#snippet child({ props })}
+    <Button {...props} variant="outline">Open</Button>
+  {/snippet}
+</Dialog.Trigger>
 ```
 
-Symptom: Component renders, click handlers silently fail. Error says `undefined`, no mention of builders.
+Symptom: compile errors about `let:` directives or `asChild`, or a trigger that renders but doesn't
+open (props not spread onto the element).
 
 ### #2: TanStack Table — Missing `get` Accessors
 
@@ -147,15 +151,18 @@ Space-separated HSL format (not `hsl(H,S,L)`) is required for the `/alpha` Tailw
 
 ```svelte
 <Form.Field {form} name="email">
-  <Form.Control let:attrs>
-    <Form.Label>Email</Form.Label>
-    <Input {...attrs} type="email" bind:value={$formData.email} />
+  <Form.Control>
+    {#snippet children({ props })}
+      <Form.Label>Email</Form.Label>
+      <Input {...props} type="email" bind:value={$formData.email} />
+    {/snippet}
   </Form.Control>
   <Form.FieldErrors />
 </Form.Field>
 ```
 
-`let:attrs` spreads aria attributes automatically. `<Form.FieldErrors />` auto-wires to validation state.
+Formsnap v2 passes `props` (id, name, aria attributes) through the `children` snippet; spread them on the
+input. `<Form.FieldErrors />` auto-wires to validation state.
 
 ## Debugging Checklists
 
@@ -164,10 +171,10 @@ Space-separated HSL format (not `hsl(H,S,L)`) is required for the `/alpha` Tailw
 2. All state wrapped in `get` (sorting, pagination, filters)?
 3. Every `onXChange` has `typeof updater === "function"` guard?
 
-### Builder undefined
-1. `asChild let:builder` on Trigger?
-2. `builders={[builder]}` array passed to child?
-3. No module-level destructuring?
+### Trigger renders but does nothing
+1. Using `{#snippet child({ props })}` (not `asChild let:builder`)?
+2. `{...props}` spread onto the rendered element?
+3. Component versions match (Svelte 5 + Bits UI 1.x + current shadcn-svelte components)?
 
 ### Tailwind classes missing
 1. `@import "tailwindcss"` (not `@tailwind` directives)?
@@ -177,17 +184,16 @@ Space-separated HSL format (not `hsl(H,S,L)`) is required for the `/alpha` Tailw
 
 ## When to Load References
 
-**Load `references/datatable-tanstack-svelte5.md`** when:
+**Load `references/shadcn-datatable.md`** when:
 - Implementing 3+ table features (sorting + filtering + selection)
 - TanStack errors mentioning `columnDef` or `getCoreRowModel`
 - Row selection with checkboxes across paginated data
 
-**Load `references/form-patterns.md`** when:
-- Multi-step wizard forms with validation
-- Cross-field dependencies or async validation
-- Zod + superforms backend integration
+**Load `references/workflows.md`** for multi-phase component builds (install → compose → form wiring).
 
 Do NOT load references for library choice, anti-pattern debugging, or Tailwind migration — handle with this file.
+
+Last verified: 2026-09-30 (bits-ui.com child snippet docs; formsnap.dev Control docs; shadcn-svelte dialog docs)
 
 ## Arguments
 

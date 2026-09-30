@@ -2,7 +2,7 @@
 
 **Version**: 1.0.0
 **Status**: Production-Ready
-**Framework**: OCI Self-Service Portal (SvelteKit + Fastify + shared packages)
+**Framework**: written for pnpm monorepos (for example SvelteKit + Fastify + shared packages); adjust the lint/typecheck commands to your layout
 
 ## What This Skill Does
 

@@ -1,6 +1,6 @@
 # OCI CLI for Landing Zone Operations
 
-Complete OCI CLI commands for deploying and managing landing zones.
+OCI CLI commands for deploying and managing landing zones. Last verified: 2026-09-30 against OCI CLI 3.94.1 (subcommands and flags; not executed against a tenancy).
 
 ## Prerequisites
 
@@ -147,7 +147,6 @@ COSTCENTER_TAG=$(oci iam tag create \
   --tag-namespace-id $TAG_NAMESPACE \
   --name "CostCenter" \
   --description "Cost center for chargeback" \
-  --is-retired false \
   --query 'data.id' --raw-output)
 
 # Environment tag (mandatory, enum)
@@ -155,7 +154,6 @@ ENVIRONMENT_TAG=$(oci iam tag create \
   --tag-namespace-id $TAG_NAMESPACE \
   --name "Environment" \
   --description "Environment type" \
-  --is-retired false \
   --validator '{
     "validatorType": "ENUM",
     "values": ["Dev", "Test", "Prod", "Sandbox"]
@@ -167,7 +165,6 @@ OWNER_TAG=$(oci iam tag create \
   --tag-namespace-id $TAG_NAMESPACE \
   --name "Owner" \
   --description "Resource owner email or team" \
-  --is-retired false \
   --query 'data.id' --raw-output)
 
 # DataClassification tag
@@ -175,7 +172,6 @@ DATACLASS_TAG=$(oci iam tag create \
   --tag-namespace-id $TAG_NAMESPACE \
   --name "DataClassification" \
   --description "Data sensitivity classification" \
-  --is-retired false \
   --validator '{
     "validatorType": "ENUM",
     "values": ["Public", "Internal", "Confidential", "Restricted"]
@@ -187,7 +183,6 @@ BACKUP_TAG=$(oci iam tag create \
   --tag-namespace-id $TAG_NAMESPACE \
   --name "BackupPolicy" \
   --description "Backup retention policy" \
-  --is-retired false \
   --validator '{
     "validatorType": "ENUM",
     "values": ["None", "Bronze", "Silver", "Gold"]
@@ -245,7 +240,7 @@ oci iam tag list \
 
 ```bash
 # Create CIS Foundation recipe
-CIS_RECIPE=$(oci cloud-guard security-zone-recipe create \
+CIS_RECIPE=$(oci cloud-guard security-recipe create \
   --compartment-id $TENANCY_ID \
   --display-name "CIS-Foundation-Recipe" \
   --description "CIS OCI Foundations Benchmark security policies" \
@@ -253,7 +248,7 @@ CIS_RECIPE=$(oci cloud-guard security-zone-recipe create \
   --query 'data.id' --raw-output)
 
 # Create production-specific recipe (stricter)
-PROD_RECIPE=$(oci cloud-guard security-zone-recipe create \
+PROD_RECIPE=$(oci cloud-guard security-recipe create \
   --compartment-id $TENANCY_ID \
   --display-name "Production-Recipe" \
   --description "Production security requirements" \
@@ -283,9 +278,8 @@ oci cloud-guard security-zone create \
 
 ```bash
 # List all security zones
-oci cloud-guard security-zone list \
+oci cloud-guard security-zone-collection list-security-zones \
   --compartment-id $TENANCY_ID \
-  --compartment-id-in-subtree true \
   --all \
   --output table
 
@@ -355,7 +349,7 @@ oci cloud-guard problem list \
 
 ```bash
 # Create monthly budget for production
-PROD_BUDGET=$(oci budgets budget create \
+PROD_BUDGET=$(oci budgets budget budget create \
   --compartment-id $TENANCY_ID \
   --amount 25000 \
   --reset-period MONTHLY \
@@ -366,7 +360,7 @@ PROD_BUDGET=$(oci budgets budget create \
   --query 'data.id' --raw-output)
 
 # Create budget for dev environment (lower threshold)
-DEV_BUDGET=$(oci budgets budget create \
+DEV_BUDGET=$(oci budgets budget budget create \
   --compartment-id $TENANCY_ID \
   --amount 5000 \
   --reset-period MONTHLY \
@@ -377,7 +371,7 @@ DEV_BUDGET=$(oci budgets budget create \
   --query 'data.id' --raw-output)
 
 # Create budget for tags (cost center-based)
-oci budgets budget create \
+oci budgets budget budget create \
   --compartment-id $TENANCY_ID \
   --amount 50000 \
   --reset-period MONTHLY \
@@ -391,7 +385,7 @@ oci budgets budget create \
 
 ```bash
 # Alert at 50% threshold
-oci budgets alert-rule create \
+oci budgets budget alert-rule create \
   --budget-id $PROD_BUDGET \
   --type ACTUAL \
   --threshold 50 \
@@ -401,7 +395,7 @@ oci budgets alert-rule create \
   --recipients "sre-team@example.com"
 
 # Alert at 80% threshold
-oci budgets alert-rule create \
+oci budgets budget alert-rule create \
   --budget-id $PROD_BUDGET \
   --type ACTUAL \
   --threshold 80 \
@@ -411,7 +405,7 @@ oci budgets alert-rule create \
   --recipients "sre-team@example.com,cfo@example.com"
 
 # Alert at 100% threshold
-oci budgets alert-rule create \
+oci budgets budget alert-rule create \
   --budget-id $PROD_BUDGET \
   --type ACTUAL \
   --threshold 100 \
@@ -421,7 +415,7 @@ oci budgets alert-rule create \
   --recipients "sre-team@example.com,cfo@example.com,ceo@example.com"
 
 # Forecast alert (predict 100% in current month)
-oci budgets alert-rule create \
+oci budgets budget alert-rule create \
   --budget-id $PROD_BUDGET \
   --type FORECAST \
   --threshold 100 \
@@ -435,13 +429,13 @@ oci budgets alert-rule create \
 
 ```bash
 # List all budgets
-oci budgets budget list \
+oci budgets budget budget list \
   --compartment-id $TENANCY_ID \
   --target-type COMPARTMENT \
   --output table
 
 # Get budget utilization
-oci budgets budget get \
+oci budgets budget budget get \
   --budget-id $PROD_BUDGET
 ```
 
@@ -586,7 +580,7 @@ oci network route-table update \
 
 ```bash
 # Get DRG route table ID
-DRG_RT=$(oci network drg list-drg-route-tables \
+DRG_RT=$(oci network drg-route-table list \
   --drg-id $DRG \
   --query 'data[0].id' \
   --raw-output)
@@ -603,18 +597,15 @@ oci network drg-route-distribution create \
 ### Upload Landing Zone Terraform Configuration
 
 ```bash
-# Create ZIP file with Terraform configs
-cd landing-zone-terraform/
-zip -r ../landing-zone.zip ./*
-cd ..
+# Create ZIP file with Terraform configs (the CLI reads and uploads the zip itself)
+(cd landing-zone-terraform && zip -r ../landing-zone.zip .)
 
 # Create Resource Manager stack
 STACK=$(oci resource-manager stack create \
   --compartment-id $TENANCY_ID \
   --display-name "OCI-Landing-Zone-Stack" \
   --description "Complete landing zone deployment" \
-  --config-source-type ZIP_UPLOAD \
-  --zip-file-base64 "$(base64 landing-zone.zip)" \
+  --config-source landing-zone.zip \
   --variables '{
     "tenancy_ocid": "'$TENANCY_ID'",
     "region": "us-ashburn-1",
@@ -714,14 +705,13 @@ oci network vcn list \
   --output table
 
 # List Security Zones
-oci cloud-guard security-zone list \
+oci cloud-guard security-zone-collection list-security-zones \
   --compartment-id $TENANCY_ID \
-  --compartment-id-in-subtree true \
   --all \
   --output table
 
 # List Budgets
-oci budgets budget list \
+oci budgets budget budget list \
   --compartment-id $TENANCY_ID \
   --output table
 ```
@@ -730,7 +720,7 @@ oci budgets budget list \
 
 ```bash
 # Get usage data for compartment
-oci usage-api usage summarized-usage get \
+oci usage-api usage-summary request-summarized-usages \
   --tenant-id $TENANCY_ID \
   --time-usage-started "2026-01-01T00:00:00Z" \
   --time-usage-ended "2026-01-31T23:59:59Z" \
@@ -738,7 +728,7 @@ oci usage-api usage summarized-usage get \
   --query-type COST \
   --group-by "[\"compartmentPath\"]" \
   --output json | jq '.data.items[] | {
-    compartment: .tags["Oracle-Tags"]["CreatedBy"],
+    compartment: .["compartment-path"],
     cost: .["computed-amount"]
   }'
 ```
