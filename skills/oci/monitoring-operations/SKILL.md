@@ -34,122 +34,105 @@ Prefer this skill only for its named domain. For broader OCI architecture triage
 
 ## NEVER Do This
 
-**NEVER debug "missing metrics" within the first 15 minutes**
-- Metrics are published every 1–5 minutes
-- Processing delay adds another 5–10 minutes
-- Total lag from event to visible metric: **10–15 minutes**
-- Premature debugging creates false investigations
-
-**NEVER use `=` for alarm thresholds with sparse metrics**
+**NEVER alert on "no data" with a threshold query — use `absent()`**
 ```
-# WRONG - alarm never fires when metric has data gaps
-MetricName[1m].mean() = 0
+# WRONG - a threshold alarm never evaluates when the metric stops arriving,
+# so a dead host / dead agent stays silent
+CpuUtilization[1m]{resourceId = "<instance-ocid>"}.mean() > 0
 
-# RIGHT - handle missing data explicitly
-MetricName[1m]{dataMissing=zero}.mean() > 0
+# RIGHT - absence alarm (default absence detection period: 2h, range 1m–3d)
+CpuUtilization[1m]{resourceId = "<instance-ocid>"}.groupBy(resourceId).absent()
+CpuUtilization[1m]{resourceId = "<instance-ocid>"}.groupBy(resourceId).absent(20m)
 ```
+OCI has no `treatMissingData` setting and no `{dataMissing=...}` MQL option (those are CloudWatch-isms).
+Use `groupBy(resourceId)` with `absent()`: without it, a new metric stream (new dimension value) can
+cause false triggers because the alarm watches every stream.
 
-**NEVER omit the `resourceId` dimension in metric queries**
-```
-# WRONG - returns no data (required dimension missing)
-CPUUtilization[1m].mean()
+**NEVER use MQL syntax in IAM policies (or vice versa)**
+- `=~` fuzzy matching (`{resourceDisplayName =~ "web-*"}` or `"a|b"`) is valid **only** in MQL dimension filters.
+- IAM policy conditions use `=`/`!=` and `/pattern*/` — see `oci/iam-identity-management`.
+- `&&` / `||` join whole queries, never dimension sets:
+  `CpuUtilization[1m]{faultDomain =~ "FAULT-DOMAIN-1|FAULT-DOMAIN-2" || resourceDisplayName = "x"}` is invalid.
 
-# RIGHT - filter by instance OCID
-CPUUtilization[1m]{resourceId="<instance-ocid>"}.mean()
+**NEVER fire on a single 1-minute sample**
 ```
-Querying without dimensions returns data for ALL resources — usually not what's intended, and rate-limited at 1000 req/min.
+# BAD - pages on every transient spike
+CpuUtilization[1m].mean() > 80
 
-**NEVER set alarm thresholds without a trigger delay**
+# BETTER - 5-minute window, plus a pending duration so the breach must persist
+CpuUtilization[5m]{resourceId = "<instance-ocid>"}.mean() > 80
 ```
-# BAD - fires on every transient CPU spike (alert fatigue)
-CPUUtilization[1m].mean() > 80
-
-# BETTER - fires only on sustained breach
-CPUUtilization[5m].mean() > 80
-# + set trigger delay: 5 minutes (5 consecutive breaches)
+```bash
+oci monitoring alarm create \
+  --compartment-id "$ALARM_COMPARTMENT" \
+  --metric-compartment-id "$METRIC_COMPARTMENT" \
+  --display-name "web-01 CPU > 80% for 10m" \
+  --namespace oci_computeagent \
+  --query-text 'CpuUtilization[5m]{resourceId = "<instance-ocid>"}.mean() > 80' \
+  --pending-duration PT10M \
+  --severity CRITICAL \
+  --destinations '["<notification-topic-ocid>"]' \
+  --is-enabled true
 ```
+The interval (`[5m]`) must be ≥ the metric's emission frequency (e.g. ADB `StorageUtilization` is
+hourly — use `[1h]`). `--pending-duration` is OCI's "trigger delay".
 
 **NEVER create alarms without notification destinations**
-```bash
-# WRONG - alarm fires but nobody is notified
-oci monitoring alarm create ... --destinations '[]'
+An alarm with `--destinations '[]'` changes state in the console and notifies nobody.
 
-# RIGHT - always link to a notification topic
-oci monitoring alarm create ... --destinations '["<notification-topic-ocid>"]'
-```
-Cost impact: undetected production outages = $5,000–50,000+/hour.
+**NEVER expect `oci_computeagent` metrics from an instance that can't reach Monitoring**
+They are emitted by the Oracle Cloud Agent's *Compute Instance Monitoring* plugin. The plugin must be
+enabled and the instance needs a route to OCI services (service gateway, NAT, or public IP).
+Check on the host: `systemctl status oracle-cloud-agent`.
 
-**NEVER ignore Cloud Guard findings**
-- Cloud Guard detects misconfigurations before they become incidents
-- Wire it: Cloud Guard → Notifications → email/Slack/PagerDuty
-- Unresolved findings fail CIS/SOC2/HIPAA audits
+**NEVER hand-write an unconditioned `any-user` policy for Connector Hub**
+`Allow any-user to ... in tenancy` with no `where` grants every principal in the tenancy.
+Accept the Console's default connector policy, or scope it yourself with
+`where all {request.principal.type = 'serviceconnector', request.principal.compartment.id = '<connector-compartment-ocid>'}`.
 
 ## Metric Namespace Reference
 
-OCI uses service-specific namespaces — using the wrong namespace returns no data with no error.
+Using the wrong namespace or metric-name casing returns no data rather than an error.
 
-| Service          | Namespace                    | Key Metrics                              |
-|------------------|------------------------------|------------------------------------------|
-| Compute          | `oci_computeagent`           | `CPUUtilization`, `MemoryUtilization`    |
-| Autonomous DB    | `oci_autonomous_database`    | `CpuUtilization`, `StorageUtilization`   |
-| Load Balancer    | `oci_lbaas`                  | `HttpRequests`, `UnHealthyBackendServers`|
-| Object Storage   | `oci_objectstorage`          | `ObjectCount`, `BytesUploaded`           |
+| Service | Namespace | Example metrics (exact casing) |
+|---------|-----------|--------------------------------|
+| Compute (agent) | `oci_computeagent` | `CpuUtilization`, `MemoryUtilization` |
+| Autonomous DB | `oci_autonomous_database` | `CpuUtilization` (relative to ECPUs), `StorageUtilization` (hourly) |
+| Load Balancer | `oci_lbaas` | `httpRequests`, `unhealthyBackendServers`, `backendTimeouts` |
+| Object Storage | `oci_objectstorage` | `ObjectCount`, `StoredBytes`, `AllRequests` |
 
-Common mistake: using `oci_compute` instead of `oci_computeagent` — the agent namespace requires the OCI Compute Agent to be running on the instance.
-
-## Alarm Missing Data Handling
-
-| Setting | Behavior | Use When |
-|---------|----------|----------|
-| `treatMissingDataAsBreaching` | Alarm fires if no data arrives | Critical services (silence = outage) |
-| `treatMissingDataAsNotBreaching` | Alarm silent if no data | Optional or intermittent monitoring |
-| `{dataMissing=zero}` in MQL | Treats gaps as 0 value | Request counters, throughput metrics |
+List what actually exists before writing a query:
+```bash
+oci monitoring metric list --compartment-id "$C" --namespace oci_computeagent
+```
 
 ## Log Collection Troubleshooting
 
 ```
-Logs not appearing in Log Analytics?
+Logs not arriving at the target (Logging Analytics, bucket, stream)?
 │
-├─ Is logging enabled on the resource?
-│  └─ Compute: is oci-compute-agent running? (systemctl status oracle-cloud-agent)
-│  └─ Functions: is logging enabled in function configuration?
+├─ Is the log enabled? (service log on the resource, or custom log via agent config)
+│  └─ Compute custom logs: Oracle Cloud Agent "Custom Logs Monitoring" plugin + agent configuration
 │
-├─ Is Service Connector configured and ACTIVE?
-│  └─ Source: Log Group → Target: Log Analytics
-│  └─ Check status: oci sch service-connector get --id <ocid>
+├─ Is the connector ACTIVE and moving data?
+│  └─ oci sch service-connector get --service-connector-id <ocid>
+│  └─ Enable the connector's own logs to see per-run errors
+│  └─ Connectors that fail for a long time are deactivated automatically
 │
-├─ IAM policy for Service Connector?
-│  └─ "Allow any-user to use log-content in tenancy"
-│  └─ "Allow service loganalytics to READ logcontent in tenancy"
-│  └─ Missing EITHER policy causes silent failure
+├─ Connector policies present? (Console offers default policies at create time;
+│  they remain after the connector is deleted — clean them up)
 │
-└─ 10–15 minute ingestion lag?
-   └─ Wait before concluding logs are missing
+└─ Failed runs recover data only within the Logging source's 24-hour retention period
 ```
-
-## Metric Query Performance
-
-Unfiltered queries scan ALL resources in compartment — slow and consumes rate limit budget.
-
-```
-# Expensive: scans all instances
-CPUUtilization[1m].mean()
-
-# Optimized: filter to specific instance
-CPUUtilization[1m]{resourceId='<instance-ocid>'}.mean()
-```
-
-Rate limit: 1000 metric queries/minute per tenancy. Dashboard with many unfiltered widgets can exhaust this.
 
 ## Progressive Loading Reference
 
-Load [`references/oci-monitoring-reference.md`](references/oci-monitoring-reference.md) when:
-- Need the complete list of OCI service metric namespaces and metric names
-- Writing complex MQL expressions (composites, functions, grouping)
-- Implementing composite alarm conditions
-- Setting up Log Analytics workspace, APM, or Service Connector Hub in detail
+Load [`references/oci-monitoring-reference.md`](references/oci-monitoring-reference.md) for the MQL
+grammar (intervals, statistics, predicates, fuzzy matching, joins, grouping) and verified examples.
+It is not a complete catalog of service metrics; use `oci monitoring metric list` or the service's
+metrics page for that.
 
-Do NOT load for alarm threshold patterns, namespace gotchas, or log troubleshooting — this file covers those.
+Last verified: 2026-09-30 (docs.oracle.com Monitoring MQL reference, absence alarms, Connector Hub; OCI CLI 3.94.1)
 
 ## Arguments
 

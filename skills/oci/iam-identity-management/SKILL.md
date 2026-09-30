@@ -46,21 +46,28 @@ Prefer this skill only for its named domain. For broader OCI architecture triage
 Allow any-user to manage all-resources in tenancy
 
 # RIGHT - explicit group, specific resource, specific compartment
-Allow group AppDevelopers to manage instance-family in compartment AppDev
-  where target.instance.name =~ 'dev-*'
+Allow group 'Default'/'AppDevelopers' to manage instance-family in compartment AppDev
 ```
+Policy conditions support only `=` and `!=` (plus `any {}` / `all {}`). There is no `=~`; that is
+MQL. Patterns use slashes: `/dev-*/`, `/*-prod/`, `/*web*/`, and matching is case-insensitive.
+A quoted `'dev-*'` is a literal string, not a wildcard.
 
-**NEVER place policy in a child compartment when the target resource is in a parent**
+**NEVER attach a policy below the compartment it grants on**
 ```
-# WRONG - policy in A/B/C cannot grant access to resources in A
-Policy location: Compartment A/B/C
-"Allow group X to read buckets in compartment A"  # Fails silently
+# WRONG - policy attached to A:B:C cannot reference A (outside its scope)
+Policy location: Compartment A:B:C
+"Allow group X to read buckets in compartment A"   # rejected when you create the policy
 
-# RIGHT - policy must be AT OR ABOVE the target compartment
-Policy location: Compartment A (or root tenancy)
+# RIGHT - attach at or above the target compartment
+Policy location: Compartment A (or the tenancy)
 "Allow group X to read buckets in compartment A"
+
+# Attached higher up? Use the compartment path relative to the attachment point:
+Policy location: tenancy
+"Allow group X to read buckets in compartment A:B"
 ```
-This is the single most common policy misconfiguration in OCI — no error is thrown, access just fails.
+Policies inherit downward: a grant on A also applies to A:B and A:B:C. The attachment
+location also decides who can edit the policy — attach it where the right admins own it.
 
 **NEVER use `any-user` in production policies**
 - Grants access to ALL future users, including compromised accounts
@@ -81,10 +88,23 @@ Allow dynamic-group app-instances to read buckets in compartment X
 # WRONG - breaks when instance is replaced
 ALL {instance.id = 'ocid1.instance.oc1.phx.xxxxx'}
 
-# RIGHT - use compartment or tag matching (survives instance replacement)
+# RIGHT - use compartment or defined-tag matching (survives instance replacement)
 ALL {instance.compartment.id = '<compartment-ocid>'}
-ANY {instance.freeform-tags.environment = 'production'}
+ANY {tag.Operations.Environment.value = 'production'}
 ```
+Dynamic group rules match **defined** tags as `tag.<namespace>.<key>.value`. There is no
+`instance.freeform-tags.*` variable.
+
+**NEVER forget that a condition variable that doesn't apply to a request denies it**
+```
+# This grants nothing for ListUsers/ListGroups: target.group.name is not
+# present on those requests, so the condition evaluates false.
+Allow group GroupAdmins to use groups in tenancy where target.group.name != 'Administrators'
+
+# Add the list permission in a separate, unconditioned statement:
+Allow group GroupAdmins to inspect groups in tenancy
+```
+`target.compartment.name`/`.id` cannot be used to filter List operations either.
 
 ## IAM Permission Troubleshooting
 
@@ -98,7 +118,8 @@ This error is intentionally ambiguous — OCI returns 404 whether the resource d
 ├─ Does the resource definitely exist?
 │  ├─ YES → Permission issue
 │  │  └─ Does caller have at least 'inspect' on that resource type?
-│  │  └─ Is policy at or above the target compartment?
+│  │  │  └─ Is policy at or above the target compartment?
+│  │  └─ Does a condition reference a variable the operation doesn't carry?
 │  └─ NO → Verify OCID, compartment, region
 │
 ├─ Using dynamic group / instance principal?
@@ -106,8 +127,8 @@ This error is intentionally ambiguous — OCI returns 404 whether the resource d
 │  └─ Does instance's compartment/tags match the dynamic group rule?
 │
 └─ Cross-compartment access?
-   └─ Policy must be in the compartment containing BOTH source and target
-      OR in root (tenancy)
+   └─ Groups live in an identity domain, not a compartment: the policy must be
+      attached at or above the *target* compartment (or in the tenancy)
 ```
 
 ### "403 NotAuthorized"
@@ -117,8 +138,9 @@ Caller is identified but explicitly lacks permission.
 **Common causes:**
 1. **Wrong verb**: Policy grants `read` but action requires `use` or `manage`
 2. **Wrong resource-type**: Granted `instance-family` but accessing `volume-family`
-3. **Condition doesn't match**: `where target.instance.name = 'prod-*'` but instance is `dev-web-1`
-4. **Propagation lag**: Policies take 10–60 seconds to take effect after creation/update
+3. **Condition doesn't match**: a quoted `'prod-*'` is literal; use `/prod-*/`
+4. **Identity domain prefix missing**: a group in a non-default domain must be written `'DomainName'/'GroupName'`
+5. **Propagation**: new or edited policies can take a short time to take effect; re-test before rewriting
 
 **Verb hierarchy** (each includes those below it):
 ```
@@ -145,38 +167,42 @@ Before changing HCL, identify the principal and scope:
 
 | Family | Includes | Common Mistake |
 |--------|----------|----------------|
-| `instance-family` | instances, console-connections, vnics, vnic-attachments | Does NOT include volumes |
-| `volume-family` | volumes, volume-backups, volume-attachments | Separate from instance-family |
-| `object-family` | buckets, objects | Objects are a separate resource type from buckets |
-| `database-family` | db-systems, databases, autonomous-databases | Very broad — scope carefully |
+| `instance-family` | instances, instance-images, instance-console-connection, console-histories, app-catalog-listing, volume-attachments (attach only) | Does NOT include VNICs/subnets (`virtual-network-family`) or volumes |
+| `volume-family` | volumes, volume-attachments, volume-backups, … | Separate from instance-family |
+| `object-family` | objectstorage-namespaces, buckets, objects | Objects are a separate resource type from buckets |
+| `database-family` | Base Database / Exadata DB systems, homes, databases, backups | Does NOT cover Autonomous DB — use `autonomous-database-family` (autonomous-databases, autonomous-backups) |
+
+`LaunchInstance` also needs `use vnics`, `use subnets` and `use network-security-groups` in the network compartment.
 
 ### Conditions (WHERE clause)
 
 ```
-# Tag-based
-where target.resource.tag.environment = 'production'
-where target.resource.freeform-tags.CostCenter = 'Engineering'
+# Defined-tag based (freeform tags are NOT usable in policy conditions)
+where target.resource.tag.Operations.Environment = 'production'
+where request.principal.group.tag.Operations.Project = 'alpha'
 
-# Resource name (regex)
-where target.instance.name =~ 'web-*'
+# Pattern match: slashes, not quotes, not =~
+where target.bucket.name = /logs-*/
 
 # Request properties
 where request.operation = 'LaunchInstance'
+where request.region = 'ARN'          # 3-letter region key (ARN = Stockholm)
 
 # Combined conditions
-where all {target.resource.tag.env = 'prod', target.compartment.name = 'AppProd'}
-where any {target.instance.shape = 'VM.Standard.E4.Flex', target.instance.shape = 'VM.Standard.A1.Flex'}
+where all {target.resource.tag.Operations.Environment = 'prod', request.permission != 'BUCKET_DELETE'}
+where any {request.user.name = 'alice', request.user.name = 'bob'}
 ```
+Tag-conditioned `manage` does not cover List or Create (the resource has no tag yet): add
+a separate `inspect` statement and create in an untagged scope, or tag via tag defaults.
 
 ### Location Syntax
 
 ```
-in compartment <name-or-ocid>          # Specific compartment only
-in tenancy                             # Root — applies everywhere
-in resource <resource-ocid>            # Rare; used for delegation
+in compartment <name>                  # Compartment (and, by inheritance, its subcompartments)
+in compartment id <compartment-ocid>   # Same, by OCID
+in compartment A:B                     # Path, when the policy is attached above A
+in tenancy                             # Whole tenancy
 ```
-
-Note: there is no built-in syntax for "compartment + all descendants" — to cover a subtree, put the policy in the parent compartment.
 
 ## Dynamic Group Patterns
 
@@ -185,15 +211,16 @@ Note: there is no built-in syntax for "compartment + all descendants" — to cov
 ALL {instance.compartment.id = '<compartment-ocid>'}
 ```
 
-**By tag** (flexible — survives instance replacement):
+**By defined tag** (flexible — survives instance replacement):
 ```
-ANY {instance.freeform-tags.app = 'webserver'}
+ANY {tag.Operations.App.value = 'webserver'}
 ```
 
 **Restrictive AND rule** (production workloads):
 ```
-ALL {instance.compartment.id = '<comp-ocid>', instance.freeform-tags.environment = 'production'}
+ALL {instance.compartment.id = '<comp-ocid>', tag.Operations.Environment.value = 'production'}
 ```
+Non-instance resources (functions, etc.) match with `resource.type`, `resource.id`, `resource.compartment.id`.
 
 ### Testing Dynamic Group Membership
 
@@ -218,14 +245,18 @@ oci os ns get  # Works only if instance principal is correctly configured
 | **API Key** | Local dev, CI/CD outside OCI | Manual rotation required |
 | **Instance Principal** | Apps on OCI compute | Only works on OCI compute |
 | **Resource Principal** | OCI Functions, Data Flow | Limited to specific services |
-| **Session Token** | Console federation via IDCS | Short-lived (~1 hour) |
+| **Session Token** | `oci session authenticate` (browser/federated login) | Short-lived; refresh with `oci session refresh` |
 
-## IDCS Federation Gotchas
+## Identity Domain Gotchas
 
-- OCI group names must **exactly match** IDCS group names (case-sensitive)
-- User can log in to console but can't see resources → Missing OCI IAM policy for the federated group
-- "Invalid credentials" → IDCS federation not configured in OCI tenancy settings
-- Group membership doesn't sync → OCI group name doesn't match IDCS group name
+- Groups live in identity domains. For the Default domain you may write `group Admins`; for any other
+  domain you must write `group 'DomainName'/'GroupName'` (and `dynamic-group 'DomainName'/'DgName'`).
+  Oracle recommends prefixing `'Default'/` anyway for readability.
+- User can log in but sees nothing → the domain group has no policy, or the policy omits the domain prefix.
+- External IdP (SAML/OIDC) users get OCI access through **domain group membership** (JIT provisioning or
+  SCIM sync); check the user's group membership inside the domain before touching policies.
+- Legacy tenancies not yet migrated to identity domains used IDCS federation with explicit IDCS→OCI
+  group mappings; that model does not apply to identity-domain tenancies.
 
 ## Compartment Hierarchy Design
 
@@ -250,13 +281,11 @@ Tenancy
 
 ## Progressive Loading Reference
 
-Load [`references/oci-iam-policies-reference.md`](references/oci-iam-policies-reference.md) when:
-- Writing complex policies with multiple conditions
-- Need service-specific verbs and permission lists
-- Troubleshooting policy evaluation order
-- Implementing least-privilege access for a specific service
+Load [`references/oci-iam-policies-reference.md`](references/oci-iam-policies-reference.md) for the
+general condition-variable table, pattern syntax, and known pitfalls. It links, rather than copies, the
+per-service verb/permission tables — open the service's policy reference page for those.
 
-Do NOT load for quick syntax examples, troubleshooting 403/404, or dynamic group rules — this file covers those.
+Last verified: 2026-09-30 (docs.oracle.com: Policy Syntax/Subjects, Conditions, General Variables, Policy Inheritance, Managing Dynamic Groups, Core Services and ADB policy references)
 
 Load [`../infrastructure-as-code/references/oci-terraform-auth-matrix.md`](../infrastructure-as-code/references/oci-terraform-auth-matrix.md) when Terraform, OCI DevOps, Resource Manager, Compute instance principals, resource principals, OKE workload identity, Cloud Shell, or CI/CD federation affect the caller.
 

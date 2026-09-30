@@ -45,7 +45,7 @@ with open('/tmp/key.pem', 'w') as f:
 os.chmod('/tmp/key.pem', 0o600)  # Too late — race condition!
 
 # RIGHT - secure BEFORE writing
-fd = os.open('/tmp/key.pem', os.O_CREAT | os.O_WRONLY, 0o600)
+fd = os.open('/tmp/key.pem', os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)  # EXCL: never reuse an existing file
 with os.fdopen(fd, 'w') as f:
     f.write(private_key)
 ```
@@ -54,12 +54,13 @@ with os.fdopen(fd, 'w') as f:
 ```
 BAD:  "Allow any-user to read secret-family in tenancy"
 BAD:  "Allow group Developers to manage secret-family in tenancy"
-GOOD: "Allow dynamic-group app-prod to read secret-family in compartment AppSecrets
-       where target.secret.name = 'db-*'"
+GOOD: "Allow dynamic-group app-prod to read secret-bundles in compartment AppSecrets
+       where target.secret.name = /db-*/"
+# Pattern matches use /.../; a quoted 'db-*' only matches a secret literally named db-*
 ```
 
 ❌ **NEVER retrieve secrets without a cache or refresh strategy**
-- OCI Secret Management is listed as free, so cache for latency, resilience, throttling, and blast-radius control rather than request-cost savings.
+- The Oracle price list has no SKU for secrets (vault keys and private vaults are billed; checked 2026-09-30), so cache for latency, resilience, throttling, and blast-radius control rather than request-cost savings.
 - Keep TTL shorter than the rotation detection window.
 - Force refresh on authentication failures that may indicate rotated downstream credentials.
 
@@ -71,18 +72,21 @@ GOOD: "Allow dynamic-group app-prod to read secret-family in compartment AppSecr
 
 ❌ **NEVER log secret contents** — even in debug/error messages; logs are retained in aggregation systems for years
 
-## IAM Permission Gotcha (Critical)
+## IAM Permissions (what retrieval actually needs)
 
-Secret retrieval requires **BOTH** of these:
+`GetSecretBundle` / `GetSecretBundleByName` require only `SECRET_BUNDLE_READ`, which is granted by
+`read secret-bundles` (also included in `read secret-family`). The caller does **not** need `use keys`
+to read a secret; Vault decrypts on the service side.
 ```
-"Allow dynamic-group X to read secret-family in compartment Y"
-"Allow dynamic-group X to use keys in compartment Y"
+# Runtime reader (least privilege)
+Allow dynamic-group 'Default'/'app-prod' to read secret-bundles in compartment AppSecrets
+
+# Secret administrators — CreateSecret needs KEY_ENCRYPT/KEY_DECRYPT (use keys) and VAULT_CREATE_SECRET (use vaults)
+Allow group 'Default'/'SecretAdmins' to manage secret-family in compartment AppSecrets
+Allow group 'Default'/'SecretAdmins' to use keys in compartment AppSecrets
+Allow group 'Default'/'SecretAdmins' to use vaults in compartment AppSecrets
 ```
-
-- `read secret-family` → list secrets and read metadata
-- `use keys` → **decrypt secret content** (all secrets are encrypted with a master key)
-
-**Without `use keys`**: Confusing 403 — "User not authorized to perform this operation." Hours of debugging because the error message doesn't mention key permissions.
+`secret-family` = `secrets`, `secret-versions`, `secret-bundles`.
 
 ## Vault Hierarchy (Often Confused)
 
@@ -93,42 +97,40 @@ Vault (container)
          └─ Secret Versions (rotation over time)
 ```
 
-**Commands use different services — this trips everyone up:**
+**Commands use different CLI services — this trips everyone up:**
 - Vault operations: `oci kms management vault ...`
 - Key operations: `oci kms management key ... --endpoint <vault-management-endpoint>`
-- Secret operations: `oci vault secret ...` (NOT `oci kms`!)
+- Secret management: `oci vault secret create-base64 | update-base64 | list | get | schedule-secret-deletion`
+- Secret *retrieval*: `oci secrets secret-bundle get --secret-id <ocid>` (a separate `secrets` service)
 
-Common mistake: `oci vault-secret create` (no such command) vs `oci vault secret create` (correct)
+`oci vault secret` has no plain `create` or `delete` subcommand; use `create-base64` and
+`schedule-secret-deletion`.
 
 ## Secret Retrieval Error Decision Tree
 
 ```
 Secret retrieval fails?
 │
-├─ 401 Unauthorized
-│  ├─ On OCI compute? → Check dynamic group membership
-│  ├─ Local dev? → Check ~/.oci/config, verify API key uploaded
-│  └─ After rotation? → Cache has old credentials (wait for TTL)
+├─ 401 NotAuthenticated
+│  ├─ Local dev? → ~/.oci/config profile, key fingerprint uploaded, clock skew
+│  └─ Instance/resource principal? → SDK signer not configured for principals
 │
-├─ 403 Forbidden
-│  ├─ Have "read secret-family"? → Add if missing
-│  └─ Have "use keys"? → THIS IS USUALLY THE ISSUE
+├─ 404 NotAuthorizedOrNotFound (the usual symptom of a missing policy)
+│  ├─ Is the caller in the dynamic group? (check the rule vs instance compartment/tags)
+│  ├─ Is there "read secret-bundles" (or read secret-family) on the secret's compartment?
+│  ├─ Condition on target.secret.name correct? (/pattern*/, not 'pattern*')
+│  └─ Right OCID and region? Secret scheduled for deletion?
 │
-├─ 404 Not Found
-│  ├─ Wrong OCID? → Verify env variable
-│  ├─ Wrong compartment? → Secrets client must use secret's compartment
-│  └─ Secret deleted? → Check vault for secret status
-│
-└─ 500 Internal Server Error
-   └─ Vault rate limit → Retry with exponential backoff
+└─ 429 TooManyRequests
+   └─ Throttled → cache secrets, retry with exponential backoff and jitter
 ```
 
 ## Secret Rotation (Zero-Downtime)
 
 ```bash
-# WRONG - creates new OCID, breaks all running apps
-oci vault secret delete --secret-id <secret-ocid>
-oci vault secret create ...
+# WRONG - a new secret gets a new OCID, breaking every app that references the old one
+oci vault secret schedule-secret-deletion --secret-id <secret-ocid>
+oci vault secret create-base64 ...
 
 # RIGHT - create new VERSION of existing secret (OCID unchanged)
 oci vault secret update-base64 \
@@ -183,14 +185,15 @@ oci iam dynamic-group create \
   --name "app-instances" \
   --matching-rule "instance.compartment.id = '<compartment-ocid>'"
 
-# 2. Grant Vault access (both policies required — see IAM gotcha above)
-# "Allow dynamic-group app-instances to read secret-family in compartment Secrets"
-# "Allow dynamic-group app-instances to use keys in compartment Secrets"
+# 2. Grant read access to secret contents (no key permission needed for reads)
+# "Allow dynamic-group 'Default'/'app-instances' to read secret-bundles in compartment Secrets"
 
 # 3. Application code — no credentials needed on instance
 signer = oci.auth.signers.InstancePrincipalsSecurityTokenSigner()
 secrets_client = oci.secrets.SecretsClient(config={}, signer=signer)
 ```
+
+Last verified: 2026-09-30 (docs.oracle.com Vault policy reference; OCI CLI 3.94.1; Oracle price list API)
 
 ## Reference Files
 
