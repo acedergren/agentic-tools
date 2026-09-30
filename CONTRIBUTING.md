@@ -151,6 +151,7 @@ A skill earns its place only if it adds knowledge, guardrails, or workflows a st
 3. **Date drift-prone content.** Add or update a `Last verified: YYYY-MM-DD` line in skills whose facts can drift.
 4. **Do not hard-code prices** unless they are verified, dated, and sourced.
 5. **Run `npm run skills:ci`.** It validates structure and registries, runs the install smoke test and secret scan, and lints OCI commands and IAM policy syntax (`scripts/ci/lint-oci-content.mjs`).
+   The CLI half needs the OCI CLI (`pip install oci-cli`); without it the lint warns and checks policy syntax only. Run it alone with `npm run skills:oci-lint`.
 6. **Use the OCI pressure scenarios** in `skills/oci-skill-pressure-scenarios.md` when editing Oracle skills.
 
 ## Reporting Issues

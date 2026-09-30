@@ -6,6 +6,8 @@ for (const script of [
   'scripts/ci/validate-skill-library.mjs',
   'scripts/ci/install-smoke.mjs',
   'scripts/ci/secret-scan.mjs',
+  'scripts/ci/lint-oci-content.test.mjs',
+  'scripts/ci/lint-oci-content.mjs',
 ]) {
   console.log(`\n== Running ${script} ==`);
   execFileSync('node', [script], { stdio: 'inherit' });

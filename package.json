@@ -42,6 +42,7 @@
     "skills:validate": "node scripts/ci/validate-skill-library.mjs",
     "skills:install-smoke": "node scripts/ci/install-smoke.mjs",
     "skills:secrets-check": "node scripts/ci/secret-scan.mjs",
+    "skills:oci-lint": "node scripts/ci/lint-oci-content.test.mjs && node scripts/ci/lint-oci-content.mjs",
     "skills:ci": "node scripts/ci/run-all.mjs"
   }
 }
