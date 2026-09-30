@@ -28,7 +28,6 @@ Use Autonomous AI Database and ADB as current/common terminology. Prefer ECPU wo
 ## Do NOT load this skill when
 
 Do not load this skill for unrelated general programming, non-Oracle cloud work, or questions covered by a narrower sibling skill.
-When the request is only asking to find or install skills, use `find-skills` instead.
 
 ## When to Use
 

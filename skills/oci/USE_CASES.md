@@ -242,21 +242,6 @@ dependencies:
 
 **References**: `references/oci-vault-reference.md`.
 
-### `oci/genai-services`
-
-**Purpose**: Handles OCI Generative AI usage, model selection, model catalog checks, RAG planning, SDK/API choices, throttling, and high-drift model availability.
-
-**Use cases**:
-
-- "Choose an OCI GenAI model for a RAG assistant."
-- "Debug OCI Generative AI 429 errors."
-- "Compare Command A, Llama, Gemini, and gpt-oss options with current docs."
-- "Plan an OCI RAG architecture without relying on stale model tables."
-
-**Pair with**: `oci/monitoring-operations`, `oci/secrets-management`, `oci/infrastructure-as-code`, and `oci/finops-cost-optimization`.
-
-**References**: `references/oci-genai-reference.md`.
-
 ### `oci/oci-events`
 
 **Purpose**: Handles OCI Events rules, filters, CloudEvents payloads, Functions, Streaming, Notifications, and event delivery troubleshooting.
@@ -452,4 +437,3 @@ Use these prompts to pressure-test routing after changing the pack:
 - "Create an OCI Events rule that triggers a Function."
 - "Review whether this Oracle deck follows brand rules."
 - "Estimate OCI egress risk without hardcoded stale prices."
-- "Choose an OCI GenAI model for a RAG app using current docs."

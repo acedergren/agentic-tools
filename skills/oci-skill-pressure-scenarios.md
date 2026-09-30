@@ -43,4 +43,4 @@ Use these scenarios before and after editing Oracle-related skills. A passing an
 | `IDCS groups`, `identity domain`, `dynamic group`, `OIDC` | `oci/iam-identity-management` or the relevant identity auth skill |
 | `ADB wallet`, `SQLcl`, `ECPU`, `Autonomous AI Database` | `oci/oracle-dba` |
 | `Vault secret rotation`, `BASE64`, `Secret Management` | `oci/secrets-management` |
-| `OCI GenAI model`, `Command A`, `Llama`, `Gemini`, `gpt-oss` | `oci/genai-services` |
+| `OCI GenAI model`, `Command A`, `Llama`, `Gemini`, `gpt-oss` | Oracle's official `oracle/skills` pack (`oci/enterprise-ai`) — not in this repo |

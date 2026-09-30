@@ -53,7 +53,7 @@ Do not load this skill for a narrow OCI task that already maps to one specialist
 | Monitoring, alarms, MQL, Service Connector | `oci/monitoring-operations` |
 | Billing, budgets, egress, Resource Scheduler savings | `oci/finops-cost-optimization` |
 | Vault, KMS, secret rotation, secret replication | `oci/secrets-management` |
-| OCI Generative AI, model catalog, RAG, rate limits | `oci/genai-services` |
+| OCI Generative AI, model catalog, RAG, rate limits | Oracle's official `oracle/skills` pack (`oci/enterprise-ai`) — not in this repo |
 | Events rules, CloudEvents, Functions, Streaming, Notifications | `oci/oci-events` |
 | Oracle-branded PPTX and slide decks | `oci/oci-pptx` |
 

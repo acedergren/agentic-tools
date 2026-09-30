@@ -47,11 +47,10 @@ Do not load this skill for a narrow, already-identified service task:
 | Autonomous AI Database / ADB operations, SQLcl, wallet, ECPU tuning | `oci/oracle-dba` |
 | Billing, egress, budgets, Resource Scheduler savings | `oci/finops-cost-optimization` |
 | Vault secrets, KMS, rotation, secret replication | `oci/secrets-management` |
-| OCI Generative AI, model choice, RAG, rate limits | `oci/genai-services` |
+| OCI Generative AI, model choice, RAG, rate limits | Oracle's official `oracle/skills` pack (`oci/enterprise-ai`) — not in this repo |
 | Events rules, CloudEvents, Functions, Streaming, Notifications | `oci/oci-events` |
 | ZPR, Bastion, Cloud Guard vs Security Zones, security-control routing | `oci/oci-security-control-plane` |
 
-When the request is only asking to find or install skills, use `find-skills` instead.
 
 ## Architecture Review Flow
 
@@ -76,7 +75,7 @@ When the request is only asking to find or install skills, use `find-skills` ins
 | `identity domain`, `IDCS`, `dynamic group`, `policy`, `403` | `oci/iam-identity-management` |
 | `ADB`, `Autonomous AI Database`, `wallet`, `SQLcl`, `ECPU` | `oci/oracle-dba` |
 | `Vault`, `KMS`, `secret rotation`, `BASE64`, `replication` | `oci/secrets-management` |
-| `OCI GenAI`, `Command A`, `Llama`, `Gemini`, `gpt-oss`, `RAG` | `oci/genai-services` |
+| `OCI GenAI`, `Command A`, `Llama`, `Gemini`, `gpt-oss`, `RAG` | Oracle's official `oracle/skills` pack (`oci/enterprise-ai`) — not in this repo |
 | `Events`, `CloudEvents`, `Functions`, `Streaming`, `Notifications` | `oci/oci-events` |
 | `Terraform`, `Resource Manager`, `state`, `import`, `drift` | `oci/infrastructure-as-code` |
 | `ZPR`, `Zero Trust Packet Routing`, `Bastion`, `Managed SSH`, `security control` | `oci/oci-security-control-plane` |

@@ -12,7 +12,6 @@ For a complete human-readable catalog with example prompts and multi-skill workf
 - `oci/compute-management`
 - `oci/database-management`
 - `oci/finops-cost-optimization`
-- `oci/genai-services`
 - `oci/iam-identity-management`
 - `oci/infrastructure-as-code`
 - `oci/landing-zones`

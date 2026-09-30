@@ -119,7 +119,7 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/):
 **Examples**:
 ```
 feat(skills): add performance-optimization skill
-fix(humanizer): correct pattern matching
+fix(tdd): correct mock bootstrap guidance
 docs: update installation instructions
 ```
 
